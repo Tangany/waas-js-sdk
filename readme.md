@@ -86,6 +86,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 ````
 
 ### general ethereum interface
+*Ethereum calls that are not wallet based*
 ````javascript
 (async () => {
     const eth = new WaasApi(...authdata).ethereum;
