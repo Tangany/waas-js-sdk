@@ -1,0 +1,3073 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Wallet as a Service",
+    "version": "1.1",
+    "description": "**Changelog**\n* Add paging via the `skiptoken` query parameter to improve server response times for long running endpoint call `GET /wallet`\n* Add support for private Ethereum networks via `tangany-ethereum-network` HTTP header\n* Add optional HTTP header `tangany-ethereum-tx-speed` that affects the amount of additional gas that is added to base gas amount required by the addressed Ethereum network. Use this setting to improve the transaction mining times\n",
+    "termsOfService": "",
+    "contact": {
+      "name": "Tangany GmbH",
+      "url": "https://tangany.com/contact/",
+      "email": "support@tangany.com"
+    }
+  },
+  "host": "api.tangany.com",
+  "paths": {
+    "/wallet": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Server response for a successful wallet list query",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "list": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "title": "Wallet",
+                    "description": "A wallet account that represents a single blockchain account.",
+                    "properties": {
+                      "wallet": {
+                        "type": "string",
+                        "title": "Wallet name",
+                        "description": "The name and a primary identifier of a wallet that cannot be changed after creation. Defaults to a random GUID when omitted as parameter. Examples: `u1938484`, `ae5de2d7-6314-463e-a470-0a47812fcbec`\n",
+                        "minLength": 1,
+                        "maxLength": 127,
+                        "pattern": "^[0-9a-zA-Z-]{1,127}$"
+                      },
+                      "version": {
+                        "type": "string",
+                        "description": "The version number of a wallet. The version is computed on wallet creation and only changes when a wallet is reset or overwritten.",
+                        "minLength": 32,
+                        "maxLength": 32,
+                        "pattern": "^(latest|[0-9a-z]{32})$"
+                      },
+                      "created": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Creation time in UTC",
+                        "example": "2019-03-07T10:19:14.000Z"
+                      },
+                      "updated": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Last updated time in UTC",
+                        "example": "2019-03-10T08:29:21.000Z"
+                      },
+                      "security": {
+                        "type": "string",
+                        "enum": [
+                          "software",
+                          "hsm"
+                        ],
+                        "description": "Configured wallet security level. Value `hsm` corresponds to FIPS 140-2 security standard",
+                        "example": "hsm"
+                      }
+                    },
+                    "required": [
+                      "wallet",
+                      "version"
+                    ]
+                  }
+                },
+                "skiptoken": {
+                  "type": "string",
+                  "title": "Skiptoken",
+                  "description": "Paging parameter returned by the endpoint to query the next batch of results when used as a query parameter in the call",
+                  "pattern": "[a-zA-Z0-9]+"
+                }
+              },
+              "required": [
+                "list"
+              ]
+            },
+            "examples": {
+              "application/json": {
+                "list": [
+                {
+                  "wallet": "dummy-wallet-d429af11af0d3f9acba61e7ef1f92aa1e2306502",
+                  "version": "latest",
+                  "created": "2019-03-26T13:08:51Z",
+                  "updated": "2019-03-26T13:08:51Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy-wallet-d95a9966f6666fd1437980506643fce1a59cfec9",
+                  "version": "latest",
+                  "created": "2019-03-22T21:04:03Z",
+                  "updated": "2019-03-22T21:04:03Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy-wallet-e4bddb240c27ab88f8eabe9d46872f29fc7b985e",
+                  "version": "latest",
+                  "created": "2019-03-22T21:04:53Z",
+                  "updated": "2019-03-22T21:04:53Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy-wallet-e89eee7ddf6554e21e3f3251a5d719dd1a644f1a",
+                  "version": "latest",
+                  "created": "2019-03-26T14:11:33Z",
+                  "updated": "2019-03-26T14:11:33Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy-wallet-eb73740a53230464c28c6158e82bf159a3bb24ae",
+                  "version": "latest",
+                  "created": "2019-03-22T23:50:47Z",
+                  "updated": "2019-03-22T23:50:47Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy-wallet-f8a6f2b4eb4e839340112050eab8c2a511e15ab4",
+                  "version": "latest",
+                  "created": "2019-03-22T21:03:13Z",
+                  "updated": "2019-03-22T21:03:13Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy-wallet-fafefe3fde3d5cc5a5a36eb0ed88320b6c357bfc",
+                  "version": "latest",
+                  "created": "2019-03-22T16:11:30Z",
+                  "updated": "2019-03-22T16:11:30Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy-wallet-ff5a65dd43306b8e181292cf2baed429cb76342f",
+                  "version": "latest",
+                  "created": "2019-03-22T21:04:29Z",
+                  "updated": "2019-03-22T21:04:29Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy001116",
+                  "version": "latest",
+                  "created": "2019-03-25T19:11:57Z",
+                  "updated": "2019-03-25T19:11:57Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy001147",
+                  "version": "latest",
+                  "created": "2019-03-25T19:11:43Z",
+                  "updated": "2019-03-25T19:11:43Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy001195",
+                  "version": "latest",
+                  "created": "2019-03-25T19:11:39Z",
+                  "updated": "2019-03-25T19:11:39Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy001213",
+                  "version": "latest",
+                  "created": "2019-03-25T19:11:30Z",
+                  "updated": "2019-03-25T19:11:30Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy001243",
+                  "version": "latest",
+                  "created": "2019-03-25T19:11:45Z",
+                  "updated": "2019-03-25T19:11:45Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy001352",
+                  "version": "latest",
+                  "created": "2019-03-25T19:11:59Z",
+                  "updated": "2019-03-25T19:11:59Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy0115",
+                  "version": "latest",
+                  "created": "2019-03-25T19:11:54Z",
+                  "updated": "2019-03-25T19:11:54Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy011583",
+                  "version": "latest",
+                  "created": "2019-03-25T19:11:49Z",
+                  "updated": "2019-03-25T19:11:49Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy001671",
+                  "version": "latest",
+                  "created": "2019-03-25T19:12:02Z",
+                  "updated": "2019-03-25T19:12:02Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy101699",
+                  "version": "latest",
+                  "created": "2019-03-25T19:11:51Z",
+                  "updated": "2019-03-25T19:11:51Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "dummy00198",
+                  "version": "latest",
+                  "created": "2019-03-25T19:11:41Z",
+                  "updated": "2019-03-25T19:11:41Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "e136ab43b3d241a8612dd8dbfcfdc354971487b0",
+                  "version": "latest",
+                  "created": "2019-03-20T20:14:25Z",
+                  "updated": "2019-03-20T20:14:25Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "e139ccc8b23a6c5581954a7bbecb3b0e188fcb41",
+                  "version": "latest",
+                  "created": "2019-03-22T23:53:36Z",
+                  "updated": "2019-03-22T23:53:36Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "e17e3098f68079ab4557faa601aa17513fdf0b98",
+                  "version": "latest",
+                  "created": "2019-03-21T07:23:40Z",
+                  "updated": "2019-03-21T07:23:40Z",
+                  "security": "software"
+                },
+                {
+                  "wallet": "e2e47f79a2dd9547196cfa9e478128b854aa5d2d",
+                  "version": "latest",
+                  "created": "2019-03-21T07:41:31Z",
+                  "updated": "2019-03-21T07:41:31Z",
+                  "security": "software"
+                }
+                ],
+                "skiptoken": "eyJOZXh0TaFya2VyIjoiMiExMTIhTURbd01EUXdJV3RsZVM5Rk5UQkVSVVp10XkxRlJFSXdMVFEyUVVFdE9USkRPQzB5Tm12tJM1JqazJRa1Uzt1RZaeR1EQXdNREk0SVRrNU9Ua3RmNcv2FTXpGVU1qTTZOVGs2TlRrdU9UazVPVGs1T1ZvaCIsIlRhcmdldExvY2F0aW9uIj01wfQ"
+              }
+            }
+          },
+          "400": {
+            "description": "Server response for invalid request parameters",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "401": {
+            "description": "Server response for invalid authentication",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          }
+        },
+        "summary": "List all wallets",
+        "security": [
+        {
+          "subscription": []
+        },
+        {
+          "secret": []
+        },
+        {
+          "client": []
+        }
+        ],
+        "operationId": "list-wallets",
+        "description": "Lists all wallets for current clientId.",
+        "tags": [
+          "wallet"
+        ]
+      },
+      "post": {
+        "responses": {
+          "201": {
+            "description": "Server response for a successfuly created or recreated wallet",
+            "schema": {
+              "type": "object",
+              "title": "Wallet",
+              "description": "A wallet account that represents a single blockchain account.",
+              "properties": {
+                "wallet": {
+                  "type": "string",
+                  "title": "Wallet name",
+                  "description": "The name and a primary identifier of a wallet that cannot be changed after creation. Defaults to a random GUID when omitted as parameter. Examples: `u1938484`, `ae5de2d7-6314-463e-a470-0a47812fcbec`\n",
+                  "minLength": 1,
+                  "maxLength": 127,
+                  "pattern": "^[0-9a-zA-Z-]{1,127}$"
+                },
+                "version": {
+                  "type": "string",
+                  "description": "The version number of a wallet. The version is computed on wallet creation and only changes when a wallet is reset or overwritten.",
+                  "minLength": 32,
+                  "maxLength": 32,
+                  "pattern": "^(latest|[0-9a-z]{32})$"
+                },
+                "created": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Creation time in UTC",
+                  "example": "2019-03-07T10:19:14.000Z"
+                },
+                "updated": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Last updated time in UTC",
+                  "example": "2019-03-10T08:29:21.000Z"
+                },
+                "security": {
+                  "type": "string",
+                  "enum": [
+                    "software",
+                    "hsm"
+                  ],
+                  "description": "Configured wallet security level. Value `hsm` corresponds to FIPS 140-2 security standard",
+                  "example": "hsm"
+                }
+              },
+              "required": [
+                "wallet",
+                "version"
+              ]
+            },
+            "examples": {
+              "application/json": {
+                "wallet": "ae5de2d7-6314-463e-a470-0a47812fcbec",
+                "version": "e48c26c458c64c669cca3f6e46142698",
+                "created": "2019-03-12T11:25:32Z",
+                "updated": "2019-03-12T11:25:32Z",
+                "security": "hsm"
+              }
+            }
+          },
+          "400": {
+            "description": "Server response for invalid request parameters",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "401": {
+            "description": "Server response for invalid authentication",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "404": {
+            "description": "Server response for a non-existent wallet",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "409": {
+            "description": "Server response for trying to create a new wallet for a exisiting wallet name. Use `PUT` operation to overwrite an existing wallet.",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          }
+        },
+        "summary": "Create new wallet ",
+        "operationId": "create-wallet",
+        "parameters": [
+        {
+          "in": "body",
+          "name": "body",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "wallet": {
+                "type": "string",
+                "title": "Wallet name",
+                "description": "The name and a primary identifier of a wallet that cannot be changed after creation. Defaults to a random GUID when omitted as parameter. Examples: `u1938484`, `ae5de2d7-6314-463e-a470-0a47812fcbec`\n",
+                "minLength": 1,
+                "maxLength": 127,
+                "pattern": "^[0-9a-zA-Z-]{1,127}$"
+              },
+              "useHsm": {
+                "type": "boolean",
+                "title": "HSM usage",
+                "description": "Enhance wallet security via Hardware Secure Module usage for cryptographic operations. Only supported by certain subscritions.",
+                "example": true
+              }
+            },
+            "required": [
+              "wallet"
+            ]
+          },
+          "x-examples": {
+            "application/json": {
+              "wallet": "u1938484",
+              "useHsm": true
+            }
+          }
+        }
+        ],
+        "description": "Creates a new wallet",
+        "security": [
+        {
+          "subscription": []
+        },
+        {
+          "client": []
+        },
+        {
+          "secret": []
+        }
+        ],
+        "tags": [
+          "wallet"
+        ]
+      },
+      "parameters": [
+      {
+        "name": "skiptoken",
+        "in": "query",
+        "type": "string",
+        "pattern": "[a-zA-Z0-9]+",
+        "description": "Query the next page of the results batch"
+      }
+      ]
+    },
+    "/eth/wallet/{wallet}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Server response for a successful Ethereum wallet query",
+            "schema": {
+              "type": "object",
+              "title": "Ethereum Wallet",
+              "properties": {
+                "balance": {
+                  "type": "string",
+                  "title": "Ethereum wallet balance",
+                  "description": "Amount of ether that a wallet address holds. Examples: `2.3410` `0.0001803`",
+                  "minLength": 1,
+                  "pattern": "^\\d*\\.?\\d*$"
+                },
+                "address": {
+                  "type": "string",
+                  "title": "Ethereum address",
+                  "description": "A hexadecimal Ethereum address. Examples: `0xde0a21566919d193e6a28a9ac8534144cb697eee`",
+                  "minLength": 42,
+                  "maxLength": 42,
+                  "pattern": "^0x[a-f0-9]{40}$"
+                },
+                "currency": {
+                  "type": "string",
+                  "enum": [
+                    "ETHER"
+                  ],
+                  "pattern": "ETHER",
+                  "description": "Blockchain currency - Ether for Ethereum based blockchains",
+                  "example": "ETHER"
+                }
+              },
+              "required": [
+                "balance",
+                "address",
+                "currency"
+              ]
+            },
+            "examples": {
+              "application/json": {
+                "balance": "3.4361104",
+                "currency": "ETHER",
+                "address": "0x21877824166e5886129313738289ae19c6bea240"
+              }
+            }
+          },
+          "400": {
+            "description": "Server response for invalid request parameters",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "401": {
+            "description": "Server response for invalid authentication",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "403": {
+            "description": "Server response for a call that is not supported by the current subscription",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "404": {
+            "description": "Server response for a non-existent wallet",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          }
+        },
+        "summary": "Get wallet balance",
+        "operationId": "get-wallet-balance",
+        "description": "Returns wallet metrics for the Ethereum blockchain like ether balance and the address ",
+        "parameters": [],
+        "security": [
+        {
+          "subscription": []
+        },
+        {
+          "secret": []
+        },
+        {
+          "client": []
+        }
+        ],
+        "tags": [
+          "ethereum"
+        ]
+      },
+      "parameters": [
+      {
+        "in": "path",
+        "type": "string",
+        "name": "wallet",
+        "description": "Wallet name path parameter. Examples: `ae5de2d7-6314-463e-a470-0a47812fcbec`",
+        "required": true,
+        "pattern": "^[0-9a-zA-Z-]{3,24}$",
+        "maxLength": 3,
+        "minLength": 24
+      },
+      {
+        "name": "tangany-ethereum-network",
+        "in": "header",
+        "type": "string",
+        "description": "Defines a public network or an ethereum rpc endpoint to operate in. Supported public networks: `mainnet`, `ropsten`. Examples for private Ethereum RPC: `https://somenetwork.example.org:8540`",
+        "enum": [
+          "mainnet",
+          "ropsten"
+        ]
+      }
+      ]
+    },
+    "/eth/wallet/{wallet}/send": {
+      "post": {
+        "responses": {
+          "202": {
+            "description": "Server response for a Ethereum transaction that was queued to be mined by the Ethereum virtual machine. Call `eth/transaction/{hash}` to retrieve the mining status for the transaction",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "hash": {
+                  "type": "string",
+                  "title": "Ethereum transaction hash",
+                  "minLength": 64,
+                  "maxLength": 64,
+                  "pattern": "^[a-z0-9]{64}$",
+                  "description": "Ethereum transaction hash that represents a blockchain operation. Examples: `0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060`",
+                  "example": "0xca394b7602a6b71c8b3525028d0101eac6e4f3c08656c9efbdc5aee7665570d6"
+                }
+              },
+              "required": [
+                "hash"
+              ]
+            },
+            "examples": {
+              "application/json": {
+                "hash": "0x8c9e3ce99b9e80cb87ef95be285537f5e41d229561ee9bcac45d8c5f256f7b2c"
+              }
+            }
+          },
+          "400": {
+            "description": "Server response for invalid request parameters",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "401": {
+            "description": "Server response for invalid authentication",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "403": {
+            "description": "Server response for a call that is not supported by the current subscription",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "404": {
+            "description": "Server response for a non-existent wallet",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          }
+        },
+        "operationId": "make-wallet-transaction",
+        "description": "Send ether to address from given wallet",
+        "summary": "Make wallet transaction",
+        "security": [
+        {
+          "subscription": []
+        },
+        {
+          "secret": []
+        },
+        {
+          "client": []
+        }
+        ],
+        "parameters": [
+        {
+          "in": "body",
+          "name": "body",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "to": {
+                "type": "string",
+                "title": "Ethereum address",
+                "description": "A hexadecimal Ethereum address. Examples: `0xde0a21566919d193e6a28a9ac8534144cb697eee`",
+                "minLength": 42,
+                "maxLength": 42,
+                "pattern": "^0x[a-f0-9]{40}$"
+              },
+              "amount": {
+                "type": "string",
+                "description": "Amount of ether to send to t",
+                "minLength": 1,
+                "pattern": "^\\d*\\.?\\d*$"
+              }
+            },
+            "required": [
+              "to",
+              "amount"
+            ]
+          },
+          "x-examples": {
+            "application/json": {
+              "to": "0xde0a21566919d193e6a28a9ac8534144cb697eee",
+              "amount": "1.00001200000000345"
+            }
+          }
+        }
+        ],
+        "tags": [
+          "ethereum"
+        ]
+      },
+      "parameters": [
+      {
+        "in": "path",
+        "type": "string",
+        "name": "wallet",
+        "description": "Wallet name path parameter. Examples: `ae5de2d7-6314-463e-a470-0a47812fcbec`",
+        "required": true,
+        "pattern": "^[0-9a-zA-Z-]{3,24}$",
+        "maxLength": 3,
+        "minLength": 24
+      },
+      {
+        "name": "tangany-ethereum-network",
+        "in": "header",
+        "type": "string",
+        "description": "Defines a public network or an ethereum rpc endpoint to operate in. Supported public networks: `mainnet`, `ropsten`. Examples for private Ethereum RPC: `https://somenetwork.example.org:8540`",
+        "enum": [
+          "mainnet",
+          "ropsten"
+        ]
+      },
+      {
+        "name": "header-ethereum-tx-speed",
+        "in": "header",
+        "type": "string",
+        "default": "default",
+        "enum": [
+          "none",
+          "slow",
+          "default",
+          "fast"
+        ],
+        "description": "(Optional header) Additional gas fee that is added to the base gas fee for the given ethereum network to speed up the mining process of the transaction. The usage of `none` value may result in the transaction never gets mined and is only intended to use for custom ethereum networks that employ zero gas price policies. Defaults to `default` when ommited from a transactional call.\n\nThe speed levels correspond with following Ethereum fees:\nSPEED|Gwei\n--|--\nnone|0\nslow|2\ndefault|5\nfast|15"
+      }
+      ]
+    },
+    "/eth/transaction/{hash}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Server response for a successful Ethereum transaction status query",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "isError": {
+                  "type": "boolean",
+                  "description": "True when Ethereum declines to mine an issued transaction. This can happen when e.g. insufficient gas was provided for the transaction."
+                },
+                "blockNr": {
+                  "title": "Ethereum block",
+                  "description": "Block number for a given Ethereum transaction. Equals null when the given transaction hash was not yet included in any block to be mined by the Ethereum Virtual Machine. Examples: `7238290`",
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "example": 45093
+                }
+              },
+              "required": [
+                "isError",
+                "blockNr"
+              ]
+            },
+            "examples": {
+              "application/json": {
+                "isError": false,
+                "blockNr": 7238290
+              }
+            }
+          },
+          "400": {
+            "description": "Server response for invalid request parameters",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "401": {
+            "description": "Server response for invalid authentication",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "403": {
+            "description": "Server response for a call that is not supported by the current subscription",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          }
+        },
+        "summary": "Get transaction status",
+        "operationId": "get-transaction-status",
+        "description": "Returns the mining status for a ethereum transaction.",
+        "security": [
+        {
+          "subscription": []
+        },
+        {
+          "secret": []
+        },
+        {
+          "client": []
+        }
+        ],
+        "tags": [
+          "ethereum"
+        ]
+      },
+      "parameters": [
+      {
+        "name": "hash",
+        "in": "path",
+        "type": "string",
+        "description": "Ethereum transaction hash path parameter. Examples: `0x8c9e3ce99b9e80cb87ef95be285537f5e41d229561ee9bcac45d8c5f256f7b2c`",
+        "required": true,
+        "maxLength": 64,
+        "minLength": 64,
+        "pattern": "^[a-z0-9]{64}$"
+      },
+      {
+        "name": "tangany-ethereum-network",
+        "in": "header",
+        "type": "string",
+        "description": "Defines a public network or an ethereum rpc endpoint to operate in. Supported public networks: `mainnet`, `ropsten`. Examples for private Ethereum RPC: `https://somenetwork.example.org:8540`",
+        "enum": [
+          "mainnet",
+          "ropsten"
+        ]
+      }
+      ]
+    },
+    "/eth/erc20/{token}/{wallet}/send": {
+      "parameters": [
+      {
+        "in": "path",
+        "type": "string",
+        "name": "wallet",
+        "description": "Wallet name path parameter. Examples: `ae5de2d7-6314-463e-a470-0a47812fcbec`",
+        "required": true,
+        "pattern": "^[0-9a-zA-Z-]{3,24}$",
+        "maxLength": 3,
+        "minLength": 24
+      },
+      {
+        "name": "tangany-ethereum-network",
+        "in": "header",
+        "type": "string",
+        "description": "Defines a public network or an ethereum rpc endpoint to operate in. Supported public networks: `mainnet`, `ropsten`. Examples for private Ethereum RPC: `https://somenetwork.example.org:8540`",
+        "enum": [
+          "mainnet",
+          "ropsten"
+        ]
+      },
+      {
+        "name": "token",
+        "in": "path",
+        "type": "string",
+        "required": true,
+        "description": "ERC20 token contract address path parameter. Examples: `0xb5a5f22694352c15b00323844ad545abb2b11028`",
+        "maxLength": 42,
+        "minLength": 42,
+        "pattern": "^0x[a-f0-9]{40}$"
+      },
+      {
+        "name": "header-ethereum-tx-speed",
+        "in": "header",
+        "type": "string",
+        "default": "default",
+        "enum": [
+          "none",
+          "slow",
+          "default",
+          "fast"
+        ],
+        "description": "(Optional header) Additional gas fee that is added to the base gas fee for the given ethereum network to speed up the mining process of the transaction. The usage of `none` value may result in the transaction never gets mined and is only intended to use for custom ethereum networks that employ zero gas price policies. Defaults to `default` when ommited from a transactional call.\n\nThe speed levels correspond with following Ethereum fees:\nSPEED|Gwei\n--|--\nnone|0\nslow|2\ndefault|5\nfast|15"
+      }
+      ],
+      "post": {
+        "responses": {
+          "202": {
+            "description": "Server response for a Ethereum transaction that was queued to be mined by the Ethereum virtual machine. Call `eth/transaction/{hash}` to retrieve the mining status for the transaction",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "hash": {
+                  "type": "string",
+                  "title": "Ethereum transaction hash",
+                  "minLength": 64,
+                  "maxLength": 64,
+                  "pattern": "^[a-z0-9]{64}$",
+                  "description": "Ethereum transaction hash that represents a blockchain operation. Examples: `0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060`",
+                  "example": "0xca394b7602a6b71c8b3525028d0101eac6e4f3c08656c9efbdc5aee7665570d6"
+                }
+              },
+              "required": [
+                "hash"
+              ]
+            },
+            "examples": {
+              "application/json": {
+                "hash": "0x8c9e3ce99b9e80cb87ef95be285537f5e41d229561ee9bcac45d8c5f256f7b2c"
+              }
+            }
+          },
+          "400": {
+            "description": "Server response for invalid request parameters",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "401": {
+            "description": "Server response for invalid authentication",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "403": {
+            "description": "Server response for a call that is not supported by the current subscription",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "404": {
+            "description": "Server response for a non-existent token or wallet",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          }
+        },
+        "summary": "Make token transaction",
+        "operationId": "make-token-transaction",
+        "description": "Send ERC20 tokens from given wallet to an Ethereum address",
+        "security": [
+        {
+          "subscription": []
+        },
+        {
+          "client": []
+        },
+        {
+          "secret": []
+        }
+        ],
+        "parameters": [
+        {
+          "in": "body",
+          "name": "body",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "to": {
+                "type": "string",
+                "title": "Ethereum address",
+                "description": "A hexadecimal Ethereum address. Examples: `0xde0a21566919d193e6a28a9ac8534144cb697eee`",
+                "minLength": 42,
+                "maxLength": 42,
+                "pattern": "^0x[a-f0-9]{40}$"
+              },
+              "amount": {
+                "type": "string",
+                "description": "ERC20 token amount to transfer. Must not fall below the token's decimals specification (e.g. \"1e-18\" is the minimum amount for a 18 decimals token)",
+                "minLength": 1,
+                "pattern": "^\\d*\\.?\\d*$"
+              }
+            },
+            "required": [
+              "to",
+              "amount"
+            ]
+          },
+          "x-examples": {
+            "application/json": {
+              "to": "0xa2a079232ef7140e2b4700973c49f297a50b2ecd",
+              "amount": "13.752658230123016985"
+            }
+          }
+        }
+        ],
+        "tags": [
+          "ethereum-erc20"
+        ]
+      }
+    },
+    "/eth/erc20/{token}/{wallet}": {
+      "parameters": [
+      {
+        "name": "token",
+        "in": "path",
+        "type": "string",
+        "required": true,
+        "description": "ERC20 token contract address path parameter. Examples: `0xb5a5f22694352c15b00323844ad545abb2b11028`",
+        "maxLength": 42,
+        "minLength": 42,
+        "pattern": "^0x[a-f0-9]{40}$"
+      },
+      {
+        "in": "path",
+        "type": "string",
+        "name": "wallet",
+        "description": "Wallet name path parameter. Examples: `ae5de2d7-6314-463e-a470-0a47812fcbec`",
+        "required": true,
+        "pattern": "^[0-9a-zA-Z-]{3,24}$",
+        "maxLength": 3,
+        "minLength": 24
+      },
+      {
+        "name": "tangany-ethereum-network",
+        "in": "header",
+        "type": "string",
+        "description": "Defines a public network or an ethereum rpc endpoint to operate in. Supported public networks: `mainnet`, `ropsten`. Examples for private Ethereum RPC: `https://somenetwork.example.org:8540`",
+        "enum": [
+          "mainnet",
+          "ropsten"
+        ]
+      }
+      ],
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Server response for a successful ERC20 token query",
+            "schema": {
+              "type": "object",
+              "title": "Ethereum Erc20 token balance",
+              "properties": {
+                "balance": {
+                  "type": "string",
+                  "title": "Ethereum ERC20 token balance",
+                  "description": "ERC20 token amount to transfer. Must not fall below the token's decimals specification Examples: `1200`, `1e-18` (min. possible amount for a 18 decimals token)",
+                  "minLength": 1,
+                  "pattern": "^\\d*\\.?\\d*$"
+                },
+                "currency": {
+                  "type": "string",
+                  "description": "ERC20 token symbol",
+                  "example": "CAT"
+                }
+              },
+              "required": [
+                "balance",
+                "currency"
+              ]
+            },
+            "examples": {
+              "application/json": {
+                "balance": "14235.76",
+                "currency": "CAT"
+              }
+            }
+          },
+          "400": {
+            "description": "Server response for invalid request parameters",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "401": {
+            "description": "Server response for invalid authentication",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "403": {
+            "description": "Server response for a call that is not supported by the current subscription",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "404": {
+            "description": "Server response for a non-existent wallet or token",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          }
+        },
+        "description": "Retrieves the token balance for given wallet",
+        "operationId": "get-token-balance",
+        "summary": "Get token balance",
+        "security": [
+        {
+          "subscription": []
+        },
+        {
+          "client": []
+        },
+        {
+          "secret": []
+        }
+        ],
+        "tags": [
+          "ethereum-erc20"
+        ]
+      }
+    },
+    "/subscription": {
+      "parameters": []
+    },
+    "/wallet/{wallet}": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Server response for a successful soft-deletion request for a wallet",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "recoveryId": {
+                  "type": "string",
+                  "title": "Wallet name",
+                  "description": "The name and a primary identifier of a wallet that cannot be changed after creation. Defaults to a random GUID when omitted as parameter. Examples: `u1938484`, `ae5de2d7-6314-463e-a470-0a47812fcbec`\n",
+                  "minLength": 1,
+                  "maxLength": 127,
+                  "pattern": "^[0-9a-zA-Z-]{1,127}$"
+                },
+                "scheduledPurgeDate": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Soft deleted wallets are purged by the system after a 90 days retention period. After that a recovery of the deleted key is impossible."
+                }
+              },
+              "required": [
+                "recoveryId",
+                "scheduledPurgeDate"
+              ]
+            },
+            "examples": {
+              "application/json": {
+                "recoveryId": "ae5de2d7-6314-463e-a470-0a47812fcbec",
+                "scheduledPurgeDate": "2019-03-12T11:25:32Z"
+              }
+            }
+          },
+          "400": {
+            "description": "Server response for invalid request parameters",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "401": {
+            "description": "Server response for invalid authentication",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "404": {
+            "description": "Server response for a non-existent wallet",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          }
+        },
+        "summary": "Delete existing wallet",
+        "operationId": "delete-wallet",
+        "description": "Soft-deletes a wallet so not writing operations cannot be executed for the associated blockchain account. Wallet recovery endpoints are not yet implemented into the API. Contact the support team to recover soft-deleted wallets during the retention period.",
+        "security": [
+        {
+          "subscription": []
+        },
+        {
+          "client": []
+        },
+        {
+          "secret": []
+        }
+        ],
+        "tags": [
+          "wallet"
+        ]
+      },
+      "put": {
+        "responses": {
+          "200": {
+            "description": "Server response for a successfuly created or recreated wallet",
+            "schema": {
+              "type": "object",
+              "title": "Wallet",
+              "description": "A wallet account that represents a single blockchain account.",
+              "properties": {
+                "wallet": {
+                  "type": "string",
+                  "title": "Wallet name",
+                  "description": "The name and a primary identifier of a wallet that cannot be changed after creation. Defaults to a random GUID when omitted as parameter. Examples: `u1938484`, `ae5de2d7-6314-463e-a470-0a47812fcbec`\n",
+                  "minLength": 1,
+                  "maxLength": 127,
+                  "pattern": "^[0-9a-zA-Z-]{1,127}$"
+                },
+                "version": {
+                  "type": "string",
+                  "description": "The version number of a wallet. The version is computed on wallet creation and only changes when a wallet is reset or overwritten.",
+                  "minLength": 32,
+                  "maxLength": 32,
+                  "pattern": "^(latest|[0-9a-z]{32})$"
+                },
+                "created": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Creation time in UTC",
+                  "example": "2019-03-07T10:19:14.000Z"
+                },
+                "updated": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Last updated time in UTC",
+                  "example": "2019-03-10T08:29:21.000Z"
+                },
+                "security": {
+                  "type": "string",
+                  "enum": [
+                    "software",
+                    "hsm"
+                  ],
+                  "description": "Configured wallet security level. Value `hsm` corresponds to FIPS 140-2 security standard",
+                  "example": "hsm"
+                }
+              },
+              "required": [
+                "wallet",
+                "version"
+              ]
+            },
+            "examples": {
+              "application/json": {
+                "wallet": "ae5de2d7-6314-463e-a470-0a47812fcbec",
+                "version": "e48c26c458c64c669cca3f6e46142698",
+                "created": "2019-03-12T11:25:32Z",
+                "updated": "2019-03-12T11:25:32Z",
+                "security": "hsm"
+              }
+            }
+          },
+          "400": {
+            "description": "Server response for invalid request parameters",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "401": {
+            "description": "Server response for invalid authentication",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "403": {
+            "description": "Server response for trying to replace the wallet with a different security setting. The security setting cannot be changed in this operation",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "404": {
+            "description": "Server response for a non-existent wallet. Use the `POST` operation to create a new wallet.",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          }
+        },
+        "summary": "Replace existing wallet",
+        "description": "Creates a new version of an existing wallet that will regenerate the cryptographic credentials and thus revoke writing access to the blockchain account of the previous wallet version.",
+        "operationId": "reset-wallet",
+        "security": [
+        {
+          "subscription": []
+        },
+        {
+          "client": []
+        },
+        {
+          "secret": []
+        }
+        ],
+        "tags": [
+          "wallet"
+        ],
+        "parameters": [
+        {
+          "in": "body",
+          "name": "body",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "useHsm": {
+                "type": "boolean",
+                "title": "HSM usage",
+                "description": "Enhance wallet security via Hardware Secure Module usage for cryptographic operations. Only supported by certain subscritions.",
+                "example": true
+              }
+            }
+          }
+        }
+        ]
+      },
+      "parameters": [
+      {
+        "in": "path",
+        "type": "string",
+        "name": "wallet",
+        "description": "Wallet name path parameter. Examples: `ae5de2d7-6314-463e-a470-0a47812fcbec`",
+        "required": true,
+        "pattern": "^[0-9a-zA-Z-]{3,24}$",
+        "maxLength": 3,
+        "minLength": 24
+      }
+      ],
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Server response for a successfuly created or recreated wallet",
+            "schema": {
+              "type": "object",
+              "title": "Wallet",
+              "description": "A wallet account that represents a single blockchain account.",
+              "properties": {
+                "wallet": {
+                  "type": "string",
+                  "title": "Wallet name",
+                  "description": "The name and a primary identifier of a wallet that cannot be changed after creation. Defaults to a random GUID when omitted as parameter. Examples: `u1938484`, `ae5de2d7-6314-463e-a470-0a47812fcbec`\n",
+                  "minLength": 1,
+                  "maxLength": 127,
+                  "pattern": "^[0-9a-zA-Z-]{1,127}$"
+                },
+                "version": {
+                  "type": "string",
+                  "description": "The version number of a wallet. The version is computed on wallet creation and only changes when a wallet is reset or overwritten.",
+                  "minLength": 32,
+                  "maxLength": 32,
+                  "pattern": "^(latest|[0-9a-z]{32})$"
+                },
+                "created": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Creation time in UTC",
+                  "example": "2019-03-07T10:19:14.000Z"
+                },
+                "updated": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Last updated time in UTC",
+                  "example": "2019-03-10T08:29:21.000Z"
+                },
+                "security": {
+                  "type": "string",
+                  "enum": [
+                    "software",
+                    "hsm"
+                  ],
+                  "description": "Configured wallet security level. Value `hsm` corresponds to FIPS 140-2 security standard",
+                  "example": "hsm"
+                }
+              },
+              "required": [
+                "wallet",
+                "version"
+              ]
+            },
+            "examples": {
+              "application/json": {
+                "wallet": "ae5de2d7-6314-463e-a470-0a47812fcbec",
+                "version": "e48c26c458c64c669cca3f6e46142698",
+                "created": "2019-03-12T11:25:32Z",
+                "updated": "2019-03-12T11:25:32Z",
+                "security": "hsm"
+              }
+            }
+          },
+          "400": {
+            "description": "Server response for invalid request parameters",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "401": {
+            "description": "Server response for invalid authentication",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          },
+          "404": {
+            "description": "Server response for a non-existent wallet",
+            "schema": {
+              "type": "object",
+              "title": "General Error",
+              "description": "Generic server response for failed requests",
+              "properties": {
+                "activityId": {
+                  "type": "string",
+                  "description": "Service tracing ID to debug the error call",
+                  "format": "uuid",
+                  "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Error description",
+                  "example": "missing authentication header tangany-client-id"
+                },
+                "statusCode": {
+                  "type": "number",
+                  "description": "Http status code ",
+                  "minimum": 100,
+                  "maximum": 599,
+                  "example": 401
+                }
+              },
+              "required": [
+                "activityId",
+                "message",
+                "statusCode"
+              ]
+            }
+          }
+        },
+        "summary": "Get wallet",
+        "description": "Returns information for given wallet name",
+        "operationId": "get-wallet",
+        "tags": [
+          "wallet"
+        ],
+        "security": [
+        {
+          "subscription": []
+        },
+        {
+          "client": []
+        },
+        {
+          "secret": []
+        }
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "subscription": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "tangany-subscription",
+      "description": "Product subscription key"
+    },
+    "client": {
+      "type": "apiKey",
+      "name": "tangany-client-id",
+      "in": "header",
+      "description": "Service to service authentication client ID"
+    },
+    "secret": {
+      "type": "apiKey",
+      "name": "tangany-client-secret",
+      "in": "header",
+      "description": "Service to service authentication client secret"
+    }
+  },
+  "definitions": {
+    "ethereum-address": {
+      "type": "string",
+      "title": "Ethereum address",
+      "description": "A hexadecimal Ethereum address. Examples: `0xde0a21566919d193e6a28a9ac8534144cb697eee`",
+      "minLength": 42,
+      "maxLength": 42,
+      "pattern": "^0x[a-f0-9]{40}$"
+    },
+    "ethereum-hash": {
+      "type": "string",
+      "title": "Ethereum transaction hash",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]{64}$",
+      "description": "Ethereum transaction hash that represents a blockchain operation. Examples: `0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060`",
+      "example": "0xca394b7602a6b71c8b3525028d0101eac6e4f3c08656c9efbdc5aee7665570d6"
+    },
+    "ethereum-public-network": {
+      "type": "string",
+      "title": "Ethereum public network",
+      "description": "Public ethereum network to operate in. Examples: `mainnet`, `ropsten`",
+      "enum": [
+        "mainnet",
+        "ropsten"
+      ]
+    },
+    "ethereum-private-network": {
+      "type": "string",
+      "title": "Ethereum private network",
+      "format": "uri",
+      "description": "Custom RPC URL for a private ethereum network to operate in. Examples: `http://somenetwork.example.org:8540`"
+    },
+    "ethereum-block": {
+      "title": "Ethereum block",
+      "description": "Block number for a given Ethereum transaction. Equals null when the given transaction hash was not yet included in any block to be mined by the Ethereum Virtual Machine. Examples: `7238290`",
+      "type": [
+        "number",
+        "null"
+      ],
+      "example": 45093
+    },
+    "ethereum-wallet-balance": {
+      "type": "string",
+      "title": "Ethereum wallet balance",
+      "description": "Amount of ether that a wallet address holds. Examples: `2.3410` `0.0001803`",
+      "minLength": 1,
+      "pattern": "^\\d*\\.?\\d*$"
+    },
+    "ethereum-erc20-token-balance": {
+      "type": "string",
+      "title": "Ethereum ERC20 token balance",
+      "description": "ERC20 token amount to transfer. Must not fall below the token's decimals specification Examples: `1200`, `1e-18` (min. possible amount for a 18 decimals token)",
+      "minLength": 1,
+      "pattern": "^\\d*\\.?\\d*$"
+    },
+    "ethereum-erc20-token-symbol": {
+      "type": "string",
+      "title": "Ethereum ERC20 token symbol",
+      "example": "BAT, ICX",
+      "description": "Ethereum ERC20 token symbol. Examples: `BAT`"
+    },
+    "wallet": {
+      "type": "object",
+      "title": "Wallet",
+      "description": "A wallet account that represents a single blockchain account.",
+      "properties": {
+        "wallet": {
+          "type": "string",
+          "title": "Wallet name",
+          "description": "The name and a primary identifier of a wallet that cannot be changed after creation. Defaults to a random GUID when omitted as parameter. Examples: `u1938484`, `ae5de2d7-6314-463e-a470-0a47812fcbec`\n",
+          "minLength": 1,
+          "maxLength": 127,
+          "pattern": "^[0-9a-zA-Z-]{1,127}$"
+        },
+        "version": {
+          "type": "string",
+          "description": "The version number of a wallet. The version is computed on wallet creation and only changes when a wallet is reset or overwritten.",
+          "minLength": 32,
+          "maxLength": 32,
+          "pattern": "^(latest|[0-9a-z]{32})$"
+        },
+        "created": {
+          "type": "string",
+          "format": "date",
+          "description": "Creation time in UTC",
+          "example": "2019-03-07T10:19:14.000Z"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date",
+          "description": "Last updated time in UTC",
+          "example": "2019-03-10T08:29:21.000Z"
+        },
+        "security": {
+          "type": "string",
+          "enum": [
+            "software",
+            "hsm"
+          ],
+          "description": "Configured wallet security level. Value `hsm` corresponds to FIPS 140-2 security standard",
+          "example": "hsm"
+        }
+      },
+      "required": [
+        "wallet",
+        "version"
+      ]
+    },
+    "wallet-name": {
+      "type": "string",
+      "title": "Wallet name",
+      "description": "The name and a primary identifier of a wallet that cannot be changed after creation. Defaults to a random GUID when omitted as parameter. Examples: `u1938484`, `ae5de2d7-6314-463e-a470-0a47812fcbec`\n",
+      "minLength": 1,
+      "maxLength": 127,
+      "pattern": "^[0-9a-zA-Z-]{1,127}$"
+    },
+    "use-hsm": {
+      "type": "boolean",
+      "title": "HSM usage",
+      "description": "Enhance wallet security via Hardware Secure Module usage for cryptographic operations. Only supported by certain subscritions.",
+      "example": true
+    },
+    "error": {
+      "type": "object",
+      "title": "General Error",
+      "description": "Generic server response for failed requests",
+      "properties": {
+        "activityId": {
+          "type": "string",
+          "description": "Service tracing ID to debug the error call",
+          "format": "uuid",
+          "example": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236"
+        },
+        "message": {
+          "type": "string",
+          "description": "Error description",
+          "example": "missing authentication header tangany-client-id"
+        },
+        "statusCode": {
+          "type": "number",
+          "description": "Http status code ",
+          "minimum": 100,
+          "maximum": 599,
+          "example": 401
+        }
+      },
+      "required": [
+        "activityId",
+        "message",
+        "statusCode"
+      ]
+    },
+    "skiptoken": {
+      "type": "string",
+      "title": "Skiptoken",
+      "description": "Paging parameter returned by the endpoint to query the next batch of results when used as a query parameter in the call",
+      "pattern": "[a-zA-Z0-9]+"
+    }
+  },
+  "responses": {
+    "ethereum-wallet": {
+      "description": "Server response for a successful Ethereum wallet query",
+      "schema": {
+        "type": "object",
+        "title": "Ethereum Wallet",
+        "properties": {
+          "balance": {
+            "type": "string",
+            "title": "Ethereum wallet balance",
+            "description": "Amount of ether that a wallet address holds. Examples: `2.3410` `0.0001803`",
+            "minLength": 1,
+            "pattern": "^\\d*\\.?\\d*$"
+          },
+          "address": {
+            "type": "string",
+            "title": "Ethereum address",
+            "description": "A hexadecimal Ethereum address. Examples: `0xde0a21566919d193e6a28a9ac8534144cb697eee`",
+            "minLength": 42,
+            "maxLength": 42,
+            "pattern": "^0x[a-f0-9]{40}$"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "ETHER"
+            ],
+            "pattern": "ETHER",
+            "description": "Blockchain currency - Ether for Ethereum based blockchains",
+            "example": "ETHER"
+          }
+        },
+        "required": [
+          "balance",
+          "address",
+          "currency"
+        ]
+      },
+      "examples": {
+        "application/json": {
+          "balance": "3.4361104",
+          "currency": "ETHER",
+          "address": "0x21877824166e5886129313738289ae19c6bea240"
+        }
+      }
+    },
+    "ethereum-erc20": {
+      "description": "Server response for a successful ERC20 token query",
+      "schema": {
+        "type": "object",
+        "title": "Ethereum Erc20 token balance",
+        "properties": {
+          "balance": {
+            "type": "string",
+            "title": "Ethereum ERC20 token balance",
+            "description": "ERC20 token amount to transfer. Must not fall below the token's decimals specification Examples: `1200`, `1e-18` (min. possible amount for a 18 decimals token)",
+            "minLength": 1,
+            "pattern": "^\\d*\\.?\\d*$"
+          },
+          "currency": {
+            "type": "string",
+            "description": "ERC20 token symbol",
+            "example": "CAT"
+          }
+        },
+        "required": [
+          "balance",
+          "currency"
+        ]
+      },
+      "examples": {
+        "application/json": {
+          "balance": "14235.76",
+          "currency": "CAT"
+        }
+      }
+    },
+    "ethereum-transaction-hash": {
+      "description": "Server response for a Ethereum transaction that was queued to be mined by the Ethereum virtual machine. Call `eth/transaction/{hash}` to retrieve the mining status for the transaction",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "string",
+            "title": "Ethereum transaction hash",
+            "minLength": 64,
+            "maxLength": 64,
+            "pattern": "^[a-z0-9]{64}$",
+            "description": "Ethereum transaction hash that represents a blockchain operation. Examples: `0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060`",
+            "example": "0xca394b7602a6b71c8b3525028d0101eac6e4f3c08656c9efbdc5aee7665570d6"
+          }
+        },
+        "required": [
+          "hash"
+        ]
+      },
+      "examples": {
+        "application/json": {
+          "hash": "0x8c9e3ce99b9e80cb87ef95be285537f5e41d229561ee9bcac45d8c5f256f7b2c"
+        }
+      }
+    },
+    "ethereum-transaction-status": {
+      "description": "Server response for a successful Ethereum transaction status query",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "isError": {
+            "type": "boolean",
+            "description": "True when Ethereum declines to mine an issued transaction. This can happen when e.g. insufficient gas was provided for the transaction."
+          },
+          "blockNr": {
+            "title": "Ethereum block",
+            "description": "Block number for a given Ethereum transaction. Equals null when the given transaction hash was not yet included in any block to be mined by the Ethereum Virtual Machine. Examples: `7238290`",
+            "type": [
+              "number",
+              "null"
+            ],
+            "example": 45093
+          }
+        },
+        "required": [
+          "isError",
+          "blockNr"
+        ]
+      },
+      "examples": {
+        "application/json": {
+          "isError": false,
+          "blockNr": 7238290
+        }
+      }
+    },
+    "wallet-status": {
+      "description": "Server response for a successfuly created or recreated wallet",
+      "schema": {
+        "type": "object",
+        "title": "Wallet",
+        "description": "A wallet account that represents a single blockchain account.",
+        "properties": {
+          "wallet": {
+            "type": "string",
+            "title": "Wallet name",
+            "description": "The name and a primary identifier of a wallet that cannot be changed after creation. Defaults to a random GUID when omitted as parameter. Examples: `u1938484`, `ae5de2d7-6314-463e-a470-0a47812fcbec`\n",
+            "minLength": 1,
+            "maxLength": 127,
+            "pattern": "^[0-9a-zA-Z-]{1,127}$"
+          },
+          "version": {
+            "type": "string",
+            "description": "The version number of a wallet. The version is computed on wallet creation and only changes when a wallet is reset or overwritten.",
+            "minLength": 32,
+            "maxLength": 32,
+            "pattern": "^(latest|[0-9a-z]{32})$"
+          },
+          "created": {
+            "type": "string",
+            "format": "date",
+            "description": "Creation time in UTC",
+            "example": "2019-03-07T10:19:14.000Z"
+          },
+          "updated": {
+            "type": "string",
+            "format": "date",
+            "description": "Last updated time in UTC",
+            "example": "2019-03-10T08:29:21.000Z"
+          },
+          "security": {
+            "type": "string",
+            "enum": [
+              "software",
+              "hsm"
+            ],
+            "description": "Configured wallet security level. Value `hsm` corresponds to FIPS 140-2 security standard",
+            "example": "hsm"
+          }
+        },
+        "required": [
+          "wallet",
+          "version"
+        ]
+      },
+      "examples": {
+        "application/json": {
+          "wallet": "ae5de2d7-6314-463e-a470-0a47812fcbec",
+          "version": "e48c26c458c64c669cca3f6e46142698",
+          "created": "2019-03-12T11:25:32Z",
+          "updated": "2019-03-12T11:25:32Z",
+          "security": "hsm"
+        }
+      }
+    },
+    "wallet-status-soft-delete": {
+      "description": "Server response for a successful soft-deletion request for a wallet",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "recoveryId": {
+            "type": "string",
+            "title": "Wallet name",
+            "description": "The name and a primary identifier of a wallet that cannot be changed after creation. Defaults to a random GUID when omitted as parameter. Examples: `u1938484`, `ae5de2d7-6314-463e-a470-0a47812fcbec`\n",
+            "minLength": 1,
+            "maxLength": 127,
+            "pattern": "^[0-9a-zA-Z-]{1,127}$"
+          },
+          "scheduledPurgeDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Soft deleted wallets are purged by the system after a 90 days retention period. After that a recovery of the deleted key is impossible."
+          }
+        },
+        "required": [
+          "recoveryId",
+          "scheduledPurgeDate"
+        ]
+      },
+      "examples": {
+        "application/json": {
+          "recoveryId": "ae5de2d7-6314-463e-a470-0a47812fcbec",
+          "scheduledPurgeDate": "2019-03-12T11:25:32Z"
+        }
+      }
+    },
+    "error-general": {
+      "description": "Generic server response for failed requests",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "activityId": {
+            "type": "string",
+            "description": "Error tracing ID",
+            "format": "uuid"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error description",
+            "example": "Error: insufficient funds for gas * price + value"
+          },
+          "statusCode": {
+            "type": "number",
+            "description": "Error description message"
+          }
+        },
+        "required": [
+          "activityId",
+          "message",
+          "statusCode"
+        ]
+      },
+      "examples": {
+        "application/json": {
+          "statusCode": 401,
+          "activityId": "03a471c7-62d9-4d6c-9bdd-888f6f2e2236",
+          "message": "missing authentication header tangany-client-id "
+        }
+      }
+    },
+    "wallet-status-list": {
+      "description": "Server response for a successful wallet list query",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "Wallet",
+              "description": "A wallet account that represents a single blockchain account.",
+              "properties": {
+                "wallet": {
+                  "type": "string",
+                  "title": "Wallet name",
+                  "description": "The name and a primary identifier of a wallet that cannot be changed after creation. Defaults to a random GUID when omitted as parameter. Examples: `u1938484`, `ae5de2d7-6314-463e-a470-0a47812fcbec`\n",
+                  "minLength": 1,
+                  "maxLength": 127,
+                  "pattern": "^[0-9a-zA-Z-]{1,127}$"
+                },
+                "version": {
+                  "type": "string",
+                  "description": "The version number of a wallet. The version is computed on wallet creation and only changes when a wallet is reset or overwritten.",
+                  "minLength": 32,
+                  "maxLength": 32,
+                  "pattern": "^(latest|[0-9a-z]{32})$"
+                },
+                "created": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Creation time in UTC",
+                  "example": "2019-03-07T10:19:14.000Z"
+                },
+                "updated": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Last updated time in UTC",
+                  "example": "2019-03-10T08:29:21.000Z"
+                },
+                "security": {
+                  "type": "string",
+                  "enum": [
+                    "software",
+                    "hsm"
+                  ],
+                  "description": "Configured wallet security level. Value `hsm` corresponds to FIPS 140-2 security standard",
+                  "example": "hsm"
+                }
+              },
+              "required": [
+                "wallet",
+                "version"
+              ]
+            }
+          },
+          "skiptoken": {
+            "type": "string",
+            "title": "Skiptoken",
+            "description": "Paging parameter returned by the endpoint to query the next batch of results when used as a query parameter in the call",
+            "pattern": "[a-zA-Z0-9]+"
+          }
+        },
+        "required": [
+          "list"
+        ]
+      },
+      "examples": {
+        "application/json": {
+          "list": [
+          {
+            "wallet": "dummy-wallet-d429af11af0d3f9acba61e7ef1f92aa1e2306502",
+            "version": "latest",
+            "created": "2019-03-26T13:08:51Z",
+            "updated": "2019-03-26T13:08:51Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy-wallet-d95a9966f6666fd1437980506643fce1a59cfec9",
+            "version": "latest",
+            "created": "2019-03-22T21:04:03Z",
+            "updated": "2019-03-22T21:04:03Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy-wallet-e4bddb240c27ab88f8eabe9d46872f29fc7b985e",
+            "version": "latest",
+            "created": "2019-03-22T21:04:53Z",
+            "updated": "2019-03-22T21:04:53Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy-wallet-e89eee7ddf6554e21e3f3251a5d719dd1a644f1a",
+            "version": "latest",
+            "created": "2019-03-26T14:11:33Z",
+            "updated": "2019-03-26T14:11:33Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy-wallet-eb73740a53230464c28c6158e82bf159a3bb24ae",
+            "version": "latest",
+            "created": "2019-03-22T23:50:47Z",
+            "updated": "2019-03-22T23:50:47Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy-wallet-f8a6f2b4eb4e839340112050eab8c2a511e15ab4",
+            "version": "latest",
+            "created": "2019-03-22T21:03:13Z",
+            "updated": "2019-03-22T21:03:13Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy-wallet-fafefe3fde3d5cc5a5a36eb0ed88320b6c357bfc",
+            "version": "latest",
+            "created": "2019-03-22T16:11:30Z",
+            "updated": "2019-03-22T16:11:30Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy-wallet-ff5a65dd43306b8e181292cf2baed429cb76342f",
+            "version": "latest",
+            "created": "2019-03-22T21:04:29Z",
+            "updated": "2019-03-22T21:04:29Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy001116",
+            "version": "latest",
+            "created": "2019-03-25T19:11:57Z",
+            "updated": "2019-03-25T19:11:57Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy001147",
+            "version": "latest",
+            "created": "2019-03-25T19:11:43Z",
+            "updated": "2019-03-25T19:11:43Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy001195",
+            "version": "latest",
+            "created": "2019-03-25T19:11:39Z",
+            "updated": "2019-03-25T19:11:39Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy001213",
+            "version": "latest",
+            "created": "2019-03-25T19:11:30Z",
+            "updated": "2019-03-25T19:11:30Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy001243",
+            "version": "latest",
+            "created": "2019-03-25T19:11:45Z",
+            "updated": "2019-03-25T19:11:45Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy001352",
+            "version": "latest",
+            "created": "2019-03-25T19:11:59Z",
+            "updated": "2019-03-25T19:11:59Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy0115",
+            "version": "latest",
+            "created": "2019-03-25T19:11:54Z",
+            "updated": "2019-03-25T19:11:54Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy011583",
+            "version": "latest",
+            "created": "2019-03-25T19:11:49Z",
+            "updated": "2019-03-25T19:11:49Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy001671",
+            "version": "latest",
+            "created": "2019-03-25T19:12:02Z",
+            "updated": "2019-03-25T19:12:02Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy101699",
+            "version": "latest",
+            "created": "2019-03-25T19:11:51Z",
+            "updated": "2019-03-25T19:11:51Z",
+            "security": "software"
+          },
+          {
+            "wallet": "dummy00198",
+            "version": "latest",
+            "created": "2019-03-25T19:11:41Z",
+            "updated": "2019-03-25T19:11:41Z",
+            "security": "software"
+          },
+          {
+            "wallet": "e136ab43b3d241a8612dd8dbfcfdc354971487b0",
+            "version": "latest",
+            "created": "2019-03-20T20:14:25Z",
+            "updated": "2019-03-20T20:14:25Z",
+            "security": "software"
+          },
+          {
+            "wallet": "e139ccc8b23a6c5581954a7bbecb3b0e188fcb41",
+            "version": "latest",
+            "created": "2019-03-22T23:53:36Z",
+            "updated": "2019-03-22T23:53:36Z",
+            "security": "software"
+          },
+          {
+            "wallet": "e17e3098f68079ab4557faa601aa17513fdf0b98",
+            "version": "latest",
+            "created": "2019-03-21T07:23:40Z",
+            "updated": "2019-03-21T07:23:40Z",
+            "security": "software"
+          },
+          {
+            "wallet": "e2e47f79a2dd9547196cfa9e478128b854aa5d2d",
+            "version": "latest",
+            "created": "2019-03-21T07:41:31Z",
+            "updated": "2019-03-21T07:41:31Z",
+            "security": "software"
+          }
+          ],
+          "skiptoken": "eyJOZXh0TaFya2VyIjoiMiExMTIhTURbd01EUXdJV3RsZVM5Rk5UQkVSVVp10XkxRlJFSXdMVFEyUVVFdE9USkRPQzB5Tm12tJM1JqazJRa1Uzt1RZaeR1EQXdNREk0SVRrNU9Ua3RmNcv2FTXpGVU1qTTZOVGs2TlRrdU9UazVPVGs1T1ZvaCIsIlRhcmdldExvY2F0aW9uIj01wfQ"
+        }
+      }
+    }
+  },
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "basePath": "/v1",
+  "tags": [
+  {
+    "name": "wallet",
+    "description": "Calls for managing wallets"
+  },
+  {
+    "name": "ethereum",
+    "description": "Ethereum based calls"
+  },
+  {
+    "name": "ethereum-erc20",
+    "description": "Ethereum ERC20 based calls"
+  }
+  ],
+  "parameters": {
+    "path-wallet": {
+      "in": "path",
+      "type": "string",
+      "name": "wallet",
+      "description": "Wallet name path parameter. Examples: `ae5de2d7-6314-463e-a470-0a47812fcbec`",
+      "required": true,
+      "pattern": "^[0-9a-zA-Z-]{3,24}$",
+      "maxLength": 3,
+      "minLength": 24
+    },
+    "path-hash": {
+      "name": "hash",
+      "in": "path",
+      "type": "string",
+      "description": "Ethereum transaction hash path parameter. Examples: `0x8c9e3ce99b9e80cb87ef95be285537f5e41d229561ee9bcac45d8c5f256f7b2c`",
+      "required": true,
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[a-z0-9]{64}$"
+    },
+    "path-token-address": {
+      "name": "token",
+      "in": "path",
+      "type": "string",
+      "required": true,
+      "description": "ERC20 token contract address path parameter. Examples: `0xb5a5f22694352c15b00323844ad545abb2b11028`",
+      "maxLength": 42,
+      "minLength": 42,
+      "pattern": "^0x[a-f0-9]{40}$"
+    },
+    "header-ethereum-network": {
+      "name": "tangany-ethereum-network",
+      "in": "header",
+      "type": "string",
+      "description": "Defines a public network or an ethereum rpc endpoint to operate in. Supported public networks: `mainnet`, `ropsten`. Examples for private Ethereum RPC: `https://somenetwork.example.org:8540`",
+      "enum": [
+        "mainnet",
+        "ropsten"
+      ]
+    },
+    "header-ethereum-tx-speed": {
+      "name": "header-ethereum-tx-speed",
+      "in": "header",
+      "type": "string",
+      "default": "default",
+      "enum": [
+        "none",
+        "slow",
+        "default",
+        "fast"
+      ],
+      "description": "(Optional header) Additional gas fee th/eth/transaction/{hash}at is added to the base gas fee for the given ethereum network to speed up the mining process of the transaction. The usage of `none` value may result in the transaction never gets mined and is only intended to use for custom ethereum networks that employ zero gas price policies. Defaults to `default` when ommited from a transactional call.\n\nThe speed levels correspond with following Ethereum fees:\nSPEED|Gwei\n--|--\nnone|0\nslow|2\ndefault|5\nfast|15"
+    },
+    "query-skiptoken": {
+      "name": "skiptoken",
+      "in": "query",
+      "type": "string",
+      "pattern": "[a-zA-Z0-9]+",
+      "description": "Query the next page of the results batch"
+    }
+  },
+  "security": [
+  {
+    "subscription": []
+  },
+  {
+    "client": []
+  },
+  {
+    "secret": []
+  }
+  ],
+  "x-stoplight": {
+    "docs": {
+      "includeDownloadLink": true
+    }
+  }
+}

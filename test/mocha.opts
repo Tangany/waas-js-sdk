@@ -1,0 +1,6 @@
+# enable typescript compilation
+--require ts-node/register
+# sort tests alphabetically
+--sort
+# display the full stack trace
+--full-trace
