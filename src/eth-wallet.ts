@@ -1,43 +1,47 @@
 import {WaasAxiosInstance} from "./waas-axios-instance";
 import {AxiosInstance, AxiosResponse} from "axios";
 import {IEthWalletBalance, ITransaction} from "./interfaces";
+import {EthErc20Token} from "./eth-erc20-token";
+import {Wallet} from "./wallet";
 
 /**
- * Class representing Ethereum endpoints for a wallet
- * @param instance - api instance created by a WaasApi instance
- * @param wallet - wallet name
+ *  instantiates a new ethereum wallet interface
+ * @param instance - axios instance created by {@link WaasApi}
+ * @param walletInstance - instance of Wallet class
  */
 export class EthWallet extends WaasAxiosInstance {
+    private readonly walletInstance: Wallet;
 
-    public readonly wallet: string;
-
-    constructor(instance: AxiosInstance, wallet: string) {
+    constructor(instance: AxiosInstance, walletInstance: Wallet) {
         super(instance);
-        if (!wallet) {
-            throw new Error("missing wallet arg");
-        }
-        this.wallet = wallet;
+        this.walletInstance = walletInstance;
     }
 
     /**
      * Returns wallet metrics for the Ethereum blockchain like ether balance and the address
-     * @param wallet - wallet name
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum/get-wallet-balance}
      */
-    public async getWalletBalance(): Promise<AxiosResponse<IEthWalletBalance>> {
+    public async get(): Promise<AxiosResponse<IEthWalletBalance>> {
+        if (!this.walletInstance.wallet) {
+            throw new Error("missing wallet variable in Wallet instance");
+        }
+
         return this.instance
-            .get(`eth/wallet/${this.wallet}`)
+            .get(`eth/wallet/${this.walletInstance.wallet}`)
             .catch(this.catch404.bind(this))
             ;
     }
 
     /**
      * Send ether to address from given wallet
-     * @param to - recipient ethereum address
+     * @param to - recipient eth address
      * @param amount - amount of eth to send in transaction
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum/make-wallet-transaction}
      */
     public async send(to: string, amount: string): Promise<AxiosResponse<ITransaction>> {
+        if (!this.walletInstance.wallet) {
+            throw new Error("missing wallet variable in Wallet instance");
+        }
         if (!to) {
             throw new Error("missing to arg");
         }
@@ -46,11 +50,19 @@ export class EthWallet extends WaasAxiosInstance {
         }
 
         return this.instance
-            .post(`eth/wallet/:wallet/${this.wallet}`, {
+            .post(`eth/wallet/${this.walletInstance.wallet}/send`, {
                 to,
                 amount,
             })
             .catch(this.catch404.bind(this))
             ;
+    }
+
+    /**
+     * Returns wallet calls for the Ethereum ERC20 token
+     * @param tokenAddress - eth erc20 token address for given eth network
+     */
+    public erc20(tokenAddress: string): EthErc20Token {
+        return new EthErc20Token(this.instance, this.walletInstance, tokenAddress);
     }
 }

@@ -23,16 +23,16 @@ describe("WaasApi", function () {
     });
 
     describe("wallet", function () {
-        it("should return a EthWallet instance", async function () {
+        it("should return a Wallet instance", async function () {
             const w = new WaasApi(auth);
-            assert.ok(w.wallet instanceof Wallet);
+            assert.ok(w.wallet() instanceof Wallet);
         });
     });
 
-    describe("ethereum", function () {
+    describe("eth", function () {
         it("should return a EthWallet instance", async function () {
             const w = new WaasApi(auth);
-            assert.ok(w.ethereum instanceof Ethereum);
+            assert.ok(w.eth() instanceof Ethereum);
         });
     });
 });

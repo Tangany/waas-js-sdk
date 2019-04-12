@@ -5,7 +5,6 @@ import {Wallet} from "./wallet";
 import {mockSandbox, queueOpenApiResponse} from "./test-helpers";
 import axios from "axios";
 import {EthWallet} from "./eth-wallet";
-import {EthErc20Token} from "./eth-erc20-token";
 
 describe("Wallet", function () {
     mockSandbox();
@@ -16,6 +15,8 @@ describe("Wallet", function () {
         subscription: "3",
     };
 
+    const dummyWalletName = "ae5de2d7-6314-463e-a470-0a47812fcbec";
+
     const queue = queueOpenApiResponse("openapi/v1.1.oas2.json");
 
     it("should construct an instance", function () {
@@ -24,8 +25,14 @@ describe("Wallet", function () {
     });
 
     it("should throw due invalid authentication", async function () {
-        const w = new WaasApi(auth);
-        const _wallet = w.wallet;
+        const w = new WaasApi({
+            clientId: "1",
+            clientSecret: "2",
+            subscription: "3",
+            ethereumNetwork: undefined,
+            ethereumTxSpeed: undefined,
+            vaultUrl: "",
+        });
 
         await queue({
             path: "/wallet",
@@ -34,16 +41,15 @@ describe("Wallet", function () {
         });
 
         try {
-            await _wallet.createWallet("ae5de2d7-6314-463e-a470-0a47812fcbec");
+            await w.wallet().create(dummyWalletName, false);
         } catch (e) {
             console.log(e);
         }
     });
 
-    describe("listWallets", function () {
+    describe("list", function () {
         it("should return a page of wallets", async function () {
             const w = new WaasApi(auth);
-            const _wallet = w.wallet;
 
             await queue({
                 path: "/wallet",
@@ -51,16 +57,15 @@ describe("Wallet", function () {
                 response: 200,
             });
 
-            const {list, skiptoken} = (await _wallet.listWallets()).data;
+            const {list, skiptoken} = (await w.wallet().list()).data;
             assert.ok(list.length > 0);
             assert.ok(skiptoken);
         });
     });
 
-    describe("createWallet", function () {
+    describe("create", function () {
         it("should respond with a new wallet", async function () {
             const w = new WaasApi(auth);
-            const _wallet = w.wallet;
 
             await queue({
                 path: "/wallet",
@@ -68,7 +73,7 @@ describe("Wallet", function () {
                 response: 201,
             });
 
-            const {wallet, created, security, updated, version} = (await _wallet.createWallet("ae5de2d7-6314-463e-a470-0a47812fcbec", false)).data;
+            const {wallet, created, security, updated, version} = (await w.wallet().create(dummyWalletName, false)).data;
             assert.ok(wallet);
             assert.ok(created);
             assert.ok(security);
@@ -78,14 +83,12 @@ describe("Wallet", function () {
 
         it("should fail due to missing wallet name", async function () {
             const w = new WaasApi(auth);
-            const wallet = w.wallet;
 
-            await assert.rejects(async () => wallet.createWallet(""));
+            await assert.rejects(async () => w.wallet().create(""));
         });
 
         it("should fail due to occupied wallet name", async function () {
             const w = new WaasApi(auth);
-            const wallet = w.wallet;
 
             await queue({
                 path: "/wallet",
@@ -94,7 +97,7 @@ describe("Wallet", function () {
             });
 
             try {
-                await wallet.createWallet("ae5de2d7-6314-463e-a470-0a47812fcbec");
+                await w.wallet().create(dummyWalletName);
                 assert.fail("should have thrown");
             } catch (e) {
                 console.log(e);
@@ -104,10 +107,9 @@ describe("Wallet", function () {
         });
     });
 
-    describe("deleteWallet", function () {
+    describe("delete", function () {
         it("should respond with deleted wallet", async function () {
             const w = new WaasApi(auth);
-            const _wallet = w.wallet;
 
             await queue({
                 path: "/wallet/{wallet}",
@@ -115,16 +117,15 @@ describe("Wallet", function () {
                 response: 200,
             });
 
-            const {recoveryId, scheduledPurgeDate} = (await _wallet.deleteWallet("ae5de2d7-6314-463e-a470-0a47812fcbec")).data;
+            const {recoveryId, scheduledPurgeDate} = (await w.wallet(dummyWalletName).delete()).data;
             assert.ok(recoveryId);
             assert.ok(scheduledPurgeDate);
         });
     });
 
-    describe("getWallet", function () {
+    describe("get", function () {
         it("should retrieve the wallet by name", async function () {
             const w = new WaasApi(auth);
-            const _wallet = w.wallet;
 
             await queue({
                 path: "/wallet/{wallet}",
@@ -132,7 +133,7 @@ describe("Wallet", function () {
                 response: 200,
             });
 
-            const {wallet, created, security, updated, version} = (await _wallet.getWallet("ae5de2d7-6314-463e-a470-0a47812fcbec")).data;
+            const {wallet, created, security, updated, version} = (await w.wallet(dummyWalletName).get()).data;
             assert.ok(wallet);
             assert.ok(created);
             assert.ok(security);
@@ -144,16 +145,8 @@ describe("Wallet", function () {
     describe("eth", function () {
         it("should return a EthWallet instance", async function () {
             const w = new WaasApi(auth);
-            const _wallet = w.wallet.eth("some-wallet");
-            assert.ok(_wallet instanceof EthWallet);
-        });
-    });
-
-    describe("ethErc20", function () {
-        it("should return a EthErc20Wallet instance", async function () {
-            const w = new WaasApi(auth);
-            const _wallet = w.wallet.ethErc20("some-wallet", "0xB8c77482e45F1F44dE1745F52C74426C631bDD52");
-            assert.ok(_wallet instanceof EthErc20Token);
+            const ethWallet = w.wallet(dummyWalletName).eth();
+            assert.ok(ethWallet instanceof EthWallet);
         });
     });
 });

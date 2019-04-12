@@ -34,7 +34,7 @@ export enum EthereumTxSpeed {
  * @param options.clientSecret - subscription client secret
  * @param options.subscription - subscription code
  * @param options.vaultUrl - tangany vault url
- * @param options.ethereumNetwork - public ethereum network name (@see https://tangany.docs.stoplight.io/api/models/ethereum-public-network) or private ethereum network url (@see https://tangany.docs.stoplight.io/api/models/ethereum-private-network)
+ * @param options.ethereumNetwork - public eth network name (@see https://tangany.docs.stoplight.io/api/models/ethereum-public-network) or private eth network url (@see https://tangany.docs.stoplight.io/api/models/ethereum-private-network)
  */
 export class WaasApi extends WaasAxiosInstance {
 
@@ -127,16 +127,18 @@ export class WaasApi extends WaasAxiosInstance {
     }
 
     /**
-     * get wallet based api calls
+     * read wallet based api calls
+     * @param [name] - wallet name
      */
-    get wallet(): Wallet {
-        return new Wallet(this.instance);
+    public wallet(name?: string): Wallet {
+        return new Wallet(this.instance, name);
     }
 
     /**
-     * get ethereum based api calls
+     * read eth based api calls
+     * @param [txHash] - ethereum transaction hash
      */
-    get ethereum(): Ethereum {
-        return new Ethereum(this.instance);
+    public eth(txHash?: string): Ethereum {
+        return new Ethereum(this.instance, txHash);
     }
 }
