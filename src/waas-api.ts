@@ -59,8 +59,15 @@ export class WaasApi extends WaasAxiosInstance {
             if (e.response) {
                 debug("interceptors.response.error", e.response.status, e.response.data);
 
-                if (e.response.status === 401) {
-                    throw new AuthenticationError(e.response.data.message);
+                switch (e.response.status) {
+                    case 401:
+                        throw new AuthenticationError(e.response.data.message);
+                    case 409:
+                        throw new ConflictError(e.response.data.message);
+                    case 404:
+                        throw new NotFoundError(e.response.data.message);
+                    default:
+                        throw new GeneralError(e.response.status, e.response.data.message);
                 }
 
             } else if (e.request) {
