@@ -17,13 +17,11 @@ npm install @tangany/waas-js-sdk
 
 Import the main module
 ```javascript
-
 const { WaasApi } = require("@tangany/waas-js-sdk");
 const { MAINNET } = require("@tangany/waas-js-sdk").ETHEREUM_PUBLIC_NETWORK;
 
-const dotenv = require("dotenv");
-
 // set the environment variables
+const dotenv = require("dotenv");
 dotenv.config();
 
 /**
@@ -41,20 +39,16 @@ dotenv.config();
     let skiptoken = undefined;
     
     async function listWallets () {
-        const data = (await api.wallet.listWallets(skiptoken)).data;
+        const data = (await api.wallet().list(skiptoken)).data;
         skiptoken = data.skiptoken;
         
         return data;
     }
     
     do {
-        try {
-            // fetch wallets until no skiptoken is returned in the response
-            const { list } = await listWallets();
-            console.log(list);
-        } catch (e) {
-            console.error(e);
-        }
+        // fetch wallets until no skiptoken is returned in the response
+        const { list } = await listWallets();
+        console.log(list);
     }
     while (!!skiptoken);
 })();
@@ -79,29 +73,30 @@ For more examples check the tests under `./src/*.spec.ts`
 https://tangany.docs.stoplight.io/api/wallet/
 
 ````javascript
+
 (async () => {
-    const wlt = new WaasApi({}).wallet;
+    const api = new WaasApi(options);
     // list all wallets
-    const {list} = (await wlt.listWallets()).data;
+    const { list } = (await api.wallet().list()).data;
     //  create a new wallet
-    const {wallet,security} = (await wlt.createWallet()).data;
+    const { wallet, security } = (await api.wallet().create("some-random-wallet-name", false)).data;
     //  fetch a wallet
-    const {created} = (await wlt.getWallet(wallet)).data;
+    const { created } = (await api.wallet(wallet).get()).data;
     //  delete a wallet
-    const {scheduledPurgeDate, recoveryId} = (await wlt.deleteWallet(wallet)).data;
-})()
+    const { scheduledPurgeDate, recoveryId } = (await api.wallet(wallet).delete()).data;
+})();
 ````
 
 #### general ethereum interface
 *Ethereum calls that are not wallet based*
 ````javascript
 (async () => {
-    const eth = new WaasApi(options).ethereum;
+    const api = new WaasApi(options);
     // get transaction status
-    const {blockNr, isError} = (await eth.getTxStatus(sampleTx)).data;
+    const { blockNr, isError } = (await api.eth("0x8a72609aaa14c4ff4bd44bd75848c27efcc36b3341d170000000000000000000").get()).data;
     // wait for transaction is mined
-    await eth.waitForMined(sampleTx);
-})()
+    await api.eth("0x8a72609aaa14c4ff4bd44bd75848c27efcc36b3341d170000000000000000000").wait();
+})();
 ````
 
 #### ethereum interface for wallet
@@ -109,12 +104,12 @@ https://tangany.docs.stoplight.io/api/ethereum/
 
 ````javascript
 (async () => {
-    const ethWlt = new WaasApi(options).wallet.eth("my-wallet-name");
+    const api = new WaasApi(options).wallet("some-wallet-name");
     // send ether
-    const {hash} = (await ethWlt.send("0xcbbe0c0454f3379ea8b0fbc8cf976a54154937c1","0.043")).data;
-    // get balance and wallet address
-    const {currency,balance,address}= (await ethWlt.getWalletBalance()).data;
-})()
+    const { hash } = (await api.eth().send("0xcbbe0c0454f3379ea8b0f0000000000000000000", "0.043")).data;
+    // get eth balance and wallet address
+    const { currency, balance, address } = (await api.eth().get()).data;
+})();
 ````
 
 #### ethereum erc20 token interface for wallet
@@ -122,12 +117,12 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 
 ````javascript
 (async () => {
-    const ethErc20Wlt = new WaasApi(options).wallet.ethErc20("my-wallet-name","0xB1c77482e45F1F44dE1745F52C74426C631beD50");
+    const api = new WaasApi(options).wallet("func-spec").eth().erc20("0xc32ae45504ee9482db99cfa21066a59e877bc0e6");
     // send token
-    const {hash} = (await ethErc20Wlt.sendToken("0xcbbe0c0454f3379ea8b0fbc8cf976a54154937c1","0.043")).data;
-    // get balance and wallet address
-    const {currency,balance,address}= (await ethErc20Wlt.getTokenBalance()).data;
-})()
+    const { hash } = (await api.send("0xcbbe0c0454f3379ea8b0fbc8cf976a54154937c1", "0.043")).data;
+    // get token balance
+    const { currency, balance, address } = (await api.get()).data;
+})();
 ````
 
 ## Debugging
