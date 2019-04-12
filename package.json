@@ -29,11 +29,13 @@
     "erc20",
     "wallet",
     "wallet as a service",
+    "waas",
     "tangany",
-    "blockchain"
+    "blockchain",
+    "api"
   ],
   "author": "Tangany <developers@tangany.com>",
-  "license": "gpl-3.0",
+  "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/Tangany/waas-js-sdk/issues"
   },
