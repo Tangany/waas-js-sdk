@@ -80,13 +80,7 @@ describe("Wallet", function () {
             assert.ok(updated);
             assert.ok(version);
         });
-
-        it("should fail due to missing wallet name", async function () {
-            const w = new WaasApi(auth);
-
-            await assert.rejects(async () => w.wallet().create(""));
-        });
-
+        
         it("should fail due to occupied wallet name", async function () {
             const w = new WaasApi(auth);
 
