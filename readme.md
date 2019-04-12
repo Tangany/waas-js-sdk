@@ -17,7 +17,10 @@ npm install @tangany/waas-js-sdk
 
 Import the main module
 ```javascript
+
 const { WaasApi } = require("@tangany/waas-js-sdk");
+const { MAINNET } = require("@tangany/waas-js-sdk").ETHEREUM_PUBLIC_NETWORK;
+
 const dotenv = require("dotenv");
 
 // set the environment variables
@@ -27,7 +30,14 @@ dotenv.config();
  * fetch all client wallets
  */
 (async () => {
-    const api = new WaasApi(process.env.CLIENT_ID, process.env.CLIENT_SECRET, process.env.SUBSCRIPTION);
+    const api = new WaasApi(
+        {
+            clientId: process.env.CLIENT_ID,
+            clientSecret: process.env.CLIENT_SECRET,
+            subscription: process.env.SUBSCRIPTION,
+            vaultUrl: "https://my-vault-url.net",
+            ethereumNetwork: MAINNET
+        });
     let skiptoken = undefined;
     
     async function listWallets () {
@@ -38,42 +48,39 @@ dotenv.config();
     }
     
     do {
-        // fetch wallets until no skiptoken is returned in the response
-        const { list } = await listWallets();
-        console.log(list);
+        try {
+            // fetch wallets until no skiptoken is returned in the response
+            const { list } = await listWallets();
+            console.log(list);
+        } catch (e) {
+            console.error(e);
+        }
     }
     while (!!skiptoken);
-    
-    /*
-    [ { wallet: 'wallet1',
-     version: 'latest',
-     created: '2019-04-05T10:12:56Z',
-     updated: '2019-04-05T10:12:56Z',
-     security: 'software' },
-    { wallet: 'some-other-wallet',
-     version: 'latest',
-     created: '2019-04-07T15:02:48Z',
-     updated: '2019-04-07T15:02:48Z',
-     security: 'software' },
-    { wallet: 'dummy-wallet101131',
-     version: 'latest',
-     created: '2019-04-11T01:02:00Z',
-     updated: '2019-04-11T01:02:00Z',
-     security: 'hardware' },
-      ...
-    */
 })();
 ```
+
+### Constructor options
+
+option | description | mandatory
+--- | --- | ---
+clientId | Service to service authentication client ID | ✔
+clientSecret | Service to service authentication client secret | ✔
+subscription | Product subscription key | ✔
+vaultUrl | Tangany vault url | 
+ethereumNetwork | Public ethereum network to operate in or private ethereum network Custom RPC URL for a private ethereum network to operate in. Example: `http://somenetwork.example.org:8540` | 
+ethereumTxSpeed |  Additional gas fee that is added to the base gas fee for the given ethereum network to speed up the mining process of the transaction. The usage of `none` value may result in the transaction never gets mined and is only intended to use for custom ethereum networks that employ zero gas price policies. The speed levels correspond with following Ethereum fees (in gwei): `none`: 0, `slow`: 2, `default`: 5, `fast`: 15. Defaults to `default`. |
+
 
 ###  Examples
 For more examples check the tests under `./src/*.spec.ts`
 
-### wallet interface
+#### wallet interface
 https://tangany.docs.stoplight.io/api/wallet/
 
 ````javascript
 (async () => {
-    const wlt = new WaasApi(...authdata).wallet;
+    const wlt = new WaasApi({}).wallet;
     // list all wallets
     const {list} = (await wlt.listWallets()).data;
     //  create a new wallet
@@ -85,11 +92,11 @@ https://tangany.docs.stoplight.io/api/wallet/
 })()
 ````
 
-### general ethereum interface
+#### general ethereum interface
 *Ethereum calls that are not wallet based*
 ````javascript
 (async () => {
-    const eth = new WaasApi(...authdata).ethereum;
+    const eth = new WaasApi(options).ethereum;
     // get transaction status
     const {blockNr, isError} = (await eth.getTxStatus(sampleTx)).data;
     // wait for transaction is mined
@@ -97,12 +104,12 @@ https://tangany.docs.stoplight.io/api/wallet/
 })()
 ````
 
-### ethereum interface for wallet
+#### ethereum interface for wallet
 https://tangany.docs.stoplight.io/api/ethereum/
 
 ````javascript
 (async () => {
-    const ethWlt = new WaasApi(...authdata).wallet.eth("my-wallet-name");
+    const ethWlt = new WaasApi(options).wallet.eth("my-wallet-name");
     // send ether
     const {hash} = (await ethWlt.send("0xcbbe0c0454f3379ea8b0fbc8cf976a54154937c1","0.043")).data;
     // get balance and wallet address
@@ -110,12 +117,12 @@ https://tangany.docs.stoplight.io/api/ethereum/
 })()
 ````
 
-### ethereum erc20 token interface for wallet
+#### ethereum erc20 token interface for wallet
 https://tangany.docs.stoplight.io/api/ethereum-erc20
 
 ````javascript
 (async () => {
-    const ethErc20Wlt = new WaasApi(...authdata).wallet.ethErc20("my-wallet-name","0xB1c77482e45F1F44dE1745F52C74426C631beD50");
+    const ethErc20Wlt = new WaasApi(options).wallet.ethErc20("my-wallet-name","0xB1c77482e45F1F44dE1745F52C74426C631beD50");
     // send token
     const {hash} = (await ethErc20Wlt.sendToken("0xcbbe0c0454f3379ea8b0fbc8cf976a54154937c1","0.043")).data;
     // get balance and wallet address

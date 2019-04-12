@@ -7,30 +7,31 @@ import {Wallet} from "./wallet";
 describe("WaasApi", function () {
     mockSandbox();
 
-    const CLIENT_ID = "1",
-        CLIENT_SECRET = "2",
-        SUBSCRIPTION = "3"
-    ;
+    const auth = {
+        clientId: "1",
+        clientSecret: "2",
+        subscription: "3",
+    };
 
     it("should construct an instance", function () {
-        const w = new WaasApi(CLIENT_ID, CLIENT_SECRET, SUBSCRIPTION);
+        const w = new WaasApi(auth);
         assert.ok(w instanceof WaasApi);
     });
 
     it("should throw on missing auth params", function () {
-        assert.throws(() => new WaasApi(CLIENT_ID, "", ""));
+        assert.throws(() => new WaasApi({clientId: "", ethereumNetwork: undefined, subscription: "", vaultUrl: "", clientSecret: "d"}));
     });
 
     describe("wallet", function () {
         it("should return a EthWallet instance", async function () {
-            const w = new WaasApi(CLIENT_ID, CLIENT_SECRET, SUBSCRIPTION);
+            const w = new WaasApi(auth);
             assert.ok(w.wallet instanceof Wallet);
         });
     });
 
     describe("ethereum", function () {
         it("should return a EthWallet instance", async function () {
-            const w = new WaasApi(CLIENT_ID, CLIENT_SECRET, SUBSCRIPTION);
+            const w = new WaasApi(auth);
             assert.ok(w.ethereum instanceof Ethereum);
         });
     });

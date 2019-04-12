@@ -6,12 +6,11 @@ import {EthWallet} from "./eth-wallet";
 
 describe("EthWallet", function () {
     mockSandbox();
-
-    const CLIENT_ID = "1",
-        CLIENT_SECRET = "2",
-        SUBSCRIPTION = "3"
-    ;
-
+    const auth = {
+        clientId: "1",
+        clientSecret: "2",
+        subscription: "3",
+    };
     const queue = queueOpenApiResponse("openapi/v1.1.oas2.json");
     const sampleWallet = "sample-wallet";
     const sampleAddress = "0xcbbe0c0454f3379ea8b0fbc8cf976a54154937c1";
@@ -23,7 +22,7 @@ describe("EthWallet", function () {
 
     describe("getWalletBalance", function () {
         it("should return the balance for given wallet", async function () {
-            const w = new WaasApi(CLIENT_ID, CLIENT_SECRET, SUBSCRIPTION);
+            const w = new WaasApi(auth);
             const _ethWallet = w.wallet.eth(sampleWallet);
 
             await queue({
@@ -40,7 +39,7 @@ describe("EthWallet", function () {
     });
     describe("send", function () {
         it("should return the hash fro sent transaction", async function () {
-            const w = new WaasApi(CLIENT_ID, CLIENT_SECRET, SUBSCRIPTION);
+            const w = new WaasApi(auth);
             const _ethWallet = w.wallet.eth(sampleWallet);
 
             await queue({

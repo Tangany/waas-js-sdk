@@ -7,14 +7,13 @@ import {EthErc20Token} from "./eth-erc20-token";
 describe("EthErc20Token", function () {
     mockSandbox();
 
-    const CLIENT_ID = "1",
-        CLIENT_SECRET = "2",
-        SUBSCRIPTION = "3"
-    ;
-
+    const auth = {
+            clientId: "1",
+            clientSecret: "2",
+            subscription: "3",
+        };
     const sampleWallet = "sample-wallet";
     const sampleErc20 = "0xB1c77482e45F1F44dE1745F52C74426C631beD50";
-
     const queue = queueOpenApiResponse("openapi/v1.1.oas2.json");
 
     it("should construct an instance", function () {
@@ -24,7 +23,7 @@ describe("EthErc20Token", function () {
 
     describe("getTokenBalance", function () {
         it("should return the balance for given token", async function () {
-            const w = new WaasApi(CLIENT_ID, CLIENT_SECRET, SUBSCRIPTION);
+            const w = new WaasApi(auth);
             const _erc20 = w.wallet.ethErc20(sampleWallet, sampleErc20);
 
             await queue({
@@ -40,7 +39,7 @@ describe("EthErc20Token", function () {
     });
     describe("sendToken", function () {
         it("should return a hash for sent tokens", async function () {
-            const w = new WaasApi(CLIENT_ID, CLIENT_SECRET, SUBSCRIPTION);
+            const w = new WaasApi(auth);
             const _erc20 = w.wallet.ethErc20(sampleWallet, sampleErc20);
 
             await queue({

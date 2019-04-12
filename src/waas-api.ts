@@ -3,7 +3,7 @@ import * as Debug from "debug";
 import {Wallet} from "./wallet";
 import {WaasAxiosInstance} from "./waas-axios-instance";
 import {Ethereum} from "./eth";
-import {AuthenticationError} from "./errors/authentication-error";
+import {AuthenticationError, NotFoundError, GeneralError, ConflictError} from "./errors";
 
 const debug = Debug("waas-js-sdk:main");
 
@@ -16,14 +16,46 @@ export enum WalletSecurity {
     HSM = "hsm",
 }
 
+export enum EthereumPublicNetwork {
+    MAINNET = "mainnet",
+    ROPSTEN = "ropsten",
+}
+
+export enum EthereumTxSpeed {
+    DEFAULT = "default",
+    FAST = "fast",
+    SLOW = "slow",
+    NONE = "none",
+}
+
 /**
- * @param clientId - subscription client id
- * @param clientSecret - subscription client secret
- * @param subscription - subscription code
+ * @param options - api options
+ * @param options.clientId - subscription client id
+ * @param options.clientSecret - subscription client secret
+ * @param options.subscription - subscription code
+ * @param options.vaultUrl - tangany vault url
+ * @param options.ethereumNetwork - public ethereum network name (@see https://tangany.docs.stoplight.io/api/models/ethereum-public-network) or private ethereum network url (@see https://tangany.docs.stoplight.io/api/models/ethereum-private-network)
  */
 export class WaasApi extends WaasAxiosInstance {
 
-    constructor(clientId: string, clientSecret: string, subscription: string) {
+    constructor(
+        {
+            clientId,
+            clientSecret,
+            subscription,
+            vaultUrl,
+            ethereumNetwork,
+            ethereumTxSpeed,
+        }:
+            {
+                clientId: string,
+                clientSecret: string,
+                subscription: string,
+                vaultUrl?: string,
+                ethereumNetwork?: EthereumPublicNetwork | string,
+                ethereumTxSpeed?: EthereumTxSpeed,
+            },
+    ) {
 
         if (!clientId) {
             throw new AuthenticationError("missing variable clientId");
@@ -48,6 +80,16 @@ export class WaasApi extends WaasAxiosInstance {
             },
             responseType: "json",
         };
+
+        if (vaultUrl) {
+            api.headers["tangany-vault-url"] = vaultUrl;
+        }
+        if (ethereumNetwork) {
+            api.headers["tangany-ethereum-network"] = ethereumNetwork;
+        }
+        if (ethereumTxSpeed) {
+            api.headers["tangany-ethereum-tx-speed"] = ethereumTxSpeed;
+        }
 
         const instance = axios.create(api);
 
