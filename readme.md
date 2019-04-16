@@ -67,7 +67,7 @@ ethereumTxSpeed |  Additional gas fee that is added to the base gas fee for the 
 
 
 ###  Examples
-For more examples check the tests under `./src/*.spec.ts`
+For more examples check the tests files (e.g. [./test/e2e.spec.ts](./test/e2e.spec.ts))
 
 #### wallet interface
 https://tangany.docs.stoplight.io/api/wallet/
