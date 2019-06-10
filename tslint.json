@@ -4,6 +4,8 @@
     "tslint:recommended"
   ],
   "rules": {
+    "no-any": true,
+    "no-unused-variable": true,
     "ordered-imports": false,
     "arrow-parens": [
       true,
