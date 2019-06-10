@@ -1,4 +1,4 @@
-import axios, {AxiosError, AxiosResponse} from "axios";
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
 import * as Debug from "debug";
 import {Wallet} from "./wallet";
 import {WaasAxiosInstance} from "./waas-axios-instance";
@@ -67,7 +67,7 @@ export class WaasApi extends WaasAxiosInstance {
             throw new AuthenticationError("missing variable subscription");
         }
 
-        const api = {
+        const api: AxiosRequestConfig = {
             baseURL: "https://api.tangany.com/v1/",
             timeout: 20000,
             headers: {
