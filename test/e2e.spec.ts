@@ -12,8 +12,8 @@ const tatetoTokenOwnerWallet = "func-spec";
 const tokenAmountToSend = "0.0032";
 
 describe("WaaS test workflow", function () {
-    this.timeout(6000);
-    this.slow(3000);
+    this.timeout(18000);
+    this.slow(6000);
 
     console.info("this suite only works with a pre-set .env file with api credentials in project's root");
 
@@ -63,15 +63,6 @@ describe("WaaS test workflow", function () {
         assert.strictEqual(wallet, createdWallet);
     });
 
-    it("should get the created wallet data", async function () {
-        const {updated, wallet, version, created, security} = (await api.wallet(createdWallet).get()).data;
-        assert.ok(security);
-        assert.ok(created);
-        assert.ok(version);
-        assert.ok(wallet);
-        assert.ok(updated);
-        assert.strictEqual(wallet, createdWallet);
-    });
     it("should get the created wallet ethereum specs", async function () {
         const {address, balance, currency} = (await api.wallet(createdWallet).eth().get()).data;
         assert.ok(address);
@@ -89,7 +80,7 @@ describe("WaaS test workflow", function () {
     });
 
     it("should wait for the transaction to get mined", async function () {
-        const timeout = 40000;
+        const timeout = 100000;
         this.timeout(timeout);
         this.slow(timeout / 2);
         const {isError, blockNr} = (await api.eth(tokenTransactionHash).wait(timeout));
