@@ -14,11 +14,11 @@ describe("Ethereum", function() {
         subscription: "3",
     };
     const sampleTx = "0x8a72609aaa14c4ff4bd44bd75848c27efcc36b3341d170000000000000000000";
-    const queue = queueOpenApiResponse("openapi/v1.1.oas2.json");
+    const queue = queueOpenApiResponse("openapi/v1.oas2.json");
 
     it("should construct an instance", function() {
         const wallet = new Ethereum(this.sandbox.stub(axios, "create"));
-        assert.ok(wallet instanceof Ethereum);
+        assert.ok(wallet);
     });
 
     describe("getTxStatus", function() {

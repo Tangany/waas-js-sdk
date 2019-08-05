@@ -12,13 +12,16 @@
     "readme.md"
   ],
   "scripts": {
-    "test": "mocha",
+    "test": "npm run build && mocha test/e2e.spec.js",
+    "test:unit": "mocha src/**/*.spec.ts",
     "lint": "tslint -p ./tsconfig.json",
     "lint:fix": "npm run lint -- --fix",
     "build": "rimraf dist/* && tsc -p tsconfig.json",
     "prepare": "npm run lint:fix && npm run build",
-    "prepublishOnly": "npm test && npm run lint",
-    "version": "node postversion.js && git add * && git push && git push --tags",
+    "prepublishOnly": "npm run test:unit && npm test && npm run lint",
+    "badge:npm": "node scripts/get-npm-version-badge.js",
+    "badge:sdk": "node scripts/get-sdk-version-badge.js",
+    "postversion": "npm run postversion:build && git add * && git push && git push --tags",
     "pub": "npm publish --access public"
   },
   "repository": {

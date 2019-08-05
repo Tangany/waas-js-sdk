@@ -1,11 +1,11 @@
 import {WaasAxiosInstance} from "./waas-axios-instance";
 import {AxiosInstance, AxiosResponse} from "axios";
-import {IEthWalletBalance, ITransaction} from "./interfaces";
+import {IWalletBalance, ITransaction} from "./interfaces";
 import {EthErc20Token} from "./eth-erc20-token";
 import {Wallet} from "./wallet";
 
 /**
- *  instantiates a new ethereum wallet interface
+ *  instantiates a new Ethereum wallet interface
  * @param instance - axios instance created by {@link WaasApi}
  * @param walletInstance - instance of Wallet class
  */
@@ -21,7 +21,7 @@ export class EthWallet extends WaasAxiosInstance {
      * Returns wallet metrics for the Ethereum blockchain like ether balance and the address
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum/get-wallet-balance}
      */
-    public async get(): Promise<AxiosResponse<IEthWalletBalance>> {
+    public async get(): Promise<AxiosResponse<IWalletBalance>> {
         if (!this.walletInstance.wallet) {
             throw new Error("missing wallet variable in Wallet instance");
         }

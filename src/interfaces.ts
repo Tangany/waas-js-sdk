@@ -43,18 +43,26 @@ export interface ISoftDeletedWallet {
 }
 
 /**
- * represents the Ethereum balance of a wallet
+ * represents the Blockchain balance of a wallet
  */
-export interface IEthWalletBalance {
+export interface IWalletBalance {
     address: string;
     balance: string;
     currency: string;
 }
 
 /**
- * represents transaction status
+ * represents the transaction status for a Ethereum network
  */
-export interface ITransactionStatus {
+export interface IEthereumTransactionStatus {
     isError: boolean;
     blockNr: number | null;
+}
+
+/**
+ * represents the transaction status for a Bitcoin network
+ */
+export interface IBitcoinTransactionStatus {
+    status: "pending" | "confirmed" | "error";
+    confirmations: number;
 }

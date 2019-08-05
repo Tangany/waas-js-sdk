@@ -15,7 +15,7 @@ describe("EthWallet", function() {
         subscription: "3",
     };
 
-    const queue = queueOpenApiResponse("openapi/v1.1.oas2.json");
+    const queue = queueOpenApiResponse("openapi/v1.oas2.json");
     const sampleWallet = "sample-wallet";
     const sampleAddress = "0xcbbe0c0454f3379ea8b0fbc8cf976a54154937c1";
 

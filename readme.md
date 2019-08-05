@@ -8,6 +8,7 @@
 A node.js integration of the [Tangany Wallet as a Service API](https://tangany.com) to be used in a backend scenario.
 
 [![NPM version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/package-badge.svg?sanitize=true)](https://www.npmjs.com/package/@tangany/waas-js-sdk)
+[![WaaS API version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/sdk-badge.svg?sanitize=true)](https://tangany.docs.stoplight.io/)
 
 ## Getting started
 Install the package
@@ -62,7 +63,7 @@ clientId | Service to service authentication client ID | ✔
 clientSecret | Service to service authentication client secret | ✔
 subscription | Product subscription key | ✔
 vaultUrl | Tangany vault url | 
-ethereumNetwork | Public ethereum network to operate in or private ethereum network Custom RPC URL for a private ethereum network to operate in. Example: `http://somenetwork.example.org:8540` | 
+ethereumNetwork | Public Ethereum network to operate in or private Ethereum network Custom RPC URL for a private ethereum network to operate in. Example: `http://somenetwork.example.org:8540` | 
 ethereumTxSpeed |  Additional gas fee that is added to the base gas fee for the given ethereum network to speed up the mining process of the transaction. The usage of `none` value may result in the transaction never gets mined and is only intended to use for custom ethereum networks that employ zero gas price policies. The speed levels correspond with following Ethereum fees (in gwei): `none`: 0, `slow`: 2, `default`: 5, `fast`: 15. Defaults to `default`. |
 
 
@@ -87,7 +88,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 })();
 ````
 
-#### general ethereum interface
+#### general Ethereum interface
 *Ethereum calls that are not wallet based*
 ````javascript
 (async () => {
@@ -99,7 +100,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 })();
 ````
 
-#### ethereum interface for wallet
+#### Ethereum interface for wallet
 https://tangany.docs.stoplight.io/api/ethereum/
 
 ````javascript
@@ -112,7 +113,7 @@ https://tangany.docs.stoplight.io/api/ethereum/
 })();
 ````
 
-#### ethereum erc20 token interface for wallet
+#### Ethereum erc20 token interface for wallet
 https://tangany.docs.stoplight.io/api/ethereum-erc20
 
 ````javascript

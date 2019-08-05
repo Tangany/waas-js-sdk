@@ -1,12 +1,12 @@
 import {WaasAxiosInstance} from "./waas-axios-instance";
 import {AxiosInstance, AxiosResponse} from "axios";
-import {ITransactionStatus} from "./interfaces";
+import {IEthereumTransactionStatus} from "./interfaces";
 import {TimeoutError} from "./errors";
 
 /**
- *  instantiates a new ethereum interface
+ *  instantiates a new Ethereum interface
  * @param instance - axios instance created by {@link WaasApi}
- * @param [txHash] - eth transaction hash
+ * @param [txHash] - Ethereum transaction hash
  */
 export class Ethereum extends WaasAxiosInstance {
     private readonly txHash?: string;
@@ -17,10 +17,10 @@ export class Ethereum extends WaasAxiosInstance {
     }
 
     /**
-     * Returns the status for a eth transaction. The transaction is not mined until a blockNr is assigned.
-     * @see {@link https://tangany.docs.stoplight.io/api/ethereum/get-transaction-status}
+     * Returns the status for an Ethereum transaction. The transaction is not mined until a blockNr is assigned.
+     * @see {@link https://tangany.docs.stoplight.io/api/ethereum/get-eth-tx-status}
      */
-    public async get(): Promise<AxiosResponse<ITransactionStatus>> {
+    public async get(): Promise<AxiosResponse<IEthereumTransactionStatus>> {
         if (!this.txHash) {
             throw new Error("missing argument txHash");
         }
@@ -29,10 +29,10 @@ export class Ethereum extends WaasAxiosInstance {
     }
 
     /**
-     * helper: resolves when given transaction is mined or errored
+     * helper: resolves when givenEthereum transaction is mined or errored
      * @param [timeout] - throw when not mined until timeout ms
      */
-    public async wait(timeout = 20000): Promise<ITransactionStatus> {
+    public async wait(timeout = 20000): Promise<IEthereumTransactionStatus> {
         if (!this.txHash) {
             throw new Error("missing argument txHash");
         }

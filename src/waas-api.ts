@@ -1,5 +1,6 @@
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
 import * as Debug from "debug";
+import {Bitcoin} from "./btc";
 import {Wallet} from "./wallet";
 import {WaasAxiosInstance} from "./waas-axios-instance";
 import {Ethereum} from "./eth";
@@ -28,13 +29,35 @@ export enum EthereumTxSpeed {
     NONE = "none",
 }
 
+export enum BitcoinNetwork {
+    BITCOIN = "bitcoin",
+    TESTNET = "testnet",
+}
+
+export enum BitcoinTxConfirmations {
+    NONE = "none",
+    DEFAULT = "default",
+    SECURE = "secure",
+}
+
+export enum BitcoinTxSpeed {
+    SLOW = "slow",
+    DEFAULT = "default",
+    FAST = "fast",
+}
+
 /**
  * @param options - api options
- * @param options.clientId - subscription client id
- * @param options.clientSecret - subscription client secret
- * @param options.subscription - subscription code
- * @param options.vaultUrl - tangany vault url
- * @param options.ethereumNetwork - public eth network name (@see https://tangany.docs.stoplight.io/api/models/ethereum-public-network) or private eth network url (@see https://tangany.docs.stoplight.io/api/models/ethereum-private-network)
+ * @param options.clientId - Subscription client id
+ * @param options.clientSecret - Subscription client secret
+ * @param options.subscription - Subscription code
+ * @param options.vaultUrl - Tangany vault url
+ * @param options.ethereumNetwork - Public Ethereum network name (@see https://tangany.docs.stoplight.io/api/models/ethereum-public-network) or private Ethereum network url (@see https://tangany.docs.stoplight.io/api/models/ethereum-private-network)
+ * @param options.ethereumTxSpeed - Amount of additional gas fee that is added to the base gas fee for the given Ethereum network to speed up the mining process of the transaction
+ * @param options.bitcoinNetwork - Public Bitcoin network name (@see https://tangany.docs.stoplight.io/api/models/bitcoin-network)
+ * @param options.bitcoinTxConfirmations - Amount of block confirmations required for Bitcoin balance outputs to be included in the total wallet balance calculation
+ * @param options.bitcoinTxSpeed - Target amount of block confirmations for the transaction to be included to the Bitcoin network
+ * @param options.bitcoinMaxFeeRate - maximum allowed satoshi per byte fee rate for a Bitcoin transaction
  */
 export class WaasApi extends WaasAxiosInstance {
 
@@ -46,6 +69,10 @@ export class WaasApi extends WaasAxiosInstance {
             vaultUrl,
             ethereumNetwork,
             ethereumTxSpeed,
+            bitcoinNetwork,
+            bitcoinTxConfirmations,
+            bitcoinTxSpeed,
+            bitcoinMaxFeeRate,
         }:
             {
                 clientId: string,
@@ -54,6 +81,10 @@ export class WaasApi extends WaasAxiosInstance {
                 vaultUrl?: string,
                 ethereumNetwork?: EthereumPublicNetwork | string,
                 ethereumTxSpeed?: EthereumTxSpeed,
+                bitcoinNetwork?: BitcoinNetwork,
+                bitcoinTxConfirmations?: BitcoinTxConfirmations,
+                bitcoinTxSpeed?: BitcoinTxSpeed,
+                bitcoinMaxFeeRate?: number,
             },
     ) {
 
@@ -89,6 +120,18 @@ export class WaasApi extends WaasAxiosInstance {
         }
         if (ethereumTxSpeed) {
             api.headers["tangany-ethereum-tx-speed"] = ethereumTxSpeed;
+        }
+        if (bitcoinNetwork) {
+            api.headers["tangany-bitcoin-network"] = bitcoinNetwork;
+        }
+        if (bitcoinTxSpeed) {
+            api.headers["tangany-bitcoin-tx-speed"] = bitcoinTxSpeed;
+        }
+        if (bitcoinTxSpeed) {
+            api.headers["tangany-bitcoin-tx-confirmations"] = bitcoinTxConfirmations;
+        }
+        if (bitcoinTxSpeed) {
+            api.headers["tangany-bitcoin-max-fee-rate"] = bitcoinMaxFeeRate;
         }
 
         const instance = axios.create(api);
@@ -136,9 +179,17 @@ export class WaasApi extends WaasAxiosInstance {
 
     /**
      * read eth based api calls
-     * @param [txHash] - ethereum transaction hash
+     * @param [txHash] - Ethereum transaction hash
      */
     public eth(txHash?: string): Ethereum {
         return new Ethereum(this.instance, txHash);
+    }
+
+    /**
+     * read eth based api calls
+     * @param [txHash] - Ethereum transaction hash
+     */
+    public btc(txHash?: string): Bitcoin {
+        return new Bitcoin(this.instance, txHash);
     }
 }

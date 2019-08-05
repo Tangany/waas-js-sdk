@@ -1,4 +1,5 @@
 import {AxiosInstance, AxiosResponse} from "axios";
+import {BtcWallet} from "./btc-wallet";
 import {ConflictError} from "./errors";
 import {WaasAxiosInstance} from "./waas-axios-instance";
 import {ISoftDeletedWallet, IWallet, IWalletList} from "./interfaces";
@@ -90,5 +91,11 @@ export class Wallet extends WaasAxiosInstance {
      */
     public eth(): EthWallet {
         return new EthWallet(this.instance, this);
+    }
+    /**
+     * Returns wallet calls for the Bitcoin blockchain
+     */
+    public btc(): BtcWallet {
+        return new BtcWallet(this.instance, this);
     }
 }

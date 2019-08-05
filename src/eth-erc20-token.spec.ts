@@ -15,7 +15,7 @@ describe("EthErc20Token", function() {
     };
     const sampleWallet = "sample-wallet";
     const sampleErc20 = "0xB1c77482e45F1F44dE1745F52C74426C631beD50";
-    const queue = queueOpenApiResponse("openapi/v1.1.oas2.json");
+    const queue = queueOpenApiResponse("openapi/v1.oas2.json");
 
     it("should construct an instance", function() {
         const axiosStub = this.sandbox.stub(axios, "create");
