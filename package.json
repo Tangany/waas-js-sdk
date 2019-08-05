@@ -8,7 +8,8 @@
     "node": ">=6.5"
   },
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "readme.md"
   ],
   "scripts": {
     "test": "mocha src/**/*.spec.ts",
@@ -25,23 +26,23 @@
     "url": "git+https://github.com/Tangany/waas-js-sdk.git"
   },
   "keywords": [
+    "blockchain",
     "ethereum",
+    "bitcoin",
+    "api",
     "erc20",
+    "token",
     "wallet",
     "wallet as a service",
     "waas",
-    "tangany",
-    "blockchain",
-    "api",
-    "private key",
-    "token"
+    "tangany"
   ],
-  "author": "Tangany <developers@tangany.com>",
+  "author": "Tangany <developers@tangany.com> (https://tangany.com)",
   "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/Tangany/waas-js-sdk/issues"
   },
-  "homepage": "https://tagany.com",
+  "homepage": "https://github.com/Tangany/waas-js-sdk#readme",
   "devDependencies": {
     "@types/debug": "^4.1.4",
     "@types/dotenv": "^6.1.1",
