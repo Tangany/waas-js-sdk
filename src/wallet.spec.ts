@@ -6,7 +6,7 @@ import {mockSandbox, queueOpenApiResponse} from "./test-helpers";
 import axios from "axios";
 import {EthWallet} from "./eth-wallet";
 
-describe("Wallet", function () {
+describe("Wallet", function() {
     mockSandbox();
 
     const auth = {
@@ -19,12 +19,12 @@ describe("Wallet", function () {
 
     const queue = queueOpenApiResponse("openapi/v1.1.oas2.json");
 
-    it("should construct an instance", function () {
+    it("should construct an instance", function() {
         const wallet = new Wallet(this.sandbox.stub(axios, "create"));
         assert.ok(wallet instanceof Wallet);
     });
 
-    it("should throw due invalid authentication", async function () {
+    it("should throw due invalid authentication", async function() {
         const w = new WaasApi({
             clientId: "1",
             clientSecret: "2",
@@ -47,8 +47,8 @@ describe("Wallet", function () {
         }
     });
 
-    describe("list", function () {
-        it("should return a page of wallets", async function () {
+    describe("list", function() {
+        it("should return a page of wallets", async function() {
             const w = new WaasApi(auth);
 
             await queue({
@@ -63,8 +63,8 @@ describe("Wallet", function () {
         });
     });
 
-    describe("create", function () {
-        it("should respond with a new wallet", async function () {
+    describe("create", function() {
+        it("should respond with a new wallet", async function() {
             const w = new WaasApi(auth);
 
             await queue({
@@ -81,7 +81,7 @@ describe("Wallet", function () {
             assert.ok(version);
         });
         
-        it("should fail due to occupied wallet name", async function () {
+        it("should fail due to occupied wallet name", async function() {
             const w = new WaasApi(auth);
 
             await queue({
@@ -101,8 +101,8 @@ describe("Wallet", function () {
         });
     });
 
-    describe("delete", function () {
-        it("should respond with deleted wallet", async function () {
+    describe("delete", function() {
+        it("should respond with deleted wallet", async function() {
             const w = new WaasApi(auth);
 
             await queue({
@@ -117,8 +117,8 @@ describe("Wallet", function () {
         });
     });
 
-    describe("get", function () {
-        it("should retrieve the wallet by name", async function () {
+    describe("get", function() {
+        it("should retrieve the wallet by name", async function() {
             const w = new WaasApi(auth);
 
             await queue({
@@ -136,8 +136,8 @@ describe("Wallet", function () {
         });
     });
 
-    describe("eth", function () {
-        it("should return a EthWallet instance", async function () {
+    describe("eth", function() {
+        it("should return a EthWallet instance", async function() {
             const w = new WaasApi(auth);
             const ethWallet = w.wallet(dummyWalletName).eth();
             assert.ok(ethWallet instanceof EthWallet);

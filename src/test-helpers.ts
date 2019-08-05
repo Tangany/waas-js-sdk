@@ -5,10 +5,9 @@ import * as assert from "assert";
 
 /**
  * setup mocha test to use sandbox and moxios and tear both down after each test
- * @this {Mocha}
  */
 export const mockSandbox = () => {
-    beforeEach(function () {
+    beforeEach(function() {
         this.sandbox = createSandbox({
             useFakeServer: true,
         });
@@ -16,30 +15,36 @@ export const mockSandbox = () => {
         moxios.install();
     });
 
-    afterEach(function () {
+    afterEach(function() {
         this.sandbox.restore();
         moxios.uninstall();
     });
 };
 
 /**
- * @typedef {path:string,operation:string, response:number } MockOpenApiRes
- * @property path - api path
- * @property operation - crud operation
- * @property response - http response code to mock
- * @property delay - response time of the mock server
- * @property useExamples - return openapi examples as mocked server results
+ * @param path - api path
+ * @param operation - crud operation
+ * @param response - http response code to mock
+ * @param delay - response time of the mock server
+ * @param useExamples - return openapi examples as mocked server results
  */
+interface IMockOpenApiRes {
+    path: string;
+    operation: string;
+    response: number;
+    delay?: number;
+    useExamples?: boolean;
+}
 
 /**
  * queue a moxios response for given openapi operation
  * @param openapi - openapi json file path
- * @return {MockOpenApiRes} response function
  */
 export const queueOpenApiResponse = (openapi: string) => {
     const mockgen = swagmock(openapi);
 
-    return async ({path, operation, response = 200, delay = 20, useExamples = false}: { path: string, operation: string, response: number, delay?: number, useExamples?: boolean }) => {
+    return async ({path, operation, response = 200, delay = 20, useExamples = false}: IMockOpenApiRes) => {
+
         const {responses} = await mockgen.responses({
             path,
             operation,

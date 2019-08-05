@@ -4,7 +4,7 @@ import {Ethereum} from "./eth";
 import {mockSandbox} from "./test-helpers";
 import {Wallet} from "./wallet";
 
-describe("WaasApi", function () {
+describe("WaasApi", function() {
     mockSandbox();
 
     const auth = {
@@ -13,24 +13,24 @@ describe("WaasApi", function () {
         subscription: "3",
     };
 
-    it("should construct an instance", function () {
+    it("should construct an instance", function() {
         const w = new WaasApi(auth);
         assert.ok(w instanceof WaasApi);
     });
 
-    it("should throw on missing auth params", function () {
+    it("should throw on missing auth params", function() {
         assert.throws(() => new WaasApi({clientId: "", ethereumNetwork: undefined, subscription: "", vaultUrl: "", clientSecret: "d"}));
     });
 
-    describe("wallet", function () {
-        it("should return a Wallet instance", async function () {
+    describe("wallet", function() {
+        it("should return a Wallet instance", async function() {
             const w = new WaasApi(auth);
             assert.ok(w.wallet() instanceof Wallet);
         });
     });
 
-    describe("eth", function () {
-        it("should return a EthWallet instance", async function () {
+    describe("eth", function() {
+        it("should return a EthWallet instance", async function() {
             const w = new WaasApi(auth);
             assert.ok(w.eth() instanceof Ethereum);
         });

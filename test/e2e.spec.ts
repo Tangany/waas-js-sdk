@@ -11,7 +11,7 @@ const tatetoTokenAddress = "0xC32AE45504Ee9482db99CfA21066A59E877Bc0e6";
 const tatetoTokenOwnerWallet = "func-spec";
 const tokenAmountToSend = "0.0032";
 
-describe("WaaS test workflow", function () {
+describe("WaaS test workflow", function() {
     this.timeout(18000);
     this.slow(6000);
 
@@ -42,7 +42,7 @@ describe("WaaS test workflow", function () {
     let createdWalletAddress = "";
     let tokenTransactionHash = "";
 
-    it("should create a wallet", async function () {
+    it("should create a wallet", async function() {
         const {security, created, version, wallet, updated} = (await api.wallet().create()).data;
         assert.ok(security);
         assert.ok(created);
@@ -53,7 +53,7 @@ describe("WaaS test workflow", function () {
         console.log("created wallet", createdWallet);
     });
 
-    it("should get the created wallet", async function () {
+    it("should get the created wallet", async function() {
         const {updated, wallet, version, created, security} = (await api.wallet(createdWallet).get()).data;
         assert.ok(security);
         assert.ok(created);
@@ -63,7 +63,7 @@ describe("WaaS test workflow", function () {
         assert.strictEqual(wallet, createdWallet);
     });
 
-    it("should get the created wallet ethereum specs", async function () {
+    it("should get the created wallet ethereum specs", async function() {
         const {address, balance, currency} = (await api.wallet(createdWallet).eth().get()).data;
         assert.ok(address);
         assert.strictEqual(balance, "0");
@@ -72,14 +72,14 @@ describe("WaaS test workflow", function () {
         console.log("address for created wallet", createdWalletAddress);
     });
 
-    it("should send a few tokens to the created wallet", async function () {
+    it("should send a few tokens to the created wallet", async function() {
         const {hash} = (await api.wallet(tatetoTokenOwnerWallet).eth().erc20(tatetoTokenAddress).send(createdWalletAddress, tokenAmountToSend)).data;
         assert.ok(hash);
         tokenTransactionHash = hash;
         console.log(`sent ${tokenAmountToSend} token to created walled with hash`, tokenTransactionHash);
     });
 
-    it("should wait for the transaction to get mined", async function () {
+    it("should wait for the transaction to get mined", async function() {
         const timeout = 100000;
         this.timeout(timeout);
         this.slow(timeout / 2);
@@ -88,13 +88,13 @@ describe("WaaS test workflow", function () {
         assert.ok(blockNr);
     });
 
-    it("should get the new token balance for the address", async function () {
+    it("should get the new token balance for the address", async function() {
         const {currency, balance} = (await api.wallet(createdWallet).eth().erc20(tatetoTokenAddress).get()).data;
         assert.strictEqual(currency, "TATETO");
         assert.strictEqual(balance, tokenAmountToSend);
     });
 
-    it("should delete the created wallet", async function () {
+    it("should delete the created wallet", async function() {
         const {recoveryId, scheduledPurgeDate} = (await api.wallet(createdWallet).delete()).data;
         assert.strictEqual(recoveryId, createdWallet);
         assert.ok(scheduledPurgeDate);

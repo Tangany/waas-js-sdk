@@ -5,7 +5,7 @@ import {WaasApi} from "./waas-api";
 import {EthErc20Token} from "./eth-erc20-token";
 import {Wallet} from "./wallet";
 
-describe("EthErc20Token", function () {
+describe("EthErc20Token", function() {
     mockSandbox();
 
     const auth = {
@@ -17,7 +17,7 @@ describe("EthErc20Token", function () {
     const sampleErc20 = "0xB1c77482e45F1F44dE1745F52C74426C631beD50";
     const queue = queueOpenApiResponse("openapi/v1.1.oas2.json");
 
-    it("should construct an instance", function () {
+    it("should construct an instance", function() {
         const axiosStub = this.sandbox.stub(axios, "create");
         const wallet = new Wallet(axiosStub, sampleWallet);
         const ethErc20 = new EthErc20Token(axiosStub, wallet, sampleErc20);
@@ -25,8 +25,8 @@ describe("EthErc20Token", function () {
         axiosStub.restore();
     });
 
-    describe("getTokenBalance", function () {
-        it("should return the balance for given token", async function () {
+    describe("getTokenBalance", function() {
+        it("should return the balance for given token", async function() {
             const w = new WaasApi(auth);
 
             await queue({
@@ -41,8 +41,8 @@ describe("EthErc20Token", function () {
         });
     });
 
-    describe("send", function () {
-        it("should return a hash for sent tokens", async function () {
+    describe("send", function() {
+        it("should return a hash for sent tokens", async function() {
             const w = new WaasApi(auth);
 
             await queue({

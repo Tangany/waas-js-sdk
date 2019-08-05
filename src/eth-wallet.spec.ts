@@ -6,7 +6,7 @@ import {EthWallet} from "./eth-wallet";
 import {EthErc20Token} from "./eth-erc20-token";
 import {Wallet} from "./wallet";
 
-describe("EthWallet", function () {
+describe("EthWallet", function() {
     mockSandbox();
 
     const auth = {
@@ -19,13 +19,13 @@ describe("EthWallet", function () {
     const sampleWallet = "sample-wallet";
     const sampleAddress = "0xcbbe0c0454f3379ea8b0fbc8cf976a54154937c1";
 
-    it("should construct an instance", function () {
+    it("should construct an instance", function() {
         const ethErc20 = new EthWallet(this.sandbox.stub(axios, "create"), this.sandbox.createStubInstance(Wallet));
         assert.ok(ethErc20 instanceof EthWallet);
     });
 
-    describe("balance", function () {
-        it("should return the balance for given wallet", async function () {
+    describe("balance", function() {
+        it("should return the balance for given wallet", async function() {
             const w = new WaasApi(auth);
 
             await queue({
@@ -40,8 +40,8 @@ describe("EthWallet", function () {
             assert.ok(currency);
         });
     });
-    describe("send", function () {
-        it("should return the hash fro sent transaction", async function () {
+    describe("send", function() {
+        it("should return the hash fro sent transaction", async function() {
             const w = new WaasApi(auth);
 
             await queue({
@@ -55,8 +55,8 @@ describe("EthWallet", function () {
         });
     });
 
-    describe("erc20", function () {
-        it("should return a EthErc20Wallet instance", async function () {
+    describe("erc20", function() {
+        it("should return a EthErc20Wallet instance", async function() {
             const w = new WaasApi(auth);
             const _wallet = w.wallet(sampleWallet).eth().erc20("0xB8c77482e45F1F44dE1745F52C74426C631bDD52");
             assert.ok(_wallet instanceof EthErc20Token);
