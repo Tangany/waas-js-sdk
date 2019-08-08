@@ -1,7 +1,9 @@
+import * as t from "typeforce";
+import {recipientType} from "./helpers"
 import {WaasAxiosInstance} from "./waas-axios-instance";
-import {AxiosInstance, AxiosResponse} from "axios";
-import {IWalletBalance, ITransaction} from "./interfaces";
-import {EthErc20Token} from "./eth-erc20-token";
+import {AxiosInstance} from "axios";
+import {IWalletBalance, ITransaction, IRecipient} from "./interfaces";
+import {EthErc20Wallet} from "./eth-erc20-wallet";
 import {Wallet} from "./wallet";
 
 /**
@@ -17,52 +19,47 @@ export class EthWallet extends WaasAxiosInstance {
         this.walletInstance = walletInstance;
     }
 
+    get wallet() {
+        t("String", this.walletInstance.wallet);
+
+        return this.walletInstance.wallet;
+    }
+
     /**
      * Returns wallet metrics for the Ethereum blockchain like ether balance and the address
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum/get-wallet-balance}
      */
-    public async get(): Promise<AxiosResponse<IWalletBalance>> {
-        if (!this.walletInstance.wallet) {
-            throw new Error("missing wallet variable in Wallet instance");
-        }
-
-        return this.instance
-            .get(`eth/wallet/${this.walletInstance.wallet}`)
-            .catch(this.catch404.bind(this))
-            ;
+    public async get(): Promise<IWalletBalance> {
+        return this.instance.get(`eth/wallet/${this.wallet}`);
     }
 
     /**
-     * Send ether to address from given wallet
-     * @param to - recipient eth address
-     * @param amount - amount of eth to send in transaction
+     * Send Ether to address from given wallet
+     * @param recipient - Recipient configuration
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum/make-wallet-transaction}
      */
-    public async send(to: string, amount: string): Promise<AxiosResponse<ITransaction>> {
-        if (!this.walletInstance.wallet) {
-            throw new Error("missing wallet variable in Wallet instance");
+    public async send(recipient: IRecipient): Promise<ITransaction> {
+        if (!recipient.to) {
+            throw new Error("Missing 'to' argument");
         }
-        if (!to) {
-            throw new Error("missing to arg");
-        }
-        if (!amount) {
-            throw new Error("missing amount arg");
+        if (!recipient.amount) {
+            throw new Error("Missing 'amount' argument");
         }
 
+        t(recipientType, recipient, true);
+
         return this.instance
-            .post(`eth/wallet/${this.walletInstance.wallet}/send`, {
-                to,
-                amount,
+            .post(`eth/wallet/${this.wallet}/send`, {
+                ...recipient,
             })
-            .catch(this.catch404.bind(this))
             ;
     }
 
     /**
      * Returns wallet calls for the Ethereum ERC20 token
-     * @param tokenAddress - eth erc20 token address for given eth network
+     * @param tokenAddress - Ethereum ERC20 token address for given eth network
      */
-    public erc20(tokenAddress: string): EthErc20Token {
-        return new EthErc20Token(this.instance, this.walletInstance, tokenAddress);
+    public erc20(tokenAddress: string): EthErc20Wallet {
+        return new EthErc20Wallet(this.instance, this.walletInstance, tokenAddress);
     }
 }

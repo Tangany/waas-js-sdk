@@ -1,0 +1,158 @@
+import {AxiosInstance} from "axios";
+import * as t from "typeforce";
+import {recipientType} from "./helpers";
+import {ITokenBalance, ITransaction} from "./interfaces";
+import {WaasAxiosInstance} from "./waas-axios-instance";
+import {Wallet} from "./wallet";
+
+enum METHOD {
+    TRANSFER = "transfer",
+    APPROVE = "approve",
+    TRANSFER_FROM = "transferFrom",
+    BURN = "burn",
+    MINT = "mint",
+}
+
+/**
+ * Instantiates a new Ethereum ERC20 wallet interface
+ * @param instance - Axios instance created by {@link WaasApi}
+ * @param walletInstance - Instance of Wallet class
+ * @param address - ERC20 token contract address
+ */
+export class EthErc20Wallet extends WaasAxiosInstance {
+
+    get wallet() {
+        t("String", this.walletInstance.wallet);
+
+        return this.walletInstance.wallet;
+    }
+
+    public readonly address: string;
+    public readonly walletInstance: Wallet;
+
+    constructor(instance: AxiosInstance, walletInstance: Wallet, address: string) {
+        super(instance);
+        this.walletInstance = walletInstance;
+
+        t("String", address);
+        this.address = address;
+    }
+
+    /**
+     * Retrieves the token balance for given wallet
+     * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/get-token-balance}
+     */
+    public async get(): Promise<ITokenBalance> {
+        return this.instance.get(`eth/erc20/${this.address}/${this.wallet}`);
+    }
+
+    /**
+     * Send ERC20 tokens from given wallet to an Ethereum address
+     * @param to - Ethereum address of the token recipient. Not to confuse with the token address
+     * @param amount - Float amount of tokens formatted as a string
+     * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/make-token-transaction}
+     */
+    public async send(to: string, amount: string): Promise<ITransaction> {
+        return this.instance
+            .post(`eth/erc20/${this.address}/${this.wallet}/send`, this
+                .getRecipientsData(METHOD.TRANSFER)({to, amount}))
+            ;
+    }
+
+    /**
+     * Approve an Ethereum address to withdraw ERC20 tokens from the wallet via the {@link transferFrom} operation
+     * @param to - Ethereum address to approve the withdrawal. Not to confuse with the token address
+     * @param amount - Float amount of tokens formatted as a string
+     * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-approve}
+     */
+    public async approve(to: string, amount: string): Promise<ITransaction> {
+        return this.instance
+            .post(`eth/erc20/${this.address}/${this.wallet}/approve`, this
+                .getRecipientsData(METHOD.APPROVE)({to, amount}))
+            ;
+    }
+
+    /**
+     * Withdraw the pre-approved amount of ERC20 tokens or less from a Ethereum address. The operation will fail if the withdrawn amount was not authorized by the address via the {@link approve} operation.
+     * @param from - Ethereum address to withdraw tokens from. Not to confuse with the token address
+     * @param amount - Float amount of tokens to withdraw formatted as a string
+     * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-transfer-from}
+     */
+    public async transferFrom(from: string, amount: string): Promise<ITransaction> {
+        return this.instance
+            .post(`eth/erc20/${this.address}/${this.wallet}/transfer-from`, this
+                .getRecipientsData(METHOD.TRANSFER_FROM)({from, amount}))
+            ;
+    }
+
+    /**
+     * Executes the ERC20 method “burn” on compatible contracts to destroy an amount of tokens from the current wallet
+     * @param amount - Float amount of tokens to burn from the wallet formatted as a string
+     * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-burn}
+     */
+    public async burn(amount: string): Promise<ITransaction> {
+        return this.instance
+            .post(`eth/erc20/${this.address}/${this.wallet}/burn`, this
+                .getRecipientsData(METHOD.BURN)({amount}))
+            ;
+    }
+
+    /**
+     * Executes the ERC20 method “mint” on compatible contracts to generate an amount of tokens to the current wallet
+     * @param amount - Float amount of tokens to mint to the wallet formatted as a string
+     * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-mint}
+     */
+    public async mint(amount: string): Promise<ITransaction> {
+        return this.instance
+            .post(`eth/erc20/${this.address}/${this.wallet}/mint`, this
+                .getRecipientsData(METHOD.MINT)({amount}))
+            ;
+    }
+
+    /**
+     * @deprecated do not use outside of unit tests
+     */
+        // tslint:disable-next-line:variable-name
+    public __test_getRecipientsData = (...args: any) => this.getRecipientsData.apply(this, args);
+
+    /**
+     * returns valid recipient obejct configuration for given ERC20 method
+     */
+    private getRecipientsData = (method: METHOD) => ({to, amount, from}: { to?: string, amount: string, from?: string }) => {
+
+        switch (method) {
+            case METHOD.BURN:
+            case METHOD.MINT:
+                if (!amount) {
+                    throw new Error("Missing 'amount' argument");
+                }
+                t({amount: "String"}, {amount}, true);
+
+                return {amount};
+            case METHOD.TRANSFER_FROM:
+                if (!from) {
+                    throw new Error("Missing 'from' argument");
+                }
+
+                if (!amount) {
+                    throw new Error("Missing 'amount' argument");
+                }
+                t({from: "String", amount: "String"}, {from, amount}, true);
+
+                return {to, amount};
+            case METHOD.APPROVE:
+            case METHOD.TRANSFER:
+            default:
+                if (!to) {
+                    throw new Error("Missing 'to' argument");
+                }
+
+                if (!amount) {
+                    throw new Error("Missing 'amount' argument");
+                }
+                t(recipientType, {to, amount}, true);
+
+                return {to, amount};
+        }
+    }
+}

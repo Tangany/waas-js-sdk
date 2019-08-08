@@ -1,4 +1,4 @@
-import {IHttpError} from "./ihttp-error";
+import {IHttpError} from ".";
 
 export class ConflictError implements IHttpError {
     public readonly status = 409;
@@ -6,7 +6,7 @@ export class ConflictError implements IHttpError {
     public readonly name: string;
 
     constructor(msg = "Cannot reset resource") {
-        Object.setPrototypeOf(this, ConflictError.prototype); // https://stackoverflow.com/questions/41102060/typescript-extending-error-class
+        Object.setPrototypeOf(this, ConflictError.prototype);
         this.message = msg;
         this.name = "ConflictError";
     }

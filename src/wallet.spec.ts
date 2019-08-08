@@ -1,146 +1,123 @@
-import {WaasApi} from "./waas-api";
+import * as moxios from "moxios";
 import * as assert from "assert";
-import {ConflictError} from "./errors";
+import {ConflictError, GeneralError} from "./errors";
 import {Wallet} from "./wallet";
-import {mockSandbox, queueOpenApiResponse} from "./test-helpers";
+import {sandbox} from "./helpers";
 import axios from "axios";
-import {EthWallet} from "./eth-wallet";
+
+sandbox();
 
 describe("Wallet", function() {
-    mockSandbox();
 
-    const auth = {
-        clientId: "1",
-        clientSecret: "2",
-        subscription: "3",
-    };
+    beforeEach(function() {
+        this.stub = this.sandbox.stub(axios, "create");
+    });
 
     const dummyWalletName = "ae5de2d7-6314-463e-a470-0a47812fcbec";
 
-    const queue = queueOpenApiResponse("openapi/v1.oas2.json");
-
     it("should construct an instance", function() {
-        const wallet = new Wallet(this.sandbox.stub(axios, "create"));
-        assert.ok(wallet instanceof Wallet);
+        assert.ok(new Wallet(axios));
+        assert.ok(new Wallet(axios, "some-name"));
     });
 
-    it("should throw due invalid authentication", async function() {
-        const w = new WaasApi({
-            clientId: "1",
-            clientSecret: "2",
-            subscription: "3",
-            ethereumNetwork: undefined,
-            ethereumTxSpeed: undefined,
-            vaultUrl: "",
-        });
+    it("should throw due to an invalid wallet name", function() {
+        assert.throws(() => new Wallet(axios, 34 as any));
+    });
 
-        await queue({
-            path: "/wallet",
-            operation: "get",
-            response: 401,
+    describe("wallet", function() {
+        it("should throw for missing wallet name in the constructor", function() {
+            const w = new Wallet(axios);
+            assert.throws(() => w.wallet);
         });
-
-        try {
-            await w.wallet().create(dummyWalletName, false);
-        } catch (e) {
-            console.log(e);
-        }
     });
 
     describe("list", function() {
-        it("should return a page of wallets", async function() {
-            const w = new WaasApi(auth);
+        it("should not throw when called without arguments", async function() {
+            const stub = this.sandbox.stub(axios, "get").resolvesArg(0);
+            const w = new Wallet(axios);
+            await w.list();
+            assert.ok(stub.alwaysCalledWithExactly("wallet"));
+        });
 
-            await queue({
-                path: "/wallet",
-                operation: "get",
-                response: 200,
-            });
+        it("should verify the skiptoken was passed to the api call", async function() {
+            const stub = this.sandbox.stub(axios, "get").resolvesArg(0);
+            const w = new Wallet(axios);
+            await w.list("123");
+            stub.alwaysCalledWithExactly([/wallet?skiptoken=123/]);
+        });
 
-            const {list, skiptoken} = (await w.wallet().list()).data;
-            assert.ok(list.length > 0);
-            assert.ok(skiptoken);
+        it("should throw on invalid skiptoken", async function() {
+            const spy = this.sandbox.spy(axios, "get");
+            const w = new Wallet(axios);
+            await assert.rejects(async () => w.list(123 as any));
+            assert.strictEqual(spy.callCount, 0);
         });
     });
 
     describe("create", function() {
-        it("should respond with a new wallet", async function() {
-            const w = new WaasApi(auth);
 
-            await queue({
-                path: "/wallet",
-                operation: "post",
-                response: 201,
-            });
-
-            const {wallet, created, security, updated, version} = (await w.wallet().create(dummyWalletName, false)).data;
-            assert.ok(wallet);
-            assert.ok(created);
-            assert.ok(security);
-            assert.ok(updated);
-            assert.ok(version);
+        beforeEach(function() {
+            moxios.install();
         });
 
-        it("should fail due to occupied wallet name", async function() {
-            const w = new WaasApi(auth);
+        afterEach(function() {
+            moxios.uninstall();
+        });
 
-            await queue({
-                path: "/wallet",
-                operation: "post",
-                response: 409,
+        it("should not throw for missing parameters", async function() {
+            const stub = this.sandbox.stub(axios, "post").resolvesArg(0);
+            const w = new Wallet(axios);
+            await assert.doesNotReject(async () => w.create());
+            await assert.doesNotReject(async () => w.create("some-wallet"));
+            assert.strictEqual(stub.callCount, 2);
+        });
+
+        it("should throw a ConflictError for an occupied wallet name", async function() {
+            const w = new Wallet(axios);
+            moxios.stubRequest(/.*/, {
+                status: 409,
+                response: {message: "ConflictError"},
             });
+            await assert.rejects(async () => w.create(dummyWalletName), ConflictError);
+        });
 
-            try {
-                await w.wallet().create(dummyWalletName);
-                assert.fail("should have thrown");
-            } catch (e) {
-                console.log(e);
-                assert.strictEqual(e.status, 409);
-                assert.ok(e instanceof ConflictError);
-            }
+        it("should throw a GeneralError for any other errors", async function() {
+            const w = new Wallet(axios);
+            moxios.stubRequest(/.*/, {
+                status: 418,
+                response: {message: "Teapot"},
+            });
+            await assert.rejects(async () => w.create(dummyWalletName), GeneralError);
         });
     });
 
     describe("delete", function() {
-        it("should respond with deleted wallet", async function() {
-            const w = new WaasApi(auth);
-
-            await queue({
-                path: "/wallet/{wallet}",
-                operation: "delete",
-                response: 200,
-            });
-
-            const {recoveryId, scheduledPurgeDate} = (await w.wallet(dummyWalletName).delete()).data;
-            assert.ok(recoveryId);
-            assert.ok(scheduledPurgeDate);
+        it("should execute the api call", function() {
+            const stub = this.sandbox.stub(axios, "delete");
+            new Wallet(axios, dummyWalletName).delete();
+            assert.strictEqual(stub.callCount, 1);
         });
     });
 
     describe("get", function() {
-        it("should retrieve the wallet by name", async function() {
-            const w = new WaasApi(auth);
-
-            await queue({
-                path: "/wallet/{wallet}",
-                operation: "get",
-                response: 200,
-            });
-
-            const {wallet, created, security, updated, version} = (await w.wallet(dummyWalletName).get()).data;
-            assert.ok(wallet);
-            assert.ok(created);
-            assert.ok(security);
-            assert.ok(updated);
-            assert.ok(version);
+        it("should execute the api call", function() {
+            const stub = this.sandbox.stub(axios, "get");
+            new Wallet(axios, dummyWalletName).get();
+            assert.strictEqual(stub.callCount, 1);
         });
     });
 
     describe("eth", function() {
-        it("should return a EthWallet instance", async function() {
-            const w = new WaasApi(auth);
-            const ethWallet = w.wallet(dummyWalletName).eth();
-            assert.ok(ethWallet instanceof EthWallet);
+        it("should return an EthWallet instance", async function() {
+            const w = new Wallet(axios, dummyWalletName);
+            assert.strictEqual(w.eth().wallet, dummyWalletName);
+        });
+    });
+
+    describe("btc", function() {
+        it("should return an BtcWallet instance", async function() {
+            const w = new Wallet(axios, dummyWalletName);
+            assert.strictEqual(w.btc().wallet, dummyWalletName);
         });
     });
 });

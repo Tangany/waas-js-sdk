@@ -1,4 +1,4 @@
-import {IHttpError} from "./ihttp-error";
+import {IHttpError} from ".";
 
 export class AuthenticationError implements IHttpError {
     public readonly status = 401;

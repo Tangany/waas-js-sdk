@@ -5,6 +5,7 @@ import {Wallet} from "./wallet";
 import {WaasAxiosInstance} from "./waas-axios-instance";
 import {Ethereum} from "./eth";
 import {AuthenticationError, NotFoundError, GeneralError, ConflictError} from "./errors";
+import * as t from "typeforce";
 
 const debug = Debug("waas-js-sdk:main");
 
@@ -46,7 +47,21 @@ export enum BitcoinTxSpeed {
     FAST = "fast",
 }
 
+interface IWaaSOptions {
+    clientId: string;
+    clientSecret: string;
+    subscription: string;
+    vaultUrl?: string;
+    ethereumNetwork?: EthereumPublicNetwork | string;
+    ethereumTxSpeed?: EthereumTxSpeed;
+    bitcoinNetwork?: BitcoinNetwork;
+    bitcoinTxConfirmations?: BitcoinTxConfirmations;
+    bitcoinTxSpeed?: BitcoinTxSpeed;
+    bitcoinMaxFeeRate?: number;
+}
+
 /**
+ * Instantiates a new API interface. Multiple instances with different settings can run in parallel
  * @param options - api options
  * @param options.clientId - Subscription client id
  * @param options.clientSecret - Subscription client secret
@@ -57,54 +72,42 @@ export enum BitcoinTxSpeed {
  * @param options.bitcoinNetwork - Public Bitcoin network name (@see https://tangany.docs.stoplight.io/api/models/bitcoin-network)
  * @param options.bitcoinTxConfirmations - Amount of block confirmations required for Bitcoin balance outputs to be included in the total wallet balance calculation
  * @param options.bitcoinTxSpeed - Target amount of block confirmations for the transaction to be included to the Bitcoin network
- * @param options.bitcoinMaxFeeRate - maximum allowed satoshi per byte fee rate for a Bitcoin transaction
+ * @param options.bitcoinMaxFeeRate - Maximum allowed fee rate in satoshi per byte for a Bitcoin transaction
  */
 export class WaasApi extends WaasAxiosInstance {
 
-    constructor(
-        {
-            clientId,
-            clientSecret,
-            subscription,
-            vaultUrl,
-            ethereumNetwork,
-            ethereumTxSpeed,
-            bitcoinNetwork,
-            bitcoinTxConfirmations,
-            bitcoinTxSpeed,
-            bitcoinMaxFeeRate,
-        }:
-            {
-                clientId: string,
-                clientSecret: string,
-                subscription: string,
-                vaultUrl?: string,
-                ethereumNetwork?: EthereumPublicNetwork | string,
-                ethereumTxSpeed?: EthereumTxSpeed,
-                bitcoinNetwork?: BitcoinNetwork,
-                bitcoinTxConfirmations?: BitcoinTxConfirmations,
-                bitcoinTxSpeed?: BitcoinTxSpeed,
-                bitcoinMaxFeeRate?: number,
-            },
-    ) {
+    constructor(options: IWaaSOptions) {
 
-        if (!clientId) {
-            throw new AuthenticationError("missing variable clientId");
+        if (!options.clientId) {
+            throw new AuthenticationError("Missing variable 'clientId'");
         }
-        if (!clientSecret) {
-            throw new AuthenticationError("missing variable clientSecret");
+        if (!options.clientSecret) {
+            throw new AuthenticationError("Missing variable 'clientSecret'");
         }
-        if (!subscription) {
-            throw new AuthenticationError("missing variable subscription");
+        if (!options.subscription) {
+            throw new AuthenticationError("Missing variable 'subscription'");
         }
+
+        t({
+            clientId: "String",
+            clientSecret: "String",
+            subscription: "String",
+            vaultUrl: "?String",
+            ethereumNetwork: "?String",
+            ethereumTxSpeed: "?String",
+            bitcoinNetwork: "?String",
+            bitcoinTxSpeed: "?String",
+            bitcoinTxConfirmations: "?String",
+            bitcoinMaxFeeRate: "?Number",
+        }, options, true);
 
         const api: AxiosRequestConfig = {
             baseURL: "https://api.tangany.com/v1/",
             timeout: 20000,
             headers: {
-                "tangany-client-id": clientId,
-                "tangany-client-secret": clientSecret,
-                "tangany-subscription": subscription,
+                "tangany-client-id": options.clientId,
+                "tangany-client-secret": options.clientSecret,
+                "tangany-subscription": options.subscription,
                 "common": {
                     Accept: "application/json",
                 },
@@ -112,26 +115,26 @@ export class WaasApi extends WaasAxiosInstance {
             responseType: "json",
         };
 
-        if (vaultUrl) {
-            api.headers["tangany-vault-url"] = vaultUrl;
+        if (options.vaultUrl) {
+            api.headers["tangany-vault-url"] = options.vaultUrl;
         }
-        if (ethereumNetwork) {
-            api.headers["tangany-ethereum-network"] = ethereumNetwork;
+        if (options.ethereumNetwork) {
+            api.headers["tangany-ethereum-network"] = options.ethereumNetwork;
         }
-        if (ethereumTxSpeed) {
-            api.headers["tangany-ethereum-tx-speed"] = ethereumTxSpeed;
+        if (options.ethereumTxSpeed) {
+            api.headers["tangany-ethereum-tx-speed"] = options.ethereumTxSpeed;
         }
-        if (bitcoinNetwork) {
-            api.headers["tangany-bitcoin-network"] = bitcoinNetwork;
+        if (options.bitcoinNetwork) {
+            api.headers["tangany-bitcoin-network"] = options.bitcoinNetwork;
         }
-        if (bitcoinTxSpeed) {
-            api.headers["tangany-bitcoin-tx-speed"] = bitcoinTxSpeed;
+        if (options.bitcoinTxSpeed) {
+            api.headers["tangany-bitcoin-tx-speed"] = options.bitcoinTxSpeed;
         }
-        if (bitcoinTxSpeed) {
-            api.headers["tangany-bitcoin-tx-confirmations"] = bitcoinTxConfirmations;
+        if (options.bitcoinTxConfirmations) {
+            api.headers["tangany-bitcoin-tx-confirmations"] = options.bitcoinTxConfirmations;
         }
-        if (bitcoinTxSpeed) {
-            api.headers["tangany-bitcoin-max-fee-rate"] = bitcoinMaxFeeRate;
+        if (options.bitcoinMaxFeeRate) {
+            api.headers["tangany-bitcoin-max-fee-rate"] = options.bitcoinMaxFeeRate;
         }
 
         const instance = axios.create(api);
@@ -152,7 +155,7 @@ export class WaasApi extends WaasAxiosInstance {
                     case 404:
                         throw new NotFoundError(e.response.data.message);
                     default:
-                        throw new GeneralError(e.response.status, e.response.data.message);
+                        throw new GeneralError(e.response.data, e.response.status);
                 }
 
             } else if (e.request) {
@@ -166,7 +169,13 @@ export class WaasApi extends WaasAxiosInstance {
         });
 
         super(instance);
+    }
 
+    /**
+     * Exposes the preconfigured AxiosInstance for arbitary api calls
+     */
+    public get axios() {
+        return this.instance;
     }
 
     /**
@@ -174,7 +183,7 @@ export class WaasApi extends WaasAxiosInstance {
      * @param [name] - wallet name
      */
     public wallet(name?: string): Wallet {
-        return new Wallet(this.instance, name);
+        return new Wallet(this.axios, name);
     }
 
     /**
@@ -182,7 +191,7 @@ export class WaasApi extends WaasAxiosInstance {
      * @param [txHash] - Ethereum transaction hash
      */
     public eth(txHash?: string): Ethereum {
-        return new Ethereum(this.instance, txHash);
+        return new Ethereum(this.axios, txHash);
     }
 
     /**

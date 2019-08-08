@@ -34,9 +34,9 @@ dotenv.config();
             clientId: process.env.CLIENT_ID,
             clientSecret: process.env.CLIENT_SECRET,
             subscription: process.env.SUBSCRIPTION,
-            vaultUrl: "https://my-vault-url.net",
-            ethereumNetwork: MAINNET
+            vaultUrl: "https://my-vault.some.cloud.tld"
         });
+
     let skiptoken = undefined;
     
     async function listWallets () {
@@ -57,20 +57,26 @@ dotenv.config();
 
 ### Constructor options
 
+WaaS configuration headers are passed as options into the constructor.
+
 option | description | mandatory
 --- | --- | ---
 clientId | Service to service authentication client ID | ✔
 clientSecret | Service to service authentication client secret | ✔
 subscription | Product subscription key | ✔
-vaultUrl | Tangany vault url | 
-ethereumNetwork | Public Ethereum network to operate in or private Ethereum network Custom RPC URL for a private ethereum network to operate in. Example: `http://somenetwork.example.org:8540` | 
+vaultUrl | Tangany vault url. Example: `https://my-vault.some.cloud.tld` | ✔
+ethereumNetwork | Public Ethereum network to operate in (`mainnet`, `ropsten`) or private Ethereum network Custom RPC URL for a private ethereum network to operate in (example: `http://somenetwork.example.org:8540`). Defaults to `mainnet`| 
 ethereumTxSpeed |  Additional gas fee that is added to the base gas fee for the given ethereum network to speed up the mining process of the transaction. The usage of `none` value may result in the transaction never gets mined and is only intended to use for custom ethereum networks that employ zero gas price policies. The speed levels correspond with following Ethereum fees (in gwei): `none`: 0, `slow`: 2, `default`: 5, `fast`: 15. Defaults to `default`. |
+bitcoinNetwork | Public Bitcoin network name. Supported networks: `bitcoin`, `testnet. Defaults to `bitcoin` |
+bitcoinTxConfirmations | Minimum amount of block confirmations required for Bitcoin balance outputs ("utxo", "coins") to be included in the total wallet balance calculation. The exclusion of unconfirmed outputs prevents the posthumous invalidation of own wallet transaction by the parent utxo sending party. The levels correspond with following target block confirmations amount (# of confirmations): `none`: 0, `default`: 1, `secure`: 6. Defaults to `default`. |
+bitcoinTxSpeed | Defines the target amount of blocks for the transaction to be included to the Bitcoin network. Faster inclusion requires a higher transaction fee. The fee is calculated in real time based on the network state and can be limited by the `header-bitcoin-max-fee-rate` option. The effective transaction delay can be calculated by multiplying the target confirmation blocks with the Bitcoin block time of 10 minutes (e.g. `slow` yields an block inclusion time of approx. 4h). The speed levels correspond with following block times (target blocks): `slow`: 24, `default`: 6, `fast`: 2.  Defaults to `default` |
+bitcoinMaxFeeRate | Defines the maximum allowed fee rate in satoshi per byte for a Bitcoin transaction. Prevents from speding absurdly high transaction fees during block fee peaks |
 
 
-###  Examples
-For more examples check the tests files (e.g. [./test/e2e.spec.ts](./test/e2e.spec.ts))
+###  More examples
+For more examples check out the tests (e.g. [./test/e2e.spec.ts](./test/e2e.spec.ts))
 
-#### wallet interface
+#### Wallet interface
 https://tangany.docs.stoplight.io/api/wallet/
 
 ````javascript
@@ -88,7 +94,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 })();
 ````
 
-#### general Ethereum interface
+#### General Ethereum interface
 *Ethereum calls that are not wallet based*
 ````javascript
 (async () => {
@@ -132,8 +138,8 @@ To log the axios HTTP requests, add the following environment variable
 DEBUG=waas-js-sdk:*
 ```
 
-## Full API documentation
-Available at https://tangany.docs.stoplight.io/
+## API documentation
+Full API documentation is available at https://tangany.docs.stoplight.io/
 
 ***
 <div align="center">

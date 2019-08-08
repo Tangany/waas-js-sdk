@@ -1,107 +1,83 @@
+import {recipientType} from "./helpers"
 import {WaasAxiosInstance} from "./waas-axios-instance";
-import {AxiosInstance, AxiosResponse} from "axios";
-import {ITransaction, IWalletBalance} from "./interfaces";
+import {AxiosInstance} from "axios";
+import {IRecipient, ITransaction, IWalletBalance} from "./interfaces";
 import {Wallet} from "./wallet";
+import * as t from "typeforce";
 
 /**
- * A Bitcoin transaction recipient configuration
- * @param to - Bitcoin recipient address
- * @param amount - Bitcoin recipient address
- */
-interface IBtcRecipient {
-    to: string;
-    amount: string;
-}
-
-/**
- *  instantiates a new Bitcoin wallet interface
+ * Represents a new Bitcoin wallet interface
  * @param instance - axios instance created by {@link WaasApi}
  * @param walletInstance - instance of Wallet class
  */
 export class BtcWallet extends WaasAxiosInstance {
-    private readonly walletInstance: Wallet;
-
-    constructor(instance: AxiosInstance, walletInstance: Wallet) {
+    constructor(instance: AxiosInstance, private readonly walletInstance: Wallet) {
         super(instance);
-        this.walletInstance = walletInstance;
+    }
+
+    public get wallet() {
+        t("String", this.walletInstance.wallet);
+
+        return this.walletInstance.wallet;
     }
 
     /**
      * Returns wallet metrics for the Bitcoin blockchain (BTC balance, wallet address)
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/get-btc-balance}
      */
-    public async get(): Promise<AxiosResponse<IWalletBalance>> {
-        if (!this.walletInstance.wallet) {
-            throw new Error("missing wallet variable in Wallet instance");
-        }
-
-        return this.instance
-            .get(`btc/wallet/${this.walletInstance.wallet}`)
-            .catch(this.catch404.bind(this))
-            ;
+    public async get(): Promise<IWalletBalance> {
+        return this.instance.get(`btc/wallet/${this.wallet}`);
     }
 
     /**
      * Send BTC to address from current wallet
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/make-btc-transaction}
      */
-    public async send(recipients: IBtcRecipient[] | IBtcRecipient): Promise<AxiosResponse<ITransaction>> {
-        if (!this.walletInstance.wallet) {
-            throw new Error("missing wallet variable in Wallet instance");
-        }
-
-        const data = this.getRecipientsData(recipients);
-
-        return this.instance
-            .post(`btc/wallet/${this.walletInstance.wallet}/send`, data)
-            .catch(this.catch404.bind(this))
-            ;
+    public async send(recipients: IRecipient[] | IRecipient): Promise<ITransaction> {
+        return this.instance.post(`btc/wallet/${this.wallet}/send`, this.getRecipientsData(recipients));
     }
 
     /**
      * Estimate sending fee in BTC for given recipients
+     * @param recipientsObject - a recipients configuration object
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/estimate-btc-transaction}
      */
-    public async estimateFee(recipients: IBtcRecipient[] | IBtcRecipient): Promise<AxiosResponse<ITransaction>> {
-        if (!this.walletInstance.wallet) {
-            throw new Error("missing wallet variable in Wallet instance");
-        }
-
-        const data = this.getRecipientsData(recipients);
-
+    public async estimateFee(recipientsObject: IRecipient[] | IRecipient): Promise<ITransaction> {
         return this.instance
-            .post(`eth/wallet/${this.walletInstance.wallet}/estimate-fee`, data)
-            .catch(this.catch404.bind(this))
+            .post(`eth/wallet/${this.wallet}/estimate-fee`, this.getRecipientsData(recipientsObject))
             ;
     }
 
     /**
+     * @deprecated do not use outside of unit tests
+     */
+        // tslint:disable-next-line:variable-name
+    public __test_getRecipientsData = (...args: any) => this.getRecipientsData.apply(this, args);
+
+    /**
      * convert recipients sdk argument to api data object
      */
-    private readonly getRecipientsData = (recipients: IBtcRecipient[] | IBtcRecipient): IBtcRecipient | { list: IBtcRecipient[] } => {
-        const data: any = {};
+    private readonly getRecipientsData = (recipients: IRecipient[] | IRecipient): IRecipient | { list: IRecipient[] } => {
+        let data: any = {};
+
+        const checkType = (recipient: IRecipient) => {
+            if (!recipient.to) {
+                throw new Error("Missing 'to' argument");
+            }
+            if (!recipient.amount) {
+                throw new Error("Missing 'amount' argument");
+            }
+
+            t(recipientType, {to: recipient.to, amount: recipient.amount}, true);
+
+            return recipient;
+        };
 
         if (recipients instanceof Array) {
-            recipients.map(r => {
-                if (!r.to) {
-                    throw new Error("missing to arg in recipient object");
-                }
-                if (!r.amount) {
-                    throw new Error("missing amount arg in recipient object");
-                }
-            });
-
-            data.list = recipients;
-
+            data.list = recipients.map(checkType);
         } else {
-            if (!recipients.to) {
-                throw new Error("missing to arg in recipient object");
-            }
-            if (!recipients.amount) {
-                throw new Error("missing amount arg in recipient object");
-            }
-            data.to = recipients.to;
-            data.amount = recipients.amount;
+            checkType(recipients);
+            data = {...recipients};
         }
 
         return data;
