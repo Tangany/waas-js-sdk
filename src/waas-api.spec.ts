@@ -73,6 +73,16 @@ describe("WaasApi", function() {
                 moxios.uninstall();
             });
 
+            it("should pass the response through the interceptor", async function() {
+                moxios.stubRequest(/.*/, {
+                    status: 200,
+                    responseText: "OK",
+                });
+                const {axios: axiosInstance} = new WaasApi(auth);
+
+                await assert.doesNotReject(async () => axiosInstance.get("bielefeld"));
+            });
+
             it("should throw a NotFoundError error for 404 server response", async function() {
                 moxios.stubRequest(/.*/, {
                     status: 404,
@@ -98,16 +108,16 @@ describe("WaasApi", function() {
                     response: {message: "ConflictError"},
                 });
                 const {axios: axiosInstance} = new WaasApi(auth);
-                await assert.rejects(async () => axiosInstance.get("bielefeld"), ConflictError);
+                await assert.rejects(async () => axiosInstance.get("ramirez"), ConflictError);
             });
 
             it("should throw a GeneralError for 400 server response", async function() {
                 moxios.stubRequest(/.*/, {
-                    status: 400,
+                    status: 500,
                     response: {message: "GeneralError"},
                 });
                 const {axios: axiosInstance} = new WaasApi(auth);
-                await assert.rejects(async () => axiosInstance.get("bielefeld"), GeneralError);
+                await assert.rejects(async () => axiosInstance.get("hal"), GeneralError);
             });
         });
     });

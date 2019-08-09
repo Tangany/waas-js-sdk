@@ -45,9 +45,12 @@ export class Ethereum extends WaasAxiosInstance {
 
             const checkMined = async (): Promise<void> => {
                 const {isError, blockNr} = (await this.get()).data;
-                if (isError || typeof blockNr === "number") {
+                if (typeof blockNr === "number") {
                     clearTimeout(timer);
                     resolve({isError, blockNr});
+                } else if (isError) {
+                    clearTimeout(timer);
+                    reject({isError, blockNr});
                 } else {
                     // wait a little and retry the call
                     setTimeout(checkMined, 100);

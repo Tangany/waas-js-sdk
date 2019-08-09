@@ -85,7 +85,6 @@ export interface IBitcoinTransactionStatus extends AxiosResponse {
     };
 }
 
-
 /**
  * Represents a transaction recipient configuration
  * @param to - Recipient address

@@ -1,5 +1,5 @@
 import * as t from "typeforce";
-import {recipientType} from "./helpers"
+import {recipientType} from "./helpers";
 import {WaasAxiosInstance} from "./waas-axios-instance";
 import {AxiosInstance} from "axios";
 import {IWalletBalance, ITransaction, IRecipient} from "./interfaces";

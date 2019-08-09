@@ -74,7 +74,7 @@ bitcoinMaxFeeRate | Defines the maximum allowed fee rate in satoshi per byte for
 
 
 ###  More examples
-For more examples check out the tests (e.g. [./test/e2e.spec.ts](./test/e2e.spec.ts))
+For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2e.js))
 
 #### Wallet interface
 https://tangany.docs.stoplight.io/api/wallet/

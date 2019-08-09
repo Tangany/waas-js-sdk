@@ -102,7 +102,7 @@ export class WaasApi extends WaasAxiosInstance {
         }, options, true);
 
         const api: AxiosRequestConfig = {
-            baseURL: "https://api.tangany.com/v1/",
+            baseURL: "http://localhost:7071",
             timeout: 20000,
             headers: {
                 "tangany-client-id": options.clientId,
@@ -158,11 +158,6 @@ export class WaasApi extends WaasAxiosInstance {
                         throw new GeneralError(e.response.data, e.response.status);
                 }
 
-            } else if (e.request) {
-                debug("interceptors.request.error", e.request);
-            } else {
-                // Something happened in setting up the request that triggered an Error
-                debug("interceptors.error", e.message, JSON.stringify(e.config));
             }
 
             throw e;

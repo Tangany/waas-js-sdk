@@ -118,7 +118,7 @@ export class EthErc20Wallet extends WaasAxiosInstance {
     /**
      * returns valid recipient obejct configuration for given ERC20 method
      */
-    private getRecipientsData = (method: METHOD) => ({to, amount, from}: { to?: string, amount: string, from?: string }) => {
+    private readonly getRecipientsData = (method: METHOD) => ({to, amount, from}: { to?: string, amount: string, from?: string }) => {
 
         switch (method) {
             case METHOD.BURN:

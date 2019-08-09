@@ -64,7 +64,17 @@ describe("Ethereum", function() {
 
             await assert.doesNotReject(async () => e.wait(), TimeoutError);
         });
-        it("should throw while the get call", async function() {
+        it("should reject for a unsuccessful transaction", async function() {
+            const e = new Ethereum(axios, nonHash);
+            this.sandbox.stub(Ethereum.prototype, "get").resolves({data: {isError: true, blockNr: undefined}});
+            await e.wait()
+                .then(() => assert.fail("should have failed"))
+                .catch(r => {
+                    assert.strictEqual(r.isError, true);
+                    assert.strictEqual(r.blockNr, undefined);
+                });
+        });
+        it("should throw while the 'get' call", async function() {
             const e = new Ethereum(axios, nonHash);
             // tslint:disable-next-line:no-null-keyword
             this.sandbox.stub(Ethereum.prototype, "get").throws(() => new Error("Some error"));

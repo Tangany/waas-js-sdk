@@ -12,7 +12,7 @@
     "readme.md"
   ],
   "scripts": {
-    "test": "npm run build && mocha test/e2e.spec.js",
+    "test": "npm run build && mocha test/*.e2e.js",
     "test:unit": "mocha src/**/*.spec.ts",
     "lint": "tslint -p ./tsconfig.json",
     "lint:fix": "npm run lint -- --fix",

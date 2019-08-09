@@ -24,6 +24,33 @@ describe("Wallet", function() {
         assert.throws(() => new Wallet(axios, 34 as any));
     });
 
+    describe("Errors", function() {
+        beforeEach(function() {
+            moxios.install();
+        });
+
+        afterEach(function() {
+            moxios.uninstall();
+        });
+
+        it("should throw a ConflictError for an occupied wallet name", async function() {
+            const w = new Wallet(axios);
+            moxios.stubRequest(/.*/, {
+                status: 409,
+                response: {message: "ConflictError"},
+            });
+            await assert.rejects(async () => w.create(dummyWalletName), ConflictError);
+        });
+
+        it("should throw a GeneralError for any other errors", async function() {
+            const w = new Wallet(axios);
+            moxios.stubRequest(/.*/, {
+                status: 418,
+            });
+            await assert.rejects(async () => w.create(dummyWalletName), GeneralError);
+        });
+    });
+
     describe("wallet", function() {
         it("should throw for missing wallet name in the constructor", function() {
             const w = new Wallet(axios);
@@ -56,38 +83,12 @@ describe("Wallet", function() {
 
     describe("create", function() {
 
-        beforeEach(function() {
-            moxios.install();
-        });
-
-        afterEach(function() {
-            moxios.uninstall();
-        });
-
         it("should not throw for missing parameters", async function() {
             const stub = this.sandbox.stub(axios, "post").resolvesArg(0);
             const w = new Wallet(axios);
             await assert.doesNotReject(async () => w.create());
             await assert.doesNotReject(async () => w.create("some-wallet"));
             assert.strictEqual(stub.callCount, 2);
-        });
-
-        it("should throw a ConflictError for an occupied wallet name", async function() {
-            const w = new Wallet(axios);
-            moxios.stubRequest(/.*/, {
-                status: 409,
-                response: {message: "ConflictError"},
-            });
-            await assert.rejects(async () => w.create(dummyWalletName), ConflictError);
-        });
-
-        it("should throw a GeneralError for any other errors", async function() {
-            const w = new Wallet(axios);
-            moxios.stubRequest(/.*/, {
-                status: 418,
-                response: {message: "Teapot"},
-            });
-            await assert.rejects(async () => w.create(dummyWalletName), GeneralError);
         });
     });
 
