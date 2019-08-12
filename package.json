@@ -1,6 +1,6 @@
 {
   "name": "@tangany/waas-js-sdk",
-  "version": "0.0.1",
+  "version": "1.0.0-beta.0",
   "description": "JavaScript SDK for Tangany Wallet as a Service API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,7 +21,7 @@
     "prepublishOnly": "npm run test:unit && npm test && npm run lint",
     "badge:npm": "node scripts/get-npm-version-badge.js",
     "badge:sdk": "node scripts/get-sdk-version-badge.js",
-    "postversion": "npm run postversion:build && git add * && git push && git push --tags",
+    "postversion": "npm run build && git add * && git push && git push --tags",
     "pub": "npm publish --access public"
   },
   "repository": {
