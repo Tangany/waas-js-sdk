@@ -42,7 +42,7 @@ describe("Wallet", function() {
             await assert.rejects(async () => w.create(dummyWalletName), ConflictError);
         });
 
-        it("should throw a GeneralError for any other errors", async function() {
+        it("should throw a MiningError for any other errors", async function() {
             const w = new Wallet(axios);
             moxios.stubRequest(/.*/, {
                 status: 418,

@@ -1,7 +1,6 @@
-import {WaasAxiosInstance} from "./waas-axios-instance";
+import {IWaitForTxStatus, WaasAxiosInstance} from "./waas-axios-instance";
 import {AxiosInstance} from "axios";
 import {IEthereumTransactionStatus} from "./interfaces";
-import {TimeoutError} from "./errors";
 import * as t from "typeforce";
 
 /**
@@ -34,38 +33,28 @@ export class Ethereum extends WaasAxiosInstance {
      * Helper: resolves when given Ethereum transaction is mined or errored
      * @param [timeout] - throw when not mined until timeout ms
      */
-    public async wait(timeout = 20000): Promise<IEthereumTransactionStatus["data"]> {
-        return new Promise(async (resolve, reject) => {
-            // reject function when the global timer completes;
-            const timer = setTimeout(() => {
-                reject(new TimeoutError(`Timeout for retrieving transaction status for ${this.transactionHash}`));
+    public async wait(timeout = 20000): Promise<IEthereumTransactionStatus> {
 
-                return;
-            }, timeout);
+        const call = this.get().then((res: IEthereumTransactionStatus) => {
 
-            const checkMined = async (): Promise<void> => {
-                const {isError, blockNr} = (await this.get()).data;
-                if (typeof blockNr === "number") {
-                    clearTimeout(timer);
-                    resolve({isError, blockNr});
-                } else if (isError) {
-                    clearTimeout(timer);
-                    reject({isError, blockNr});
-                } else {
-                    // wait a little and retry the call
-                    setTimeout(checkMined, 100);
-                }
+            let status: IWaitForTxStatus["status"];
 
-                return;
+            // tslint:disable-next-line:prefer-conditional-expression
+            if (typeof res.data.blockNr === "number") {
+                status = "confirmed";
+            } else if (res.data.isError) {
+                status = "error";
+            } else {
+                status = "pending";
+            }
+
+            return {
+                status,
+                response: res,
             };
-
-            checkMined()
-                .catch(e => {
-                    clearTimeout(timer);
-                    reject(e);
-
-                    return;
-                });
         });
+
+        return this.waitForTxStatus(call, this.txHash, timeout) as Promise<IEthereumTransactionStatus>;
+
     }
 }

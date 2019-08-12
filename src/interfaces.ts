@@ -65,6 +65,8 @@ export interface IWalletBalance extends AxiosResponse {
     };
 }
 
+export type IBlockchainTransactionStatus = IEthereumTransactionStatus | IBitcoinTransactionStatus;
+
 /**
  * Represents the transaction status response for the Ethereum network
  */
@@ -82,6 +84,16 @@ export interface IBitcoinTransactionStatus extends AxiosResponse {
     data: {
         status: "pending" | "confirmed" | "error";
         confirmations: number;
+    };
+}
+
+/**
+ * Represents a Bitcoin transaction estimation
+ */
+export interface IBitcoinTransactionEstimation extends AxiosResponse {
+    data: {
+        fee: string;
+        feeRate: number;
     };
 }
 

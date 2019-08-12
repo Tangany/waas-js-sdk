@@ -1,13 +1,10 @@
-import {IHttpError} from ".";
+import {HttpError} from "./http-error";
 
-export class ConflictError implements IHttpError {
-    public readonly status = 409;
-    public readonly message: string;
-    public readonly name: string;
-
+export class ConflictError extends HttpError {
     constructor(msg = "Cannot reset resource") {
+        super(msg, 409);
+        Error.captureStackTrace(this, this.constructor);
+        this.name = this.constructor.name;
         Object.setPrototypeOf(this, ConflictError.prototype);
-        this.message = msg;
-        this.name = "ConflictError";
     }
 }

@@ -36,6 +36,8 @@ export class EthWallet extends WaasAxiosInstance {
     /**
      * Send Ether to address from given wallet
      * @param recipient - Recipient configuration
+     * @param recipient.to - Recipient's Ethereum address
+     * @param recipient.amount - Amount of Ether to send
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum/make-wallet-transaction}
      */
     public async send(recipient: IRecipient): Promise<ITransaction> {

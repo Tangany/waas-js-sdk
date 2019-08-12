@@ -7,15 +7,14 @@ const { resolve } = require("path");
 const path = resolve(process.cwd(), ".env");
 config({ path });
 
-const tokenAddress = "0xC32AE45504Ee9482db99CfA21066A59E877Bc0e6"; // ERC20 token address
-const tokenName = "TATETO"; // ERC20 token name
-const tokenMasterWallet = "func-spec"; // Wallet that owns the ERC20 token
-let tokenMasterWalletAddress; // Wallet address
-const tokenAmountToSend = "0.0032"; // Token amount used for transactions
-const etherToSend = "0.001"; // Token amount used for transactions
+const tokenAddress = "0x0A35aA64eb710c97Fa14258243eeD09AB51a5b4E"; // ERC20 token address
+const tokenWallet = "func-spec"; // Wallet that owns the ERC20 token
+let tokenWalletAddress; // Wallet address
+const tokenAmount = "0.0032"; // Token amount used for transactions
+const etherAmount = "0.001"; // Token amount used for transactions
 
 describe("WaaS sample Ethereum workflow", function () {
-	const timeout = 36e3;  // Must suffice for the Ethereum testnet mining delay
+	const timeout = 120e3;  // Ethereum testnet mining delay
 	this.timeout(timeout);
 	this.slow(timeout / 3);
 	
@@ -56,6 +55,7 @@ describe("WaaS sample Ethereum workflow", function () {
 			const nextList = (await api.wallet().list(allWallets.skiptoken)).data;
 			assert.ok(nextList.list.length);
 			assert.strictEqual(allWallets.list.find(l => l.wallet === nextList.list[0].wallet), undefined);
+			console.log("wallet list next page", nextList);
 		}
 	});
 	
@@ -82,27 +82,22 @@ describe("WaaS sample Ethereum workflow", function () {
 		assert.strictEqual(wallet, createdWallet);
 	});
 	
-	it("should send a small amount of ether to the new wallet to fund the token transactions", async function () {
-		const { hash } = (await api.wallet(tokenMasterWallet).eth().send(createdWalletAddress, etherToSend)).data;
-		await api.eth(hash).wait(timeout);
-	});
-	
 	it("should get the Ethereum specs for created wallet", async function () {
 		assert.ok(createdWallet, "cannot run without previous tests");
 		const { address, balance, currency } = (await api.wallet(createdWallet).eth().get()).data;
 		assert.ok(address);
-		assert.strictEqual(balance, etherToSend);
-		assert.ok(currency);
+		assert.strictEqual(balance, "0");
+		assert.strictEqual(currency, "ETHER");
 		createdWalletAddress = address;
-		console.log(`Address for created wallet: ${createdWalletAddress}. Balance: ${balance}`);
+		console.log(`address for created wallet: ${createdWalletAddress}. Balance: ${balance}`);
 	});
 	
 	it("should send a few tokens to the created wallet", async function () {
 		assert.ok(createdWalletAddress, "cannot run without previous tests");
-		const { hash } = (await api.wallet(tokenMasterWallet).eth().erc20(tokenAddress).send(createdWalletAddress, tokenAmountToSend)).data;
+		const { hash } = (await api.wallet(tokenWallet).eth().erc20(tokenAddress).send(createdWalletAddress, tokenAmount)).data;
 		assert.ok(hash);
 		tokenTransactionHash = hash;
-		console.log(`sent ${tokenAmountToSend} token to created walled with hash`, tokenTransactionHash);
+		console.log(`sent ${tokenAmount} token to created walled with hash`, tokenTransactionHash);
 	});
 	
 	it("should get the transaction status for the hash", async function () {
@@ -121,23 +116,57 @@ describe("WaaS sample Ethereum workflow", function () {
 	
 	it("should get the new token balance for the new wallet", async function () {
 		const { currency, balance } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).get()).data;
-		assert.strictEqual(currency, tokenName);
-		assert.strictEqual(balance, tokenAmountToSend);
+		assert.ok(currency);
+		assert.strictEqual(balance, tokenAmount);
 		console.log(`new token balance: ${balance}`);
 	});
 	
+	it("should send a small amount of ether to the new wallet to fund the token transactions", async function () {
+		assert.ok(createdWalletAddress, "cannot run without previous tests");
+		const { hash } = (await api.wallet(tokenWallet).eth().send({ to: createdWalletAddress, amount: etherAmount })).data;
+		console.log(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
+		await api.eth(hash).wait(timeout);
+	});
+	
 	it("should approve to the master wallet to withdraw tokens from the new wallet", async function () {
-		tokenMasterWalletAddress = (await api.wallet(tokenMasterWallet).eth().get()).data.address;
-		console.log("tokenMasterWalletAddress", tokenMasterWalletAddress);
-		const { hash } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).approve(tokenMasterWalletAddress, tokenAmountToSend)).data;
+		tokenWalletAddress = (await api.wallet(tokenWallet).eth().get()).data.address;
+		console.log("tokenMasterWalletAddress", tokenWalletAddress);
+		const { hash } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).approve(tokenWalletAddress, tokenAmount)).data;
+		console.log(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
 		await api.eth(hash).wait(timeout);
 	});
 	
 	it("should withdraw the approved token amount from the new wallet", async function () {
-		const { hash } = (await api.wallet(tokenMasterWallet).eth().erc20(tokenAddress).transferFrom(createdWalletAddress, tokenAmountToSend)).data;
+		const { hash } = (await api.wallet(tokenWallet).eth().erc20(tokenAddress).transferFrom(createdWalletAddress, tokenAmount)).data;
+		console.log(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
 		await api.eth(hash).wait(timeout);
 		const { balance } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).get()).data;
 		assert.strictEqual(balance, "0");
 		console.log(`new token balance: ${balance}`);
+	});
+	
+	it("should mint tokens to new wallet", async function () {
+		const { hash } = (await api.wallet(tokenWallet).eth().erc20(tokenAddress).mint(tokenAmount, createdWalletAddress)).data;
+		console.log(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
+		await api.eth(hash).wait(timeout);
+		const { balance } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).get()).data;
+		assert.strictEqual(balance, tokenAmount);
+		console.log(`new token balance: ${balance}`);
+	});
+	
+	it("should burn tokens from new wallet", async function () {
+		const { hash } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).burn(tokenAmount)).data;
+		console.log(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
+		await api.eth(hash).wait(timeout);
+		const { balance } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).get()).data;
+		assert.strictEqual(balance, "0");
+		console.log(`new token balance: ${balance}`);
+	});
+	
+	it("should delete the new wallet", async function () {
+		const { recoveryId, scheduledPurgeDate } = (await api.wallet(createdWallet).delete()).data;
+		assert.ok(recoveryId);
+		assert.ok(scheduledPurgeDate);
+		console.log(`soft deleted wallet ${recoveryId} and scheduled for purging at ${scheduledPurgeDate}`);
 	});
 });

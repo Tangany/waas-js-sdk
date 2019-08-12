@@ -98,33 +98,50 @@ export class EthErc20Wallet extends WaasAxiosInstance {
     }
 
     /**
-     * Executes the ERC20 method “mint” on compatible contracts to generate an amount of tokens to the current wallet
+     * Executes the ERC20 method “mint” on compatible contracts to generate an amount of tokens to the current wallet. Fails if wallet is not a contract minter
      * @param amount - Float amount of tokens to mint to the wallet formatted as a string
+     * @param [to] - Ethereum address to assign the mined tokens to. If omitted, tokens are assigned to the wallet address
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-mint}
      */
-    public async mint(amount: string): Promise<ITransaction> {
+    public async mint(amount: string, to?: string): Promise<ITransaction> {
         return this.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/mint`, this
-                .getRecipientsData(METHOD.MINT)({amount}))
+                .getRecipientsData(METHOD.MINT)({amount, to}))
             ;
     }
 
     /**
      * @deprecated do not use outside of unit tests
      */
+        // @ts-ignore
         // tslint:disable-next-line:variable-name
     public __test_getRecipientsData = (...args: any) => this.getRecipientsData.apply(this, args);
 
     /**
-     * returns valid recipient obejct configuration for given ERC20 method
+     * returns valid recipient object configuration for given ERC20 method
      */
     private readonly getRecipientsData = (method: METHOD) => ({to, amount, from}: { to?: string, amount: string, from?: string }) => {
 
         switch (method) {
-            case METHOD.BURN:
             case METHOD.MINT:
                 if (!amount) {
                     throw new Error("Missing 'amount' argument");
+                }
+                if (from) {
+                    throw new Error("Invalid 'from' argument");
+                }
+                t({to: "?String", amount: "String"}, {to, amount}, true);
+
+                return {to, amount};
+            case METHOD.BURN:
+                if (!amount) {
+                    throw new Error("Missing 'amount' argument");
+                }
+                if (to) {
+                    throw new Error("Invalid 'to' argument");
+                }
+                if (from) {
+                    throw new Error("Invalid 'from' argument");
                 }
                 t({amount: "String"}, {amount}, true);
 
@@ -133,20 +150,24 @@ export class EthErc20Wallet extends WaasAxiosInstance {
                 if (!from) {
                     throw new Error("Missing 'from' argument");
                 }
-
+                if (to) {
+                    throw new Error("Invalid 'to' argument");
+                }
                 if (!amount) {
                     throw new Error("Missing 'amount' argument");
                 }
                 t({from: "String", amount: "String"}, {from, amount}, true);
 
-                return {to, amount};
+                return {from, amount};
             case METHOD.APPROVE:
             case METHOD.TRANSFER:
             default:
                 if (!to) {
                     throw new Error("Missing 'to' argument");
                 }
-
+                if (from) {
+                    throw new Error("Invalid 'from' argument");
+                }
                 if (!amount) {
                     throw new Error("Missing 'amount' argument");
                 }

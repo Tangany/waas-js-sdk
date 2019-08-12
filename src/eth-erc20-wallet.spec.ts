@@ -49,7 +49,7 @@ describe("EthErc20Wallet", function() {
         it("should execute the call", async function() {
             const stub = this.sandbox.stub(axios, "post");
             const r = new EthErc20Wallet(axios, walletInstance, sampleToken);
-            r.send(sampleAddress, "23.010298");
+            await r.send(sampleAddress, "23.010298");
             assert.strictEqual(stub.callCount, 1);
         });
     });
@@ -58,8 +58,8 @@ describe("EthErc20Wallet", function() {
         it("should execute the call", async function() {
             const stub = this.sandbox.stub(axios, "post");
             const r = new EthErc20Wallet(axios, walletInstance, sampleToken);
-            r.approve(sampleAddress, "23.010298");
-            r.approve(sampleAddress, "1");
+            await r.approve(sampleAddress, "23.010298");
+            await r.approve(sampleAddress, "1");
             assert.strictEqual(stub.callCount, 2);
         });
     });
@@ -68,7 +68,7 @@ describe("EthErc20Wallet", function() {
         it("should execute the call", async function() {
             const stub = this.sandbox.stub(axios, "post");
             const r = new EthErc20Wallet(axios, walletInstance, sampleToken);
-            r.transferFrom(sampleAddress, "0.0138");
+            await r.transferFrom(sampleAddress, "0.0138");
             assert.strictEqual(stub.callCount, 1);
         });
     });
@@ -77,7 +77,7 @@ describe("EthErc20Wallet", function() {
         it("should execute the call", async function() {
             const stub = this.sandbox.stub(axios, "post");
             const r = new EthErc20Wallet(axios, walletInstance, sampleToken);
-            r.burn("18");
+            await r.burn("18");
             assert.strictEqual(stub.callCount, 1);
         });
     });
@@ -85,7 +85,7 @@ describe("EthErc20Wallet", function() {
         it("should execute the call", async function() {
             const stub = this.sandbox.stub(axios, "post");
             const r = new EthErc20Wallet(axios, walletInstance, sampleToken);
-            r.mint("18");
+            await r.mint("18");
             assert.strictEqual(stub.callCount, 1);
         });
     });
@@ -105,14 +105,38 @@ describe("EthErc20Wallet", function() {
             assert.throws(() => r.__test_getRecipientsData()({to: sampleAddress, amount: 6 as any}));
             assert.throws(() => r.__test_getRecipientsData()({to: sampleAddress} as any));
             assert.throws(() => r.__test_getRecipientsData("transfer")({from: sampleAddress, amount: "6"}));
+            assert.throws(() => r.__test_getRecipientsData("transfer")({
+                from: sampleAddress,
+                amount: "6",
+                someProp: "yeah",
+            } as any));
             assert.throws(() => r.__test_getRecipientsData("approve")({to: "", amount: "6"}));
+            assert.throws(() => r.__test_getRecipientsData("approve")({
+                to: sampleAddress,
+                from: sampleAddress,
+                amount: "6",
+            }));
             assert.throws(() => r.__test_getRecipientsData("transferFrom")({to: sampleAddress, amount: "6"}));
             assert.throws(() => r.__test_getRecipientsData("transferFrom")({
                 from: sampleAddress,
                 amount: Symbol as any,
             }));
             assert.throws(() => r.__test_getRecipientsData("transferFrom")({from: sampleAddress} as any));
+            assert.throws(() => r.__test_getRecipientsData("transferFrom")({
+                from: sampleAddress,
+                to: sampleAddress,
+                amount: "11",
+            } as any));
             assert.throws(() => r.__test_getRecipientsData("burn")({amount: 6 as any}));
+            assert.throws(() => r.__test_getRecipientsData("burn")({amount: "6", from: "123"} as any));
+            assert.throws(() => r.__test_getRecipientsData("burn")({from: "123"} as any));
+            assert.throws(() => r.__test_getRecipientsData("burn")({
+                to: "123",
+                from: sampleAddress,
+                amount: "1",
+            } as any));
+            assert.throws(() => r.__test_getRecipientsData("mint")({amount: "1", to: Error as any}));
+            assert.throws(() => r.__test_getRecipientsData("mint")({amount: "1", from: "123"}));
             assert.throws(() => r.__test_getRecipientsData("mint")({} as any));
         });
     });

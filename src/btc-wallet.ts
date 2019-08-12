@@ -1,7 +1,7 @@
 import {recipientType} from "./helpers";
 import {WaasAxiosInstance} from "./waas-axios-instance";
 import {AxiosInstance} from "axios";
-import {IRecipient, ITransaction, IWalletBalance} from "./interfaces";
+import {IBitcoinTransactionEstimation, IRecipient, ITransaction, IWalletBalance} from "./interfaces";
 import {Wallet} from "./wallet";
 import * as t from "typeforce";
 
@@ -31,6 +31,7 @@ export class BtcWallet extends WaasAxiosInstance {
 
     /**
      * Send BTC to address from current wallet
+     * @param recipients - Recipient configuration
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/make-btc-transaction}
      */
     public async send(recipients: IRecipient[] | IRecipient): Promise<ITransaction> {
@@ -42,15 +43,16 @@ export class BtcWallet extends WaasAxiosInstance {
      * @param recipientsObject - a recipients configuration object
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/estimate-btc-transaction}
      */
-    public async estimateFee(recipientsObject: IRecipient[] | IRecipient): Promise<ITransaction> {
+    public async estimateFee(recipientsObject: IRecipient[] | IRecipient): Promise<IBitcoinTransactionEstimation> {
         return this.instance
-            .post(`eth/wallet/${this.wallet}/estimate-fee`, this.getRecipientsData(recipientsObject))
+            .post(`btc/wallet/${this.wallet}/estimate-fee`, this.getRecipientsData(recipientsObject))
             ;
     }
 
     /**
      * @deprecated do not use outside of unit tests
      */
+        // @ts-ignore
         // tslint:disable-next-line:variable-name
     public __test_getRecipientsData = (...args: any) => this.getRecipientsData.apply(this, args);
 

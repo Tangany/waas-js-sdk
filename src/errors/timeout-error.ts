@@ -1,13 +1,9 @@
-import {IHttpError} from ".";
+import {HttpError} from "./http-error";
 
-export class TimeoutError implements IHttpError {
-    public readonly status = 408;
-    public readonly message: string;
-    public readonly name: string;
-
+export class TimeoutError extends HttpError {
     constructor(msg = "Request Timeout") {
+        super(msg, 408);
+        this.name = this.constructor.name;
         Object.setPrototypeOf(this, TimeoutError.prototype);
-        this.message = msg;
-        this.name = "TimeoutError";
     }
 }

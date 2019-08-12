@@ -102,7 +102,7 @@ export class WaasApi extends WaasAxiosInstance {
         }, options, true);
 
         const api: AxiosRequestConfig = {
-            baseURL: "http://localhost:7071",
+            baseURL: "https://api.tangany.com/v1",
             timeout: 20000,
             headers: {
                 "tangany-client-id": options.clientId,
@@ -167,7 +167,7 @@ export class WaasApi extends WaasAxiosInstance {
     }
 
     /**
-     * Exposes the preconfigured AxiosInstance for arbitary api calls
+     * Exposes the preconfigured AxiosInstance for arbitrary api calls
      */
     public get axios() {
         return this.instance;

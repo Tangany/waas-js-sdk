@@ -1,12 +1,9 @@
-import {IHttpError} from ".";
+import {HttpError} from "./http-error";
 
-export class GeneralError implements IHttpError {
-    public readonly message: string;
-    public readonly name: string;
-
+export class GeneralError extends HttpError {
     constructor(msg: string, public readonly status = 400) {
+        super(msg, status);
+        this.name = this.constructor.name;
         Object.setPrototypeOf(this, GeneralError.prototype);
-        this.message = msg;
-        this.name = "Error";
     }
 }

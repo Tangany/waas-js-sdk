@@ -1,13 +1,9 @@
-import {IHttpError} from ".";
+import {HttpError} from "./http-error";
 
-export class NotFoundError implements IHttpError {
-    public readonly status = 404;
-    public readonly message: string;
-    public readonly name: string;
-
+export class NotFoundError extends HttpError {
     constructor(msg = "Requested resource not found") {
+        super(msg, 404);
+        this.name = this.constructor.name;
         Object.setPrototypeOf(this, NotFoundError.prototype);
-        this.message = msg;
-        this.name = "NotFoundError";
     }
 }

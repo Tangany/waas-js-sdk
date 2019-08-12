@@ -1,6 +1,7 @@
 import * as assert from "assert";
 import axios from "axios";
-import {TimeoutError} from "./errors";
+import {MiningError, TimeoutError} from "./errors";
+import {isBitcoinMiningErrorData} from "./errors/mining-error";
 import {Ethereum} from "./eth";
 import {sandbox} from "./helpers";
 
@@ -69,9 +70,13 @@ describe("Ethereum", function() {
             this.sandbox.stub(Ethereum.prototype, "get").resolves({data: {isError: true, blockNr: undefined}});
             await e.wait()
                 .then(() => assert.fail("should have failed"))
-                .catch(r => {
-                    assert.strictEqual(r.isError, true);
-                    assert.strictEqual(r.blockNr, undefined);
+                .catch((r: MiningError) => {
+                    console.log(r);
+                    if (isBitcoinMiningErrorData(r.txData)) {
+                        throw  new Error("invalid error type");
+                    }
+                    assert.strictEqual(r.txData.data.isError, true);
+                    assert.strictEqual(r.txData.data.blockNr, undefined);
                 });
         });
         it("should throw while the 'get' call", async function() {

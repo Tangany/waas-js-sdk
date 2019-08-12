@@ -111,7 +111,7 @@ describe("WaasApi", function() {
                 await assert.rejects(async () => axiosInstance.get("ramirez"), ConflictError);
             });
 
-            it("should throw a GeneralError for 400 server response", async function() {
+            it("should throw a MiningError for 400 server response", async function() {
                 moxios.stubRequest(/.*/, {
                     status: 500,
                     response: {message: "GeneralError"},

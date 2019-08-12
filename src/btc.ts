@@ -1,7 +1,7 @@
-import {IBitcoinTransactionStatus} from "./interfaces";
-import {WaasAxiosInstance} from "./waas-axios-instance";
 import {AxiosInstance} from "axios";
 import * as t from "typeforce";
+import {IBitcoinTransactionStatus} from "./interfaces";
+import {IWaitForTxStatus, WaasAxiosInstance} from "./waas-axios-instance";
 
 export class Bitcoin extends WaasAxiosInstance {
 
@@ -27,5 +27,21 @@ export class Bitcoin extends WaasAxiosInstance {
      */
     public async get(): Promise<IBitcoinTransactionStatus> {
         return this.instance.get(`btc/transaction/${this.txHash}`);
+    }
+
+    /**
+     * Helper: resolves when given Ethereum transaction is mined or errored
+     * @param [timeout] - throw when not mined until timeout ms
+     */
+    public async wait(timeout = 20000): Promise<IBitcoinTransactionStatus> {
+        const call: Promise<IWaitForTxStatus> = this.get().then((s: IBitcoinTransactionStatus) => {
+
+            return {
+                status: s.data.status,
+                response: s,
+            };
+        });
+
+        return this.waitForTxStatus(call, this.txHash, timeout) as Promise<IBitcoinTransactionStatus>;
     }
 }
