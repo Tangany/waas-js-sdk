@@ -39,7 +39,7 @@ export abstract class WaasAxiosInstance {
             const checkMined = async (): Promise<void> => {
                 debug("waiting for getter call");
                 const {status, response} = await statusGetterCall();
-                debug("received getter response", status, response.data);
+                debug("received getter response", {status}, response.data);
 
                 switch (status) {
                     case "confirmed":

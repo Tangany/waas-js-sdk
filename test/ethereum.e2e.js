@@ -36,7 +36,7 @@ describe("WaaS sample Ethereum workflow", function () {
 	
 	let createdWallet = "";
 	let createdWalletAddress = "";
-	let hash = "";
+	let txHash = "";
 	
 	const api = new WaasApi({
 		clientId: process.env.CLIENT_ID,
@@ -97,20 +97,20 @@ describe("WaaS sample Ethereum workflow", function () {
 		assert.ok(createdWalletAddress, "cannot run without previous tests");
 		const { hash } = (await api.wallet(tokenWallet).eth().erc20(tokenAddress).send(createdWalletAddress, tokenAmount)).data;
 		assert.ok(hash);
-		hash = hash;
+		txHash = hash;
 		debug(`sent ${tokenAmount} token to created walled with hash`, hash);
 	});
 	
 	it("should get the transaction status for the hash", async function () {
-		assert.ok(hash, "cannot run without previous tests");
-		const { blockNr, isError } = (await api.eth(hash).get()).data;
+		assert.ok(txHash, "cannot run without previous tests");
+		const { blockNr, isError } = (await api.eth(txHash).get()).data;
 		debug("inital tx status", { blockNr, isError });
 		assert.strictEqual(isError, false);
 	});
 	
 	it("should wait for the transaction to get mined", async function () {
-		assert.ok(hash, "cannot run without previous tests");
-		const { isError, blockNr } = (await api.eth(hash).wait(timeout));
+		assert.ok(txHash, "cannot run without previous tests");
+		const { isError, blockNr } = (await api.eth(txHash).wait(timeout));
 		assert.ok(typeof blockNr === "number");
 		debug(`mined in blockNr ${blockNr}`);
 	});
