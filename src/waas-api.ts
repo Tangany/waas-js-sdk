@@ -142,11 +142,11 @@ export class WaasApi extends WaasAxiosInstance {
         // removes functions from axios headers
         const filterHeaders = (headers: any) => Object.entries(headers).filter((v: [string, any]) => {
             return typeof v[1] === "string";
-        }).reduce((o, e) => ({...o, ...{[e[0]]: e[1]}}), {});
+        }).reduce((o, e) => ({...o, [e[0]]: e[1]}), {});
 
         instance.interceptors.request.use((req: AxiosRequestConfig) => {
-            const {method, url, data, headers} = req;
-            debug("interceptors.request", {method, url, data, headers: filterHeaders(headers)});
+            const {method, url, baseURL, data, headers} = req;
+            debug("interceptors.request", {method, url: `${baseURL}/${url}`, data, headers: filterHeaders(headers)});
 
             return req;
         });
