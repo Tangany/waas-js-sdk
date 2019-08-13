@@ -139,8 +139,26 @@ export class WaasApi extends WaasAxiosInstance {
 
         const instance = axios.create(api);
 
+        // removes functions from axios headers
+        const filterHeaders = (headers: any) => Object.entries(headers).filter((v: [string, any]) => {
+            return typeof v[1] === "string";
+        }).reduce((o, e) => ({...o, ...{[e[0]]: e[1]}}), {});
+
+        instance.interceptors.request.use((req: AxiosRequestConfig) => {
+            const {method, url, data, headers} = req;
+            debug("interceptors.request", {method, url, data, headers: filterHeaders(headers)});
+
+            return req;
+        });
+
         instance.interceptors.response.use((response: AxiosResponse) => {
-            debug("interceptors.response", response);
+            const {headers, data, status, statusText} = response;
+            debug("interceptors.response", {
+                headers: filterHeaders(headers),
+                data,
+                status,
+                statusText,
+            });
 
             return response;
         }, async (e: AxiosError) => {

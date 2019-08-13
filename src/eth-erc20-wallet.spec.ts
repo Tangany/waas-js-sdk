@@ -30,7 +30,7 @@ describe("EthErc20Wallet", function() {
             assert.throws(() => new EthErc20Wallet(axios, walletInstance, undefined as any).wallet);
         });
         it("should reject for invalid wallet", async function() {
-            assert.throws(() => new EthErc20Wallet(axios, walletInstance, console.log as any).wallet);
+            assert.throws(() => new EthErc20Wallet(axios, walletInstance, console.log.bind(this) as any).wallet);
         });
         it("should return the wallet", async function() {
             assert.strictEqual(new EthErc20Wallet(axios, walletInstance, sampleWallet).wallet, sampleWallet);
@@ -38,9 +38,9 @@ describe("EthErc20Wallet", function() {
     });
 
     describe("get", function() {
-        it("should execute the api call", function() {
+        it("should execute the api call", async function() {
             const stub = this.sandbox.stub(axios, "get");
-            new EthErc20Wallet(axios, walletInstance, sampleToken).get();
+            await new EthErc20Wallet(axios, walletInstance, sampleToken).get();
             assert.strictEqual(stub.callCount, 1);
         });
     });

@@ -1,7 +1,7 @@
 import {AxiosInstance} from "axios";
 import * as t from "typeforce";
 import {IBitcoinTransactionStatus} from "./interfaces";
-import {IWaitForTxStatus, WaasAxiosInstance} from "./waas-axios-instance";
+import {WaasAxiosInstance} from "./waas-axios-instance";
 
 export class Bitcoin extends WaasAxiosInstance {
 
@@ -22,7 +22,7 @@ export class Bitcoin extends WaasAxiosInstance {
     }
 
     /**
-     * Returns the status for a eth transaction. The transaction is not mined until a blockNr is assigned.
+     * Returns the status for a Bitcoin transaction
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/get-btc-tx-status}
      */
     public async get(): Promise<IBitcoinTransactionStatus> {
@@ -30,11 +30,11 @@ export class Bitcoin extends WaasAxiosInstance {
     }
 
     /**
-     * Helper: resolves when given Ethereum transaction is mined or errored
-     * @param [timeout] - throw when not mined until timeout ms
+     * Helper: resolves when transaction is mined and rejects on errors or timeout
+     * @param [timeout] - reject timeout in ms
      */
     public async wait(timeout = 20000): Promise<IBitcoinTransactionStatus> {
-        const call: Promise<IWaitForTxStatus> = this.get().then((s: IBitcoinTransactionStatus) => {
+        const call = () => this.get().then((s: IBitcoinTransactionStatus) => {
 
             return {
                 status: s.data.status,

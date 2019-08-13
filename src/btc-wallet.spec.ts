@@ -35,25 +35,25 @@ describe("BtcWallet", function() {
     });
 
     describe("get", function() {
-        it("should execute the api call", function() {
+        it("should execute the api call", async function() {
             const stub = this.sandbox.stub(axios, "get");
-            new BtcWallet(axios, new Wallet(axios, sampleWallet)).get();
+            await new BtcWallet(axios, new Wallet(axios, sampleWallet)).get();
             assert.strictEqual(stub.callCount, 1);
         });
     });
 
     describe("send", function() {
-        it("should execute the api call", function() {
+        it("should execute the api call", async function() {
             const stub = this.sandbox.stub(axios, "post");
-            new BtcWallet(axios, new Wallet(axios, sampleWallet)).send([recipient, recipient]);
+            await new BtcWallet(axios, new Wallet(axios, sampleWallet)).send([recipient, recipient]);
             assert.strictEqual(stub.callCount, 1);
         });
     });
 
     describe("estimateFee", function() {
-        it("should execute the api call", function() {
+        it("should execute the api call", async function() {
             const stub = this.sandbox.stub(axios, "post");
-            new BtcWallet(axios, new Wallet(axios, sampleWallet)).estimateFee(recipient);
+            await new BtcWallet(axios, new Wallet(axios, sampleWallet)).estimateFee(recipient);
             assert.strictEqual(stub.callCount, 1);
         });
     });

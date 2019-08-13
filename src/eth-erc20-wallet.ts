@@ -113,7 +113,6 @@ export class EthErc20Wallet extends WaasAxiosInstance {
     /**
      * @deprecated do not use outside of unit tests
      */
-        // @ts-ignore
         // tslint:disable-next-line:variable-name
     public __test_getRecipientsData = (...args: any) => this.getRecipientsData.apply(this, args);
 

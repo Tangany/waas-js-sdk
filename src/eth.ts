@@ -30,12 +30,12 @@ export class Ethereum extends WaasAxiosInstance {
     }
 
     /**
-     * Helper: resolves when given Ethereum transaction is mined or errored
-     * @param [timeout] - throw when not mined until timeout ms
+     * Helper: resolves when transaction is mined and rejects on errors or timeout
+     * @param [timeout] - reject timeout in ms
      */
-    public async wait(timeout = 20000): Promise<IEthereumTransactionStatus> {
+    public async wait(timeout = 20e3): Promise<IEthereumTransactionStatus> {
 
-        const call = this.get().then((res: IEthereumTransactionStatus) => {
+        const call = () => this.get().then((res: IEthereumTransactionStatus) => {
 
             let status: IWaitForTxStatus["status"];
 

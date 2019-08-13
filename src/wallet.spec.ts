@@ -93,17 +93,17 @@ describe("Wallet", function() {
     });
 
     describe("delete", function() {
-        it("should execute the api call", function() {
+        it("should execute the api call", async function() {
             const stub = this.sandbox.stub(axios, "delete");
-            new Wallet(axios, dummyWalletName).delete();
+            await new Wallet(axios, dummyWalletName).delete();
             assert.strictEqual(stub.callCount, 1);
         });
     });
 
     describe("get", function() {
-        it("should execute the api call", function() {
+        it("should execute the api call", async function() {
             const stub = this.sandbox.stub(axios, "get");
-            new Wallet(axios, dummyWalletName).get();
+            await new Wallet(axios, dummyWalletName).get();
             assert.strictEqual(stub.callCount, 1);
         });
     });

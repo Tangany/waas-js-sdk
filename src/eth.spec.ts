@@ -36,17 +36,17 @@ describe("Ethereum", function() {
     });
 
     describe("get", function() {
-        it("should execute the api call", function() {
+        it("should execute the api call", async function() {
             const stub = this.sandbox.stub(axios, "get");
-            new Ethereum(axios, nonHash).get();
+            await new Ethereum(axios, nonHash).get();
             assert.strictEqual(stub.callCount, 1);
         });
     });
 
     describe("send", function() {
-        it("should execute the api call", function() {
+        it("should execute the api call", async function() {
             const stub = this.sandbox.stub(axios, "get");
-            new Ethereum(axios, nonHash).get();
+            await new Ethereum(axios, nonHash).get();
             assert.strictEqual(stub.callCount, 1);
         });
     });
@@ -63,7 +63,7 @@ describe("Ethereum", function() {
             const e = new Ethereum(axios, nonHash);
             this.sandbox.stub(Ethereum.prototype, "get").resolves({data: {isError: false, blockNr: 777}});
 
-            await assert.doesNotReject(async () => e.wait(), TimeoutError);
+            await assert.doesNotReject(async () => e.wait());
         });
         it("should reject for a unsuccessful transaction", async function() {
             const e = new Ethereum(axios, nonHash);

@@ -3,6 +3,8 @@ const { config } = require("dotenv");
 const assert = require("assert");
 const { resolve } = require("path");
 const path = resolve(process.cwd(), ".env");
+const debug = require("debug")("waas-js-sdk:bitcoin-e2e");
+
 config({ path });
 
 describe("WaaS sample Bitcoin workflow", function () {
@@ -45,14 +47,14 @@ describe("WaaS sample Bitcoin workflow", function () {
 		assert.strictEqual(currency, "BTCTEST");
 		assert.ok(balance);
 		assert.ok(address);
-		console.log(`Wallet holds ${balance} ${currency} `);
+		debug(`Wallet holds ${balance} ${currency} `);
 	});
 	
 	it("should estimate the fee for given tx", async function () {
 		const { fee, feeRate } = (await api.wallet(wallet).btc().estimateFee(recipients)).data;
 		assert.ok(fee);
 		assert.ok(feeRate);
-		console.log(`Estimated a total transaction fee of ${fee} for given recipients based on a feeRate of ${feeRate}`);
+		debug(`Estimated a total transaction fee of ${fee} for given recipients based on a feeRate of ${feeRate}`);
 	});
 	
 	let lastHash;
@@ -61,7 +63,7 @@ describe("WaaS sample Bitcoin workflow", function () {
 			[recipients, recipients]
 		)).data;
 		assert.ok(hash);
-		console.log(`Sent with hash ${hash}`);
+		debug(`Sent with hash ${hash}`);
 		lastHash = hash;
 	});
 	
@@ -70,7 +72,7 @@ describe("WaaS sample Bitcoin workflow", function () {
 		const { confirmations, status } = (await api.btc(lastHash).get()).data;
 		assert.strictEqual(confirmations, 0);
 		assert.strictEqual(status, "pending");
-		console.log("inital tx status", { confirmations, status });
+		debug("inital tx status", { confirmations, status });
 	});
 	
 	it("should wait for the transaction to get mined", async function () {
@@ -78,6 +80,6 @@ describe("WaaS sample Bitcoin workflow", function () {
 		const { confirmations, status } = (await api.btc(lastHash).wait(timeout)).data;
 		assert.ok(confirmations);
 		assert.ok(status);
-		console.log(`tx mined in block ${confirmations}`);
+		debug(`tx mined in block ${confirmations}`);
 	});
 });

@@ -37,9 +37,9 @@ describe("Bitcoin", function() {
     });
 
     describe("get", function() {
-        it("should execute the api call", function() {
+        it("should execute the api call", async function() {
             const stub = this.sandbox.stub(axios, "get");
-            new Bitcoin(axios, nonHash).get();
+            await new Bitcoin(axios, nonHash).get();
             assert.strictEqual(stub.callCount, 1);
         });
     });
@@ -62,7 +62,7 @@ describe("Bitcoin", function() {
             this.sandbox.stub(Bitcoin.prototype, "get").resolves({data: {status: "confirmed", confirmations: 213}});
 
             await assert.doesNotReject(async () => e.wait());
-            await assert.strictEqual((await e.wait()).data.confirmations, 213);
+            assert.strictEqual((await e.wait()).data.confirmations, 213);
         });
         it("should reject for a unsuccessful transaction", async function() {
             const e = new Bitcoin(axios, nonHash);
