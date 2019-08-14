@@ -1,7 +1,7 @@
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
 import * as Debug from "debug";
 import {Bitcoin} from "./btc";
-import {IWaasError} from "./interfaces"
+import {IWaasError} from "./interfaces";
 import {Wallet} from "./wallet";
 import {WaasAxiosInstance} from "./waas-axios-instance";
 import {Ethereum} from "./eth";
@@ -141,7 +141,7 @@ export class WaasApi extends WaasAxiosInstance {
         const instance = axios.create(api);
 
         // removes functions from axios headers object
-        const filterHeaders = (headers: any) => Object.entries(headers)
+        const filterHeaders = (headers: object) => headers && Object.entries(headers)
             .filter((v: [string, any]) => {
                 return typeof v[1] === "string";
             })
