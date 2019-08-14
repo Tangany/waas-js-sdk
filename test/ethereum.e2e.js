@@ -4,9 +4,11 @@ const { config } = require("dotenv");
 const assert = require("assert");
 const { resolve } = require("path");
 const debug = require("debug")("waas-js-sdk:ethereum-e2e");
-
 const path = resolve(process.cwd(), ".env");
+
+process.env.DEBUG = "waas-js-sdk:*"; // force enable logging
 config({ path });
+
 
 const tokenAddress = "0x0A35aA64eb710c97Fa14258243eeD09AB51a5b4E"; // ERC20 token address
 const tokenWallet = "func-spec"; // Wallet that owns the ERC20 token

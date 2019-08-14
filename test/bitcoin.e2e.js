@@ -5,6 +5,7 @@ const { resolve } = require("path");
 const path = resolve(process.cwd(), ".env");
 const debug = require("debug")("waas-js-sdk:bitcoin-e2e");
 
+process.env.DEBUG = "waas-js-sdk:*"; // force enable logging
 config({ path });
 
 describe("WaaS sample Bitcoin workflow", function () {

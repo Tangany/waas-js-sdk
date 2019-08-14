@@ -3,8 +3,9 @@ const { config } = require("dotenv");
 const { resolve } = require("path");
 const debug = require("debug")("waas-js-sdk:wait-e2e");
 const assert = require("assert");
-
 const path = resolve(process.cwd(), ".env");
+
+process.env.DEBUG = "waas-js-sdk:*"; // force enable logging
 config({ path });
 
 describe("wait", function () {
