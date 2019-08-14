@@ -31,9 +31,11 @@ export class Ethereum extends WaasAxiosInstance {
 
     /**
      * Helper: resolves when transaction is mined and rejects on errors or timeout
+     * Attention: method polls the API frequently and may result in excessive quota usage
      * @param [timeout] - reject timeout in ms
+     * @param [ms] - milliseconds delay between API polling attempts
      */
-    public async wait(timeout = 20e3): Promise<IEthereumTransactionStatus> {
+    public async wait(timeout = 20e3, ms = 4e2): Promise<IEthereumTransactionStatus> {
 
         const call = () => this.get().then((res: IEthereumTransactionStatus) => {
 
@@ -54,7 +56,7 @@ export class Ethereum extends WaasAxiosInstance {
             };
         });
 
-        return this.waitForTxStatus(call, this.txHash, timeout) as Promise<IEthereumTransactionStatus>;
+        return this.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IEthereumTransactionStatus>;
 
     }
 }

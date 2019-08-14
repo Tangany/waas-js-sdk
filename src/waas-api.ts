@@ -1,6 +1,7 @@
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
 import * as Debug from "debug";
 import {Bitcoin} from "./btc";
+import {IWaasError} from "./interfaces"
 import {Wallet} from "./wallet";
 import {WaasAxiosInstance} from "./waas-axios-instance";
 import {Ethereum} from "./eth";
@@ -139,10 +140,12 @@ export class WaasApi extends WaasAxiosInstance {
 
         const instance = axios.create(api);
 
-        // removes functions from axios headers
-        const filterHeaders = (headers: any) => Object.entries(headers).filter((v: [string, any]) => {
-            return typeof v[1] === "string";
-        }).reduce((o, e) => ({...o, [e[0]]: e[1]}), {});
+        // removes functions from axios headers object
+        const filterHeaders = (headers: any) => Object.entries(headers)
+            .filter((v: [string, any]) => {
+                return typeof v[1] === "string";
+            })
+            .reduce((o, e) => ({...o, [e[0]]: e[1]}), {});
 
         instance.interceptors.request.use((req: AxiosRequestConfig) => {
             const {method, url, baseURL, data, headers} = req;
@@ -161,19 +164,25 @@ export class WaasApi extends WaasAxiosInstance {
             });
 
             return response;
-        }, async (e: AxiosError) => {
+        }, async (e: AxiosError<IWaasError>) => {
             if (e.response) {
-                debug("interceptors.response.error", e.response.status, e.response.data);
+                const {response, message} = e;
+
+                debug("interceptors.response.error", {
+                    response: response.data,
+                    headers: filterHeaders(response.headers),
+                    message,
+                });
 
                 switch (e.response.status) {
                     case 401:
-                        throw new AuthenticationError(e.response.data.message);
+                        throw new AuthenticationError(response.data.message);
                     case 409:
-                        throw new ConflictError(e.response.data.message);
+                        throw new ConflictError(response.data.message);
                     case 404:
-                        throw new NotFoundError(e.response.data.message);
+                        throw new NotFoundError(response.data.message);
                     default:
-                        throw new GeneralError(e.response.data, e.response.status);
+                        throw new GeneralError(response.data.message, response.status);
                 }
 
             }

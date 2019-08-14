@@ -106,3 +106,9 @@ export interface IRecipient {
     to: string;
     amount: string;
 }
+
+export interface IWaasError {
+    statusCode: number;
+    activityId: string;
+    message: string;
+}

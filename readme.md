@@ -148,7 +148,7 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
     // get transaction status
     const { confirmations, status } = (await api.get()).data;
     // wait until the transaction is mined
-    await api.wait(); 
+    await api.wait(20e3, 1e3); 
 })();
 ````
 

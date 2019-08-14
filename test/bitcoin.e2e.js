@@ -33,17 +33,19 @@ describe("WaaS sample Bitcoin workflow", function () {
 		throw new Error("process.env.VAULT_URL not defined");
 	}
 	
-	const api = new WaasApi({
+	const options = {
 		clientId: process.env.CLIENT_ID,
 		clientSecret: process.env.CLIENT_SECRET,
 		subscription: process.env.SUBSCRIPTION,
 		vaultUrl: process.env.VAULT_URL,
 		bitcoinNetwork: BITCOIN_NETWORK.TESTNET,
-		bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.NONE,
-	});
+		bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.NONE
+	};
+	const noConfirmationsBtcApi = new WaasApi(options); // coins available regardless of mining status
+	const safeBtcBalanceApi = new WaasApi({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.DEFAULT }); // test transaction mining status
 	
 	it("should get the Bitcoin specs for the current wallet", async function () {
-		const { currency, balance, address } = (await api.wallet(wallet).btc().get()).data;
+		const { currency, balance, address } = (await noConfirmationsBtcApi.wallet(wallet).btc().get()).data;
 		assert.strictEqual(currency, "BTCTEST");
 		assert.ok(balance);
 		assert.ok(address);
@@ -51,7 +53,7 @@ describe("WaaS sample Bitcoin workflow", function () {
 	});
 	
 	it("should estimate the fee for given tx", async function () {
-		const { fee, feeRate } = (await api.wallet(wallet).btc().estimateFee(recipients)).data;
+		const { fee, feeRate } = (await noConfirmationsBtcApi.wallet(wallet).btc().estimateFee(recipients)).data;
 		assert.ok(fee);
 		assert.ok(feeRate);
 		debug(`Estimated a total transaction fee of ${fee} for given recipients based on a feeRate of ${feeRate}`);
@@ -59,7 +61,7 @@ describe("WaaS sample Bitcoin workflow", function () {
 	
 	let lastHash;
 	it("should send some BTC to two recipients in a single tx", async function () {
-		const { hash } = (await api.wallet(wallet).btc().send(
+		const { hash } = (await noConfirmationsBtcApi.wallet(wallet).btc().send(
 			[recipients, recipients]
 		)).data;
 		assert.ok(hash);
@@ -69,15 +71,14 @@ describe("WaaS sample Bitcoin workflow", function () {
 	
 	it("should fetch the tx details", async function () {
 		assert.ok(lastHash, "cannot run without previous tests");
-		const { confirmations, status } = (await api.btc(lastHash).get()).data;
+		const { confirmations, status } = (await noConfirmationsBtcApi.btc(lastHash).get()).data;
 		assert.strictEqual(confirmations, 0);
-		assert.strictEqual(status, "pending");
 		debug("inital tx status", { confirmations, status });
 	});
 	
 	it("should wait for the transaction to get mined", async function () {
 		assert.ok(lastHash, "cannot run without previous tests");
-		const { confirmations, status } = (await api.btc(lastHash).wait(timeout)).data;
+		const { confirmations, status } = (await safeBtcBalanceApi.btc(lastHash).wait(timeout)).data;
 		assert.ok(confirmations);
 		assert.ok(status);
 		debug(`tx mined in block ${confirmations}`);

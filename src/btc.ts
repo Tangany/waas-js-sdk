@@ -31,9 +31,11 @@ export class Bitcoin extends WaasAxiosInstance {
 
     /**
      * Helper: resolves when transaction is mined and rejects on errors or timeout
+     * Attention: method polls the API frequently and may result in high quota usage
      * @param [timeout] - reject timeout in ms
+     * @param [ms] - milliseconds delay between api polling attempts
      */
-    public async wait(timeout = 20000): Promise<IBitcoinTransactionStatus> {
+    public async wait(timeout = 20e3, ms = 8e2): Promise<IBitcoinTransactionStatus> {
         const call = () => this.get().then((s: IBitcoinTransactionStatus) => {
 
             return {
@@ -42,6 +44,6 @@ export class Bitcoin extends WaasAxiosInstance {
             };
         });
 
-        return this.waitForTxStatus(call, this.txHash, timeout) as Promise<IBitcoinTransactionStatus>;
+        return this.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IBitcoinTransactionStatus>;
     }
 }

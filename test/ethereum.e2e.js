@@ -110,7 +110,7 @@ describe("WaaS sample Ethereum workflow", function () {
 	
 	it("should wait for the transaction to get mined", async function () {
 		assert.ok(txHash, "cannot run without previous tests");
-		const { isError, blockNr } = (await api.eth(txHash).wait(timeout));
+		const { isError, blockNr } = (await api.eth(txHash).wait(timeout)).data;
 		assert.ok(typeof blockNr === "number");
 		debug(`mined in blockNr ${blockNr}`);
 	});
