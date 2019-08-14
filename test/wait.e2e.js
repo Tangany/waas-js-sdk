@@ -1,4 +1,4 @@
-const { Waas, ETHEREUM_PUBLIC_NETWORK, BITCOIN_NETWORK, BITCOIN_TX_CONFIRMATIONS, TimeoutError } = require("../dist");
+const { Waas, ETHEREUM_PUBLIC_NETWORK, BITCOIN_NETWORK, BITCOIN_TX_CONFIRMATIONS,BITCOIN_TX_SPEED, TimeoutError } = require("../dist");
 const { config } = require("dotenv");
 const { resolve } = require("path");
 const debug = require("debug")("waas-js-sdk:wait-e2e");
@@ -57,11 +57,13 @@ describe("wait", function () {
 			subscription: process.env.SUBSCRIPTION,
 			vaultUrl: process.env.VAULT_URL,
 			bitcoinNetwork: BITCOIN_NETWORK.TESTNET,
-			bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.NONE
+			bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.NONE,
+			bitcoinTxSpeed: BITCOIN_TX_SPEED.FAST,
+			bitcoinMaxFeeRate: 2000
 		};
 		
 		it("should wait for a Bitcoin tx", async function () {
-			this.timeout(600e3);
+			this.timeout(600e3); // could take a while
 			
 			const fastApi = new Waas(options);
 			const safeApi = new Waas({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.DEFAULT });
