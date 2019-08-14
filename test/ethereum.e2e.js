@@ -1,5 +1,5 @@
-const { WaasApi } = require("../dist");
-const { EthereumPublicNetwork } = require("../src/waas-api");
+const { Waas } = require("../dist");
+const { EthereumPublicNetwork } = require("../src/waas");
 const { config } = require("dotenv");
 const assert = require("assert");
 const { resolve } = require("path");
@@ -40,7 +40,7 @@ describe("WaaS sample Ethereum workflow", function () {
 	let createdWalletAddress = "";
 	let txHash = "";
 	
-	const api = new WaasApi({
+	const api = new Waas({
 		clientId: process.env.CLIENT_ID,
 		clientSecret: process.env.CLIENT_SECRET,
 		subscription: process.env.SUBSCRIPTION,

@@ -5,7 +5,7 @@ import * as t from "typeforce";
 
 /**
  * Instantiates a new Ethereum interface
- * @param instance - axios instance created by {@link WaasApi}
+ * @param instance - axios instance created by {@link Waas}
  * @param [txHash] - Ethereum transaction hash
  */
 export class Ethereum extends WaasAxiosInstance {

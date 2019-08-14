@@ -1,4 +1,4 @@
-const { WaasApi, BITCOIN_NETWORK, BITCOIN_TX_CONFIRMATIONS } = require("../dist");
+const { Waas, BITCOIN_NETWORK, BITCOIN_TX_CONFIRMATIONS } = require("../dist");
 const { config } = require("dotenv");
 const assert = require("assert");
 const { resolve } = require("path");
@@ -42,8 +42,8 @@ describe("WaaS sample Bitcoin workflow", function () {
 		bitcoinNetwork: BITCOIN_NETWORK.TESTNET,
 		bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.NONE
 	};
-	const noConfirmationsBtcApi = new WaasApi(options); // coins available regardless of mining status
-	const safeBtcBalanceApi = new WaasApi({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.DEFAULT }); // test transaction mining status
+	const noConfirmationsBtcApi = new Waas(options); // coins available regardless of mining status
+	const safeBtcBalanceApi = new Waas({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.DEFAULT }); // test transaction mining status
 	
 	it("should get the Bitcoin specs for the current wallet", async function () {
 		const { currency, balance, address } = (await noConfirmationsBtcApi.wallet(wallet).btc().get()).data;

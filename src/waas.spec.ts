@@ -9,14 +9,14 @@ import {
     BitcoinTxSpeed,
     EthereumPublicNetwork,
     EthereumTxSpeed,
-    WaasApi,
-} from "./waas-api";
+    Waas,
+} from "./waas";
 import {Wallet} from "./wallet";
 import * as moxios from "moxios";
 
 sandbox();
 
-describe("WaasApi", function() {
+describe("Waas", function() {
 
     const auth = {
         clientId: "1",
@@ -25,8 +25,8 @@ describe("WaasApi", function() {
     };
 
     it("should construct an instance", function() {
-        assert.ok(new WaasApi(auth));
-        assert.ok(new WaasApi({
+        assert.ok(new Waas(auth));
+        assert.ok(new Waas({
             ...auth,
             vaultUrl: "https://my-vault.some-cloud.tld",
             ethereumNetwork: EthereumPublicNetwork.ROPSTEN,
@@ -39,26 +39,26 @@ describe("WaasApi", function() {
     });
 
     it("should throw for missing or invalid authentication", function() {
-        assert.throws(() => new WaasApi({} as any));
-        assert.throws(() => new WaasApi({...auth, clientId: ""}));
-        assert.throws(() => new WaasApi({clientId: "123"} as any));
-        assert.throws(() => new WaasApi({clientId: "123", clientSecret: true} as any));
+        assert.throws(() => new Waas({} as any));
+        assert.throws(() => new Waas({...auth, clientId: ""}));
+        assert.throws(() => new Waas({clientId: "123"} as any));
+        assert.throws(() => new Waas({clientId: "123", clientSecret: true} as any));
     });
 
     it("should throw for invalid options", function() {
-        assert.throws(() => new WaasApi({...auth, vaultUrl: true} as any));
-        assert.throws(() => new WaasApi({...auth, ethereumNetwork: 23} as any));
-        assert.throws(() => new WaasApi({...auth, ethereumTxSpeed: eval} as any));
-        assert.throws(() => new WaasApi({...auth, bitcoinNetwork: 1} as any));
-        assert.throws(() => new WaasApi({...auth, bitcoinTxSpeed: Symbol} as any));
-        assert.throws(() => new WaasApi({...auth, bitcoinTxConfirmations: -2} as any));
-        assert.throws(() => new WaasApi({...auth, bitcoinMaxFeeRate: "yak"} as any));
+        assert.throws(() => new Waas({...auth, vaultUrl: true} as any));
+        assert.throws(() => new Waas({...auth, ethereumNetwork: 23} as any));
+        assert.throws(() => new Waas({...auth, ethereumTxSpeed: eval} as any));
+        assert.throws(() => new Waas({...auth, bitcoinNetwork: 1} as any));
+        assert.throws(() => new Waas({...auth, bitcoinTxSpeed: Symbol} as any));
+        assert.throws(() => new Waas({...auth, bitcoinTxConfirmations: -2} as any));
+        assert.throws(() => new Waas({...auth, bitcoinMaxFeeRate: "yak"} as any));
     });
 
     describe("axios", function() {
 
         it("should return a preconfigured AxiosInstance", async function() {
-            const {axios: axiosInstance} = new WaasApi(auth);
+            const {axios: axiosInstance} = new Waas(auth);
             this.sandbox.stub(axiosInstance, "get").resolves({response: {status: 202}});
             await assert.doesNotReject(async () => axiosInstance.get("/"));
         });
@@ -78,7 +78,7 @@ describe("WaasApi", function() {
                     status: 200,
                     responseText: "OK",
                 });
-                const {axios: axiosInstance} = new WaasApi(auth);
+                const {axios: axiosInstance} = new Waas(auth);
 
                 await assert.doesNotReject(async () => axiosInstance.get("bielefeld"));
             });
@@ -88,7 +88,7 @@ describe("WaasApi", function() {
                     status: 404,
                     response: {message: "NotFoundError"},
                 });
-                const {axios: axiosInstance} = new WaasApi(auth);
+                const {axios: axiosInstance} = new Waas(auth);
 
                 await assert.rejects(async () => axiosInstance.get("bielefeld"), NotFoundError);
             });
@@ -98,7 +98,7 @@ describe("WaasApi", function() {
                     status: 401,
                     response: {message: "AuthenticationError"},
                 });
-                const {axios: axiosInstance} = new WaasApi(auth);
+                const {axios: axiosInstance} = new Waas(auth);
                 await assert.rejects(async () => axiosInstance.get("navorski"), AuthenticationError);
             });
 
@@ -107,7 +107,7 @@ describe("WaasApi", function() {
                     status: 409,
                     response: {message: "ConflictError"},
                 });
-                const {axios: axiosInstance} = new WaasApi(auth);
+                const {axios: axiosInstance} = new Waas(auth);
                 await assert.rejects(async () => axiosInstance.get("ramirez"), ConflictError);
             });
 
@@ -116,7 +116,7 @@ describe("WaasApi", function() {
                     status: 500,
                     response: {message: "GeneralError"},
                 });
-                const {axios: axiosInstance} = new WaasApi(auth);
+                const {axios: axiosInstance} = new Waas(auth);
                 await assert.rejects(async () => axiosInstance.get("hal"), GeneralError);
             });
         });
@@ -124,21 +124,21 @@ describe("WaasApi", function() {
 
     describe("wallet", function() {
         it("should return a Wallet instance", async function() {
-            const w = new WaasApi(auth);
+            const w = new Waas(auth);
             assert.ok(w.wallet() instanceof Wallet);
         });
     });
 
     describe("eth", function() {
         it("should return a Ethereum instance", async function() {
-            const w = new WaasApi(auth);
+            const w = new Waas(auth);
             assert.ok(w.eth() instanceof Ethereum);
         });
     });
 
     describe("btc", function() {
         it("should return a Bitcoin instance", async function() {
-            const w = new WaasApi(auth);
+            const w = new Waas(auth);
             assert.ok(w.btc() instanceof Bitcoin);
         });
     });

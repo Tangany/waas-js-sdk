@@ -8,7 +8,7 @@ import {Wallet} from "./wallet";
 
 /**
  *  instantiates a new Ethereum wallet interface
- * @param instance - axios instance created by {@link WaasApi}
+ * @param instance - axios instance created by {@link Waas}
  * @param walletInstance - instance of Wallet class
  */
 export class EthWallet extends WaasAxiosInstance {

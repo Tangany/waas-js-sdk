@@ -7,7 +7,7 @@ export class Bitcoin extends WaasAxiosInstance {
 
     /**
      * Instantiates a new Bitcoin interface
-     * @param instance - axios instance created by {@link WaasApi}
+     * @param instance - axios instance created by {@link Waas}
      * @param [transactionHash] - Bitcoin transaction hash
      */
     constructor(instance: AxiosInstance, private readonly transactionHash?: string) {

@@ -1,4 +1,4 @@
-const { WaasApi, ETHEREUM_PUBLIC_NETWORK, BITCOIN_NETWORK, BITCOIN_TX_CONFIRMATIONS, TimeoutError } = require("../dist");
+const { Waas, ETHEREUM_PUBLIC_NETWORK, BITCOIN_NETWORK, BITCOIN_TX_CONFIRMATIONS, TimeoutError } = require("../dist");
 const { config } = require("dotenv");
 const { resolve } = require("path");
 const debug = require("debug")("waas-js-sdk:wait-e2e");
@@ -23,7 +23,7 @@ describe("wait", function () {
 		it("should wait for a Ethereum tx", async function () {
 			this.timeout(60e3);
 			
-			const api = new WaasApi(options);
+			const api = new Waas(options);
 			
 			const { wallet: newWallet } = (await api.wallet().create()).data;
 			const { address: newWalletAddress } = (await api.wallet(newWallet).eth().get()).data;
@@ -38,7 +38,7 @@ describe("wait", function () {
 		it("should time out for a Ethereum tx", async function () {
 			this.timeout(20e3);
 			
-			const api = new WaasApi(options);
+			const api = new Waas(options);
 			
 			const { wallet: newWallet } = (await api.wallet().create()).data;
 			const { address: newWalletAddress } = (await api.wallet(newWallet).eth().get()).data;
@@ -63,8 +63,8 @@ describe("wait", function () {
 		it("should wait for a Bitcoin tx", async function () {
 			this.timeout(600e3);
 			
-			const fastApi = new WaasApi(options);
-			const safeApi = new WaasApi({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.DEFAULT });
+			const fastApi = new Waas(options);
+			const safeApi = new Waas({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.DEFAULT });
 			
 			const { wallet: newWallet } = (await fastApi.wallet().create()).data;
 			const { address: newWalletAddress } = (await fastApi.wallet(newWallet).btc().get()).data;
@@ -79,8 +79,8 @@ describe("wait", function () {
 		it("should time out for a Bitcoin tx", async function () {
 			this.timeout(20e3);
 			
-			const fastApi = new WaasApi(options);
-			const safeApi = new WaasApi({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.DEFAULT });
+			const fastApi = new Waas(options);
+			const safeApi = new Waas({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.DEFAULT });
 			
 			const { wallet: newWallet } = (await fastApi.wallet().create()).data;
 			const { address: newWalletAddress } = (await fastApi.wallet(newWallet).btc().get()).data;

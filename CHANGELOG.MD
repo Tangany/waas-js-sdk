@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   
 ### Changed
 * 🚨 Breaking: changed accepted function arguments in `EthereumWallet.send` to match `BitcoinWallet.send`
+* 🚨 Breaking: main export renamed to "Waas"
 
 ## [0.1.0]
 Initial release for WaaS 1.1 

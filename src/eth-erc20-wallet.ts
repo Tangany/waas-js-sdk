@@ -15,7 +15,7 @@ enum METHOD {
 
 /**
  * Instantiates a new Ethereum ERC20 wallet interface
- * @param instance - Axios instance created by {@link WaasApi}
+ * @param instance - Axios instance created by {@link Waas}
  * @param walletInstance - Instance of Wallet class
  * @param address - ERC20 token contract address
  */

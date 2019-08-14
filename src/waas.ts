@@ -75,7 +75,7 @@ interface IWaaSOptions {
  * @param options.bitcoinTxSpeed - Target amount of block confirmations for the transaction to be included to the Bitcoin network
  * @param options.bitcoinMaxFeeRate - Maximum allowed fee rate in satoshi per byte for a Bitcoin transaction
  */
-export class WaasApi extends WaasAxiosInstance {
+export class Waas extends WaasAxiosInstance {
 
     constructor(options: IWaaSOptions) {
 

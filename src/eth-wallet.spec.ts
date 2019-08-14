@@ -1,7 +1,7 @@
 import {sandbox} from "./helpers";
 import axios from "axios";
 import * as assert from "assert";
-import {WaasApi} from "./waas-api";
+import {Waas} from "./waas";
 import {EthWallet} from "./eth-wallet";
 import {Wallet} from "./wallet";
 
@@ -56,7 +56,7 @@ describe("EthWallet", function() {
     describe("erc20", function() {
         it("should return an EthErc20Token instance", async function() {
             this.stub.restore();
-            const w = new WaasApi(auth);
+            const w = new Waas(auth);
             assert.ok(w.wallet(sampleWallet).eth().erc20("0xB8c77482e45F1F44dE1745F52C74426C631bDD52"));
         });
     });

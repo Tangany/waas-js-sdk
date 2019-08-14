@@ -7,7 +7,7 @@ import * as t from "typeforce";
 
 /**
  * Represents a new Bitcoin wallet interface
- * @param instance - axios instance created by {@link WaasApi}
+ * @param instance - axios instance created by {@link Waas}
  * @param walletInstance - instance of Wallet class
  */
 export class BtcWallet extends WaasAxiosInstance {

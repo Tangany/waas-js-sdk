@@ -18,14 +18,14 @@ npm install @tangany/waas-js-sdk
 
 Import the main module
 ```javascript
-const { WaasApi } = require("@tangany/waas-js-sdk");
+const { Waas } = require("@tangany/waas-js-sdk");
 
 // load the environment variables
 const dotenv = require("dotenv");
 dotenv.config();
 
 // instantiate the SDK
-const api = new WaasApi({
+const api = new Waas({
         clientId: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
         subscription: process.env.SUBSCRIPTION,
@@ -80,7 +80,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 ````javascript
 
 (async () => {
-    const api = new WaasApi(options);
+    const api = new Waas(options);
     // list all wallets
     const { list } = (await api.wallet().list()).data;
     //  create a new wallet
@@ -96,7 +96,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 *Ethereum calls that are not wallet based*
 ````javascript
 (async () => {
-    const api = new WaasApi(options).eth(txHash);
+    const api = new Waas(options).eth(txHash);
     // get transaction status
     const { blockNr, isError } = (await api.get()).data;
     // wait until the transaction is mined
@@ -109,7 +109,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 https://tangany.docs.stoplight.io/api/ethereum/
 ````javascript
 (async () => {
-    const api = new WaasApi(options).wallet("my-wallet");
+    const api = new Waas(options).wallet("my-wallet");
     // send Ether
     const { hash } = (await api.eth().send({to: someOtherWalletAddress, amount: "0.043"})).data;
     // get eth balance and wallet address
@@ -122,7 +122,7 @@ https://tangany.docs.stoplight.io/api/ethereum/
 https://tangany.docs.stoplight.io/api/ethereum-erc20
 ````javascript
 (async () => {
-    const api = new WaasApi(options).wallet("my-wallet").eth().erc20(tokenAddress); 
+    const api = new Waas(options).wallet("my-wallet").eth().erc20(tokenAddress); 
     // send token
     const { hash } = (await api.send(someOtherWalletAddress, "0.043")).data;
     // get token balance
@@ -132,9 +132,9 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
     // approve token withdrawal
     await api.approve(someOtherWalletAddress, "213");
     // withdraw pre-approved tokens
-    await new WaasApi(options).wallet("some-other-wallet").eth().erc20(tokenAddress).transferFrom(myWalletAddress, "213");
+    await new Waas(options).wallet("some-other-wallet").eth().erc20(tokenAddress).transferFrom(myWalletAddress, "213");
     // burn token
-    await new WaasApi(options).wallet("some-other-wallet").eth().erc20(tokenAddress).burn("2");
+    await new Waas(options).wallet("some-other-wallet").eth().erc20(tokenAddress).burn("2");
 })();
 ````
 
@@ -142,7 +142,7 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 *Bitcoin calls that are not wallet based*
 ````javascript
 (async () => {
-    const api = new WaasApi(options).btc(hash);
+    const api = new Waas(options).btc(hash);
     // get transaction status
     const { confirmations, status } = (await api.get()).data;
     // wait until the transaction is mined
@@ -155,7 +155,7 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 https://tangany.docs.stoplight.io/api/bitcoin/
 ````javascript
 (async () => {
-    const api = new WaasApi(options).wallet("my-wallet");
+    const api = new Waas(options).wallet("my-wallet");
     // estimate fee for a transaction
     const { fee, feeRate } = (await api.btc().estimateFee({to: someAddress, amount: "0.021"})).data;
     // send BTC to a single recipient

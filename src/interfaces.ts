@@ -1,5 +1,5 @@
 import {AxiosResponse} from "axios";
-import {WalletSecurity, WalletVersion} from "./waas-api";
+import {WalletSecurity, WalletVersion} from "./waas";
 
 /**
  * Represents the response of a ERC20 token wallet balance
