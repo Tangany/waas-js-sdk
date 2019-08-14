@@ -60,7 +60,7 @@ describe("WaaS sample Bitcoin workflow", function () {
 	});
 	
 	let lastHash;
-	it("should send some BTC to two recipients in a single tx", async function () {
+	it("should send some BTC to multiple recipients in a single tx", async function () {
 		const { hash } = (await noConfirmationsBtcApi.wallet(wallet).btc().send(
 			[recipients, recipients]
 		)).data;
@@ -74,13 +74,5 @@ describe("WaaS sample Bitcoin workflow", function () {
 		const { confirmations, status } = (await noConfirmationsBtcApi.btc(lastHash).get()).data;
 		assert.strictEqual(confirmations, 0);
 		debug("inital tx status", { confirmations, status });
-	});
-	
-	it("should wait for the transaction to get mined", async function () {
-		assert.ok(lastHash, "cannot run without previous tests");
-		const { confirmations, status } = (await safeBtcBalanceApi.btc(lastHash).wait(timeout)).data;
-		assert.ok(confirmations);
-		assert.ok(status);
-		debug(`tx mined in block ${confirmations}`);
 	});
 });
