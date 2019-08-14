@@ -11,7 +11,7 @@
 [![WaaS API version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/sdk-badge.svg?sanitize=true)](https://tangany.docs.stoplight.io/)
 
 ## Getting started
-Install the package
+Install the [npm package]
 ```
 npm install @tangany/waas-js-sdk
 ```
@@ -195,3 +195,5 @@ Full API documentation is available at https://tangany.docs.stoplight.io/
 • <a href="https://github.com/Tangany/">Github</a>
 </p>
 </div>
+
+[npm package]: https://www.npmjs.com/package/@tangany/waas-js-sdk
