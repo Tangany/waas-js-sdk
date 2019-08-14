@@ -73,7 +73,7 @@ describe("WaaS sample Ethereum workflow", function () {
 	
 	it("should get the created wallet data", async function () {
 		assert.ok(createdWallet, "cannot run without previous tests");
-		const { updated, wallet, version, created, security } = (await api.wallet(createdWallet).get()).data;
+		const { security, created, version, wallet, updated } = (await api.wallet(createdWallet).get()).data;
 		assert.ok(security);
 		assert.ok(created);
 		assert.ok(version);

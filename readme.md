@@ -5,7 +5,7 @@
   <h1>Official Javascript SDK for Tangany Wallet as a Service API</h1>      
 </div>  
 
-A node.js integration of the [Tangany Wallet as a Service API](https://tangany.com) to be used in a backend scenario.
+[Axios](https://github.com/axios/axios) based node.js wrapper for [Tangany WaaS](https://tangany.com)
 
 [![NPM version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/package-badge.svg?sanitize=true)](https://www.npmjs.com/package/@tangany/waas-js-sdk)
 [![WaaS API version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/sdk-badge.svg?sanitize=true)](https://tangany.docs.stoplight.io/)
@@ -19,25 +19,24 @@ npm install @tangany/waas-js-sdk
 Import the main module
 ```javascript
 const { WaasApi } = require("@tangany/waas-js-sdk");
-const { MAINNET } = require("@tangany/waas-js-sdk").ETHEREUM_PUBLIC_NETWORK;
 
-// set the environment variables
+// load the environment variables
 const dotenv = require("dotenv");
 dotenv.config();
+
+// instantiate the SDK
+const api = new WaasApi({
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        subscription: process.env.SUBSCRIPTION,
+        vaultUrl: "https://my-vault.some.cloud.tld"
+    });
 
 /**
  * fetch all client wallets
  */
 (async () => {
-    const api = new WaasApi(
-        {
-            clientId: process.env.CLIENT_ID,
-            clientSecret: process.env.CLIENT_SECRET,
-            subscription: process.env.SUBSCRIPTION,
-            vaultUrl: "https://my-vault.some.cloud.tld"
-        });
-
-    let skiptoken = undefined;
+   let skiptoken = undefined;
     
     async function listWallets () {
         const data = (await api.wallet().list(skiptoken)).data;
@@ -56,7 +55,6 @@ dotenv.config();
 ```
 
 ### Constructor options
-
 WaaS configuration headers are passed as options into the constructor.
 
 option | description | mandatory
@@ -72,11 +70,11 @@ bitcoinTxConfirmations | Minimum amount of block confirmations required for Bitc
 bitcoinTxSpeed | Defines the target amount of blocks for the transaction to be included to the Bitcoin network. Faster inclusion requires a higher transaction fee. The fee is calculated in real time based on the network state and can be limited by the `header-bitcoin-max-fee-rate` option. The effective transaction delay can be calculated by multiplying the target confirmation blocks with the Bitcoin block time of 10 minutes (e.g. `slow` yields an block inclusion time of approx. 4h). The speed levels correspond with following block times (target blocks): `slow`: 24, `default`: 6, `fast`: 2.  Defaults to `default` |
 bitcoinMaxFeeRate | Defines the maximum allowed fee rate in satoshi per byte for a Bitcoin transaction. Prevents from spending absurdly high transaction fees during block fee peaks |
 
-
 ###  More examples
 For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2e.js))
 
 #### Wallet interface
+*Global wallet management*
 https://tangany.docs.stoplight.io/api/wallet/
 
 ````javascript
@@ -107,8 +105,8 @@ https://tangany.docs.stoplight.io/api/wallet/
 ````
 
 #### Ethereum interface for wallet
+*Wallet based Ethereum calls*
 https://tangany.docs.stoplight.io/api/ethereum/
-
 ````javascript
 (async () => {
     const api = new WaasApi(options).wallet("my-wallet");
@@ -119,9 +117,9 @@ https://tangany.docs.stoplight.io/api/ethereum/
 })();
 ````
 
-#### Ethereum erc20 token interface for wallet
+#### Ethereum ERC20 token interface for wallet
+*Wallet based calls for Ethereum ERC20 token management*
 https://tangany.docs.stoplight.io/api/ethereum-erc20
-
 ````javascript
 (async () => {
     const api = new WaasApi(options).wallet("my-wallet").eth().erc20(tokenAddress); 
@@ -153,8 +151,8 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 ````
 
 #### Bitcoin interface for wallet
+*Wallet based Bitcoin calls*
 https://tangany.docs.stoplight.io/api/bitcoin/
-
 ````javascript
 (async () => {
     const api = new WaasApi(options).wallet("my-wallet");
@@ -170,7 +168,7 @@ https://tangany.docs.stoplight.io/api/bitcoin/
 ````
 
 ## Debugging
-To log the axios HTTP requests, add the following environment variable
+To enable additional logging (e.g. to debug HTTP requests), use following environment variable
 ```
 DEBUG=waas-js-sdk:*
 ```
