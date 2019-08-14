@@ -1,67 +1,62 @@
-import {WaasAxiosInstance} from "./waas-axios-instance";
-import {AxiosInstance, AxiosResponse} from "axios";
-import {ITransactionStatus} from "./interfaces";
-import {TimeoutError} from "./errors";
+import {IWaitForTxStatus, WaasAxiosInstance} from "./waas-axios-instance";
+import {AxiosInstance} from "axios";
+import {IEthereumTransactionStatus} from "./interfaces";
+import * as t from "typeforce";
 
 /**
- *  instantiates a new ethereum interface
+ * Instantiates a new Ethereum interface
  * @param instance - axios instance created by {@link WaasApi}
- * @param [txHash] - eth transaction hash
+ * @param [txHash] - Ethereum transaction hash
  */
 export class Ethereum extends WaasAxiosInstance {
-    private readonly txHash?: string;
 
-    constructor(instance: AxiosInstance, txHash?: string) {
+    constructor(instance: AxiosInstance, private readonly transactionHash?: string) {
         super(instance);
-        this.txHash = txHash;
+        t("?String", transactionHash);
+    }
+
+    get txHash() {
+        t("String", this.transactionHash);
+
+        return this.transactionHash;
     }
 
     /**
-     * Returns the status for a eth transaction. The transaction is not mined until a blockNr is assigned.
-     * @see {@link https://tangany.docs.stoplight.io/api/ethereum/get-transaction-status}
+     * Returns the status for an Ethereum transaction. The transaction is not mined until a blockNr is assigned.
+     * @see {@link https://tangany.docs.stoplight.io/api/ethereum/get-eth-tx-status}
      */
-    public async get(): Promise<AxiosResponse<ITransactionStatus>> {
-        if (!this.txHash) {
-            throw new Error("missing argument txHash");
-        }
-
-        return this.instance.get(`eth/transaction/${this.txHash}`);
+    public async get(): Promise<IEthereumTransactionStatus> {
+        return this.instance.get(`eth/transaction/${this.transactionHash}`);
     }
 
     /**
-     * helper: resolves when given transaction is mined or errored
-     * @param [timeout] - throw when not mined until timeout ms
+     * Helper: resolves when transaction is mined and rejects on errors or timeout
+     * Attention: method polls the API frequently and may result in excessive quota usage
+     * @param [timeout] - reject timeout in ms
+     * @param [ms] - milliseconds delay between API polling attempts
      */
-    public async wait(timeout = 20000): Promise<ITransactionStatus> {
-        if (!this.txHash) {
-            throw new Error("missing argument txHash");
-        }
+    public async wait(timeout = 20e3, ms = 4e2): Promise<IEthereumTransactionStatus> {
 
-        return new Promise(async (resolve, reject) => {
-            const timer = setTimeout(() => {
-                reject(new TimeoutError("timeout for retrieving mined status for transaction"));
+        const call = () => this.get().then((res: IEthereumTransactionStatus) => {
 
-                return;
-            }, timeout);
+            let status: IWaitForTxStatus["status"];
 
-            const checkMined = async (): Promise<void> => {
-                const {isError, blockNr} = (await this.get()).data;
-                if (isError || typeof blockNr === "number") {
-                    clearTimeout(timer);
-                    resolve({isError, blockNr});
-                } else {
-                    setTimeout(checkMined, 100);
-                }
-
-                return;
-            };
-
-            try {
-                return checkMined();
-            } catch (e) {
-                clearTimeout(timer);
-                throw e;
+            // tslint:disable-next-line:prefer-conditional-expression
+            if (typeof res.data.blockNr === "number") {
+                status = "confirmed";
+            } else if (res.data.isError) {
+                status = "error";
+            } else {
+                status = "pending";
             }
+
+            return {
+                status,
+                response: res,
+            };
         });
+
+        return this.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IEthereumTransactionStatus>;
+
     }
 }

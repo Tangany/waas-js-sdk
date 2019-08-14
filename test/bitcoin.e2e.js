@@ -1,0 +1,79 @@
+const { WaasApi, BITCOIN_NETWORK, BITCOIN_TX_CONFIRMATIONS } = require("../dist");
+const { config } = require("dotenv");
+const assert = require("assert");
+const { resolve } = require("path");
+const path = resolve(process.cwd(), ".env");
+const debug = require("debug")("waas-js-sdk:bitcoin-e2e");
+
+process.env.DEBUG = "waas-js-sdk:*"; // force enable logging
+config({ path });
+
+describe("WaaS sample Bitcoin workflow", function () {
+	const timeout = 20e3;
+	this.timeout(timeout);
+	this.slow(timeout / 4);
+	
+	const wallet = "func-spec";
+	const recipients = {
+		amount: "0.000001",
+		to: "2NBDAdTp3gES9Aar5woJBuGZgiyPCP6trmk"
+	};
+	
+	console.info("this suite only works with a pre-set .env file with api credentials in project's root");
+	
+	if (!process.env.CLIENT_ID) {
+		throw new Error("process.env.CLIENT_ID not defined");
+	}
+	if (!process.env.CLIENT_SECRET) {
+		throw new Error("process.env.CLIENT_SECRET not defined");
+	}
+	if (!process.env.SUBSCRIPTION) {
+		throw new Error("process.env.SUBSCRIPTION not defined");
+	}
+	if (!process.env.VAULT_URL) {
+		throw new Error("process.env.VAULT_URL not defined");
+	}
+	
+	const options = {
+		clientId: process.env.CLIENT_ID,
+		clientSecret: process.env.CLIENT_SECRET,
+		subscription: process.env.SUBSCRIPTION,
+		vaultUrl: process.env.VAULT_URL,
+		bitcoinNetwork: BITCOIN_NETWORK.TESTNET,
+		bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.NONE
+	};
+	const noConfirmationsBtcApi = new WaasApi(options); // coins available regardless of mining status
+	const safeBtcBalanceApi = new WaasApi({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.DEFAULT }); // test transaction mining status
+	
+	it("should get the Bitcoin specs for the current wallet", async function () {
+		const { currency, balance, address } = (await noConfirmationsBtcApi.wallet(wallet).btc().get()).data;
+		assert.strictEqual(currency, "BTCTEST");
+		assert.ok(balance);
+		assert.ok(address);
+		debug(`Wallet holds ${balance} ${currency} `);
+	});
+	
+	it("should estimate the fee for given tx", async function () {
+		const { fee, feeRate } = (await noConfirmationsBtcApi.wallet(wallet).btc().estimateFee(recipients)).data;
+		assert.ok(fee);
+		assert.ok(feeRate);
+		debug(`Estimated a total transaction fee of ${fee} for given recipients based on a feeRate of ${feeRate}`);
+	});
+	
+	let lastHash;
+	it("should send some BTC to multiple recipients in a single tx", async function () {
+		const { hash } = (await noConfirmationsBtcApi.wallet(wallet).btc().send(
+			[recipients, recipients]
+		)).data;
+		assert.ok(hash);
+		debug(`Sent with hash ${hash}`);
+		lastHash = hash;
+	});
+	
+	it("should fetch the tx details", async function () {
+		assert.ok(lastHash, "cannot run without previous tests");
+		const { confirmations, status } = (await noConfirmationsBtcApi.btc(lastHash).get()).data;
+		assert.strictEqual(confirmations, 0);
+		debug("inital tx status", { confirmations, status });
+	});
+});

@@ -1,13 +1,12 @@
-import {mockSandbox, queueOpenApiResponse} from "./test-helpers";
+import {sandbox} from "./helpers";
 import axios from "axios";
 import * as assert from "assert";
 import {WaasApi} from "./waas-api";
 import {EthWallet} from "./eth-wallet";
-import {EthErc20Token} from "./eth-erc20-token";
 import {Wallet} from "./wallet";
 
 describe("EthWallet", function() {
-    mockSandbox();
+    sandbox();
 
     const auth = {
         clientId: "1",
@@ -15,51 +14,50 @@ describe("EthWallet", function() {
         subscription: "3",
     };
 
-    const queue = queueOpenApiResponse("openapi/v1.1.oas2.json");
     const sampleWallet = "sample-wallet";
     const sampleAddress = "0xcbbe0c0454f3379ea8b0fbc8cf976a54154937c1";
+    const wallet = new Wallet(axios, sampleWallet);
+
+    beforeEach(function() {
+        this.stub = this.sandbox.stub(axios, "create");
+    });
 
     it("should construct an instance", function() {
-        const ethErc20 = new EthWallet(this.sandbox.stub(axios, "create"), this.sandbox.createStubInstance(Wallet));
-        assert.ok(ethErc20 instanceof EthWallet);
+        const ethErc20 = new EthWallet(this.stub, this.sandbox.createStubInstance(Wallet));
+        assert.ok(ethErc20);
     });
 
-    describe("balance", function() {
-        it("should return the balance for given wallet", async function() {
-            const w = new WaasApi(auth);
-
-            await queue({
-                path: "/eth/wallet/{wallet}",
-                operation: "get",
-                response: 200,
-            });
-
-            const {address, balance, currency} = (await w.wallet(sampleWallet).eth().get()).data;
-            assert.ok(address);
-            assert.ok(balance);
-            assert.ok(currency);
+    describe("get", function() {
+        it("should execute the api call", async function() {
+            const stub = this.sandbox.stub(axios, "get");
+            await new EthWallet(axios, wallet).get();
+            assert.strictEqual(stub.callCount, 1);
         });
     });
+
     describe("send", function() {
-        it("should return the hash fro sent transaction", async function() {
-            const w = new WaasApi(auth);
-
-            await queue({
-                path: "/eth/wallet/{wallet}/send",
-                operation: "post",
-                response: 202,
-            });
-
-            const {hash} = (await w.wallet(sampleWallet).eth().send(sampleAddress, "1.23")).data;
-            assert.ok(hash);
+        it("should throw for invalid recipients", async function() {
+            const e = new EthWallet(axios, wallet);
+            await assert.rejects(async () => e.send({to: sampleAddress, from: "abc"} as any));
+            await assert.rejects(async () => e.send({to: sampleAddress} as any));
+            await assert.rejects(async () => e.send({to: NaN, amount: "NaN"} as any));
+            await assert.rejects(async () => e.send({to: true, amount: true} as any));
         });
+
+        it("should execute the call", async function() {
+            const stub = this.sandbox.stub(axios, "post");
+            const r = new EthWallet(axios, wallet);
+            await r.send({to: sampleAddress, amount: "0.1"});
+            assert.strictEqual(stub.callCount, 1);
+        });
+
     });
 
     describe("erc20", function() {
-        it("should return a EthErc20Wallet instance", async function() {
+        it("should return an EthErc20Token instance", async function() {
+            this.stub.restore();
             const w = new WaasApi(auth);
-            const _wallet = w.wallet(sampleWallet).eth().erc20("0xB8c77482e45F1F44dE1745F52C74426C631bDD52");
-            assert.ok(_wallet instanceof EthErc20Token);
+            assert.ok(w.wallet(sampleWallet).eth().erc20("0xB8c77482e45F1F44dE1745F52C74426C631bDD52"));
         });
     });
 });

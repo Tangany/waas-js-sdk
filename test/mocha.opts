@@ -4,5 +4,3 @@
 --sort
 # display the full stack trace
 --full-trace
-# files
-**/*.spec.ts

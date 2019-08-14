@@ -1,13 +1,9 @@
-import {IHttpError} from "./ihttp-error";
+import {HttpError} from "./http-error";
 
-export class AuthenticationError implements IHttpError {
-    public readonly status = 401;
-    public readonly message: string;
-    public readonly name: string;
-
+export class AuthenticationError extends HttpError {
     constructor(msg = "Invalid authentication") {
-        Object.setPrototypeOf(this, AuthenticationError.prototype); // https://stackoverflow.com/questions/41102060/typescript-extending-error-class
-        this.message = msg;
-        this.name = "AuthenticationError";
+        super(msg, 401);
+        this.name = this.constructor.name;
+        Object.setPrototypeOf(this, AuthenticationError.prototype);
     }
 }
