@@ -2,7 +2,7 @@ import * as assert from "assert";
 import {Bitcoin} from "./btc";
 import {AuthenticationError, ConflictError, GeneralError, NotFoundError} from "./errors";
 import {Ethereum} from "./eth";
-import {sandbox} from "./helpers";
+import {sandbox} from "./spec-helpers";
 import {
     BitcoinNetwork,
     BitcoinTxConfirmations,

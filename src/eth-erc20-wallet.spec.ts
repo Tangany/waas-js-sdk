@@ -1,4 +1,4 @@
-import {sandbox} from "./helpers";
+import {sandbox} from "./spec-helpers";
 import axios from "axios";
 import * as assert from "assert";
 import {EthErc20Wallet} from "./eth-erc20-wallet";

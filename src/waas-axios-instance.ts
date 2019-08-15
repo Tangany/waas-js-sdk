@@ -1,10 +1,16 @@
 import {AxiosInstance} from "axios";
+import * as t from "typeforce";
 import {MiningError, TimeoutError} from "./errors";
 import {IBlockchainTransactionStatus} from "./interfaces";
 import Timeout = NodeJS.Timeout;
 import * as Debug from "debug";
 
 const debug = Debug("waas-js-sdk:waas-axios-instance");
+
+export const recipientType = t.compile({
+    to: "String",
+    amount: "String",
+});
 
 export interface IWaitForTxStatus {
     status: "confirmed" | "pending" | "error";

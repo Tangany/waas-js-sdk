@@ -1,5 +1,4 @@
-import {recipientType} from "./helpers";
-import {WaasAxiosInstance} from "./waas-axios-instance";
+import {WaasAxiosInstance, recipientType} from "./waas-axios-instance";
 import {AxiosInstance} from "axios";
 import {IBitcoinTransactionEstimation, IRecipient, ITransaction, IWalletBalance} from "./interfaces";
 import {Wallet} from "./wallet";

@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Added 
 
+## [1.0.0-beta.1]
+### Fixed
+* Removed sinon from dist dependencies
+
 ## [1.0.0-beta.0]
 ### Added 
 * Added support for WaaS 1.2 (Full release notes in our [Blog post](https://tangany.com/blog/release-notes-1-2/))

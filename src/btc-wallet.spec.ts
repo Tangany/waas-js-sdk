@@ -1,7 +1,7 @@
 import axios from "axios";
 import {BtcWallet} from "./btc-wallet";
 import * as assert from "assert";
-import {sandbox} from "./helpers";
+import {sandbox} from "./spec-helpers";
 import {Wallet} from "./wallet";
 
 sandbox();

@@ -4,7 +4,7 @@ import {Bitcoin} from "./btc";
 import {MiningError, TimeoutError} from "./errors";
 import {isBitcoinMiningErrorData} from "./errors/mining-error";
 import {Ethereum} from "./eth";
-import {sandbox} from "./helpers";
+import {sandbox} from "./spec-helpers";
 
 sandbox();
 const nonHash = "0000000000000000000000000000000000000000000000000000000000000000";

@@ -2,7 +2,7 @@ import * as moxios from "moxios";
 import * as assert from "assert";
 import {ConflictError, GeneralError} from "./errors";
 import {Wallet} from "./wallet";
-import {sandbox} from "./helpers";
+import {sandbox} from "./spec-helpers";
 import axios from "axios";
 
 sandbox();

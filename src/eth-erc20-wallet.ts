@@ -1,8 +1,7 @@
 import {AxiosInstance} from "axios";
 import * as t from "typeforce";
-import {recipientType} from "./helpers";
 import {ITokenBalance, ITransaction} from "./interfaces";
-import {WaasAxiosInstance} from "./waas-axios-instance";
+import {WaasAxiosInstance, recipientType} from "./waas-axios-instance";
 import {Wallet} from "./wallet";
 
 enum METHOD {
