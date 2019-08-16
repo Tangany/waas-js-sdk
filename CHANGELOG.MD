@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Added 
 
+## [1.0.0-beta.2]
+### Fixed
+* Removed tests from the build
+
 ## [1.0.0-beta.1]
 ### Fixed
 * Removed sinon from dist dependencies
