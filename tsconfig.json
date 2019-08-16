@@ -25,5 +25,8 @@
     "outDir": "dist",
     "sourceMap": true,
     "downlevelIteration": true
-  }
+  },
+  "exclude": [
+    "**/*.spec.ts"
+  ]
 }
