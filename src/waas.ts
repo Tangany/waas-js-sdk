@@ -104,7 +104,6 @@ export class Waas extends WaasAxiosInstance {
 
         const api: AxiosRequestConfig = {
             baseURL: "https://api.tangany.com/v1",
-            timeout: 20000,
             headers: {
                 "tangany-client-id": options.clientId,
                 "tangany-client-secret": options.clientSecret,
