@@ -4,6 +4,7 @@ import {
     BitcoinTxSpeed,
     EthereumPublicNetwork,
     EthereumTxSpeed,
+    ApiVersion,
 } from "./waas";
 import * as Errors from "./errors";
 
@@ -14,3 +15,4 @@ export const ETHEREUM_PUBLIC_NETWORK = EthereumPublicNetwork;
 export const BITCOIN_NETWORK = BitcoinNetwork;
 export const BITCOIN_TX_SPEED = BitcoinTxSpeed;
 export const BITCOIN_TX_CONFIRMATIONS = BitcoinTxConfirmations;
+export const API_VERSION = ApiVersion;

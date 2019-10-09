@@ -48,6 +48,11 @@ export enum BitcoinTxSpeed {
     FAST = "fast",
 }
 
+export enum ApiVersion {
+    V1 = "v1",
+    V2_ALPHA = "v2-alpha",
+}
+
 interface IWaaSOptions {
     clientId: string;
     clientSecret: string;
@@ -77,7 +82,7 @@ interface IWaaSOptions {
  */
 export class Waas extends WaasAxiosInstance {
 
-    constructor(options: IWaaSOptions) {
+    constructor(options: IWaaSOptions, version = ApiVersion.V1) {
 
         if (!options.clientId) {
             throw new AuthenticationError("Missing variable 'clientId'");
@@ -100,10 +105,19 @@ export class Waas extends WaasAxiosInstance {
             bitcoinTxSpeed: "?String",
             bitcoinTxConfirmations: "?String",
             bitcoinMaxFeeRate: "?Number",
+            version: "?Number",
         }, options, true);
 
         const api: AxiosRequestConfig = {
-            baseURL: "https://api.tangany.com/v1",
+            baseURL: (() => {
+                switch (version) {
+                    case ApiVersion.V2_ALPHA:
+                        return "https://api.tangany.com/v2-alpha";
+                    case ApiVersion.V1:
+                    default:
+                        return "https://api.tangany.com/v1";
+                }
+            })(),
             headers: {
                 "tangany-client-id": options.clientId,
                 "tangany-client-secret": options.clientSecret,
