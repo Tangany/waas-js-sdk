@@ -80,7 +80,7 @@ describe("Waas", function() {
                 });
                 const {axios: axiosInstance} = new Waas(auth);
 
-                await assert.doesNotReject(async () => axiosInstance.get("bielefeld"));
+                await assert.doesNotReject(async () => axiosInstance.get("annie"));
             });
 
             it("should throw a NotFoundError error for 404 server response", async function() {
@@ -111,7 +111,7 @@ describe("Waas", function() {
                 await assert.rejects(async () => axiosInstance.get("ramirez"), ConflictError);
             });
 
-            it("should throw a MiningError for 400 server response", async function() {
+            it("should throw a GeneralError for 400 server response", async function() {
                 moxios.stubRequest(/.*/, {
                     status: 500,
                     response: {message: "GeneralError"},

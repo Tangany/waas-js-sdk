@@ -71,7 +71,7 @@ describe("Ethereum", function() {
             await e.wait()
                 .then(() => assert.fail("should have failed"))
                 .catch((r: MiningError) => {
-                    console.log(r);
+                    assert.ok(r instanceof MiningError);
                     if (isBitcoinMiningErrorData(r.txData)) {
                         throw  new Error("invalid error type");
                     }
