@@ -5,6 +5,7 @@
 ### JetBrains template
 .idea/
 .idea/httpRequests
+.idea/deployment.xml
 
 ### Node template
 # Logs
@@ -81,3 +82,5 @@ typings/
 # Serverless directories
 .serverless
 
+
+!.idea/
