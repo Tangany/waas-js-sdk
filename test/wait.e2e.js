@@ -8,7 +8,11 @@ const path = resolve(process.cwd(), ".env");
 process.env.DEBUG = "waas-js-sdk:*"; // force enable logging
 config({ path });
 
+console.info("this suite only works with a pre-set .env file with api credentials in project's root");
+
 describe("wait", function () {
+	
+	const wallet = process.env.WALLET;
 	
 	describe("Ethereum", function () {
 		
@@ -27,7 +31,7 @@ describe("wait", function () {
 			
 			const { wallet: newWallet } = (await api.wallet().create()).data;
 			const { address: newWalletAddress } = (await api.wallet(newWallet).eth().get()).data;
-			const { hash } = (await api.wallet("func-spec").eth().send({ to: newWalletAddress, amount: "0.000128" })).data;
+			const { hash } = (await api.wallet(wallet).eth().send({ to: newWalletAddress, amount: "0.000128" })).data;
 			
 			const response = await api.eth(hash).wait(50e3);
 			debug(response.data);
@@ -42,7 +46,7 @@ describe("wait", function () {
 			
 			const { wallet: newWallet } = (await api.wallet().create()).data;
 			const { address: newWalletAddress } = (await api.wallet(newWallet).eth().get()).data;
-			const { hash } = (await api.wallet("func-spec").eth().send({ to: newWalletAddress, amount: "0.000128" })).data;
+			const { hash } = (await api.wallet(wallet).eth().send({ to: newWalletAddress, amount: "0.000128" })).data;
 			
 			await assert.rejects(async () => api.eth(hash).wait(1e3), TimeoutError);
 			
@@ -63,16 +67,16 @@ describe("wait", function () {
 		};
 		
 		it("should wait for a Bitcoin tx", async function () {
-			this.timeout(600e3); // could take a while
+			this.timeout(80e3); // could take a while
 			
 			const fastApi = new Waas(options);
-			const safeApi = new Waas({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.DEFAULT });
+			const safeApi = new Waas({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.NONE });
 			
 			const { wallet: newWallet } = (await fastApi.wallet().create()).data;
 			const { address: newWalletAddress } = (await fastApi.wallet(newWallet).btc().get()).data;
-			const { hash } = (await fastApi.wallet("func-spec").btc().send({ to: newWalletAddress, amount: "0.000128" })).data;
+			const { hash } = (await fastApi.wallet(wallet).btc().send({ to: newWalletAddress, amount: "0.000128" })).data;
 			
-			const response = await safeApi.btc(hash).wait(600e3);
+			const response = await safeApi.btc(hash).wait(60e3);
 			debug(response.data);
 			
 			await fastApi.wallet(newWallet).delete();
@@ -82,11 +86,11 @@ describe("wait", function () {
 			this.timeout(20e3);
 			
 			const fastApi = new Waas(options);
-			const safeApi = new Waas({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.DEFAULT });
+			const safeApi = new Waas({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.SECURE });
 			
 			const { wallet: newWallet } = (await fastApi.wallet().create()).data;
 			const { address: newWalletAddress } = (await fastApi.wallet(newWallet).btc().get()).data;
-			const { hash } = (await fastApi.wallet("func-spec").btc().send({ to: newWalletAddress, amount: "0.000128" })).data;
+			const { hash } = (await fastApi.wallet(wallet).btc().send({ to: newWalletAddress, amount: "0.000128" })).data;
 			
 			await assert.rejects(async () => safeApi.btc(hash).wait(1e3), TimeoutError);
 			

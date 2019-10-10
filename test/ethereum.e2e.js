@@ -9,19 +9,18 @@ const path = resolve(process.cwd(), ".env");
 process.env.DEBUG = "waas-js-sdk:*"; // force enable logging
 config({ path });
 
-
-const tokenAddress = "0x0A35aA64eb710c97Fa14258243eeD09AB51a5b4E"; // ERC20 token address
-const tokenWallet = "func-spec"; // Wallet that owns the ERC20 token
-let tokenWalletAddress; // Wallet address
-const tokenAmount = "0.0032"; // Token amount used for transactions
-const etherAmount = "0.001"; // Token amount used for transactions
+console.info("this suite only works with a pre-set .env file with api credentials in project's root");
 
 describe("WaaS sample Ethereum workflow", function () {
 	const timeout = 120e3;  // Ethereum testnet mining delay
 	this.timeout(timeout);
 	this.slow(timeout / 3);
 	
-	console.info("this suite only works with a pre-set .env file with api credentials in project's root");
+	const tokenWallet = process.env.WALLET; // Wallet that owns the ERC20 token
+	const tokenAddress = "0x0A35aA64eb710c97Fa14258243eeD09AB51a5b4E"; // ERC20 token address
+	let tokenWalletAddress; // Wallet address
+	const tokenAmount = "0.0032"; // Token amount used for transactions
+	const etherAmount = "0.001"; // Token amount used for transactions
 	
 	if (!process.env.CLIENT_ID) {
 		throw new Error("process.env.CLIENT_ID not defined");

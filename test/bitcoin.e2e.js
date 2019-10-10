@@ -8,31 +8,18 @@ const debug = require("debug")("waas-js-sdk:bitcoin-e2e");
 process.env.DEBUG = "waas-js-sdk:*"; // force enable logging
 config({ path });
 
+console.info("this suite only works with a pre-set .env file with api credentials in project's root");
+
 describe("WaaS sample Bitcoin workflow", function () {
 	const timeout = 20e3;
 	this.timeout(timeout);
 	this.slow(timeout / 4);
 	
-	const wallet = "func-spec";
+	const wallet = process.env.WALLET;
 	const recipients = {
 		amount: "0.000001",
 		to: "2NBDAdTp3gES9Aar5woJBuGZgiyPCP6trmk"
 	};
-	
-	console.info("this suite only works with a pre-set .env file with api credentials in project's root");
-	
-	if (!process.env.CLIENT_ID) {
-		throw new Error("process.env.CLIENT_ID not defined");
-	}
-	if (!process.env.CLIENT_SECRET) {
-		throw new Error("process.env.CLIENT_SECRET not defined");
-	}
-	if (!process.env.SUBSCRIPTION) {
-		throw new Error("process.env.SUBSCRIPTION not defined");
-	}
-	if (!process.env.VAULT_URL) {
-		throw new Error("process.env.VAULT_URL not defined");
-	}
 	
 	const options = {
 		clientId: process.env.CLIENT_ID,
@@ -43,7 +30,6 @@ describe("WaaS sample Bitcoin workflow", function () {
 		bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.NONE
 	};
 	const noConfirmationsBtcApi = new Waas(options); // coins available regardless of mining status
-	const safeBtcBalanceApi = new Waas({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.DEFAULT }); // test transaction mining status
 	
 	it("should get the Bitcoin specs for the current wallet", async function () {
 		const { currency, balance, address } = (await noConfirmationsBtcApi.wallet(wallet).btc().get()).data;
