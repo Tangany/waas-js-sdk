@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0-beta.3]
 ### Added 
-* Added a optional versioning parameter to the constructor
+* Added an optional versioning parameter to the constructor
+* Added an API throttling limiter per WaaS instance to prevent `429 Too Many Request` errors
 
 ## [1.0.0-beta.2]
 ### Fixed
