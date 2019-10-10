@@ -167,6 +167,11 @@ https://tangany.docs.stoplight.io/api/bitcoin/
 })();
 ````
 
+## Testing
+Copy `.env.example` to `.env` and enter you WaaS subscription details to be able to run the [tests](./test). Use testnet faucets to charge a wallet with some crypto and paste the name to the `WALLET` variable.
+
+Start the test suite with `npm run test:e2e`
+
 ## Debugging
 To enable additional logging (e.g. to debug HTTP requests), use following environment variable
 ```
