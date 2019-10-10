@@ -9,6 +9,8 @@
   },
   "files": [
     "dist/**/*",
+    "test/**/*",
+    ".env.example",
     "readme.md"
   ],
   "scripts": {
