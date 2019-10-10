@@ -8,6 +8,7 @@ import {Wallet} from "./wallet";
 /**
  *  instantiates a new Ethereum wallet interface
  * @param instance - axios instance created by {@link Waas}
+ * @param limiter - Bottleneck limiter instance
  * @param walletInstance - instance of Wallet class
  */
 export class EthWallet extends WaasAxiosInstance {
@@ -29,7 +30,9 @@ export class EthWallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum/get-wallet-balance}
      */
     public async get(): Promise<IWalletBalance> {
-        return this.instance.get(`eth/wallet/${this.wallet}`);
+        return this.wrap<IWalletBalance>(() => this.instance
+            .get(`eth/wallet/${this.wallet}`),
+        );
     }
 
     /**
@@ -49,10 +52,11 @@ export class EthWallet extends WaasAxiosInstance {
 
         t(recipientType, recipient, true);
 
-        return this.instance
+        return this.wrap<ITransaction>(() => this.instance
             .post(`eth/wallet/${this.wallet}/send`, {
                 ...recipient,
-            })
+            }),
+        )
             ;
     }
 
@@ -61,6 +65,8 @@ export class EthWallet extends WaasAxiosInstance {
      * @param tokenAddress - Ethereum ERC20 token address for given eth network
      */
     public erc20(tokenAddress: string): EthErc20Wallet {
-        return new EthErc20Wallet(this.instance, this.walletInstance, tokenAddress);
+        const erc20 = new EthErc20Wallet(this.instance, this.walletInstance, tokenAddress);
+
+        return erc20;
     }
 }

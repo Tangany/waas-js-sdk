@@ -1,3 +1,4 @@
+import Bottleneck from "bottleneck"
 import {sandbox} from "./spec-helpers";
 import axios from "axios";
 import * as assert from "assert";
@@ -30,7 +31,9 @@ describe("EthWallet", function() {
     describe("get", function() {
         it("should execute the api call", async function() {
             const stub = this.sandbox.stub(axios, "get");
-            await new EthWallet(axios, wallet).get();
+            const ew = new EthWallet(axios, wallet);
+            ew.limiter = new Bottleneck();
+            await ew.get();
             assert.strictEqual(stub.callCount, 1);
         });
     });
@@ -47,8 +50,9 @@ describe("EthWallet", function() {
         it("should execute the call", async function() {
             const stub = this.sandbox.stub(axios, "post");
             const r = new EthWallet(axios, wallet);
+            r.limiter = new Bottleneck();
             await r.send({to: sampleAddress, amount: "0.1"});
-            assert.strictEqual(stub.callCount, 1);
+            assert.strictEqual(stub.callCount, 1, "invalid stub.callCount");
         });
 
     });

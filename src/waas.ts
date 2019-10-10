@@ -8,6 +8,14 @@ import {Ethereum} from "./eth";
 import {AuthenticationError, NotFoundError, GeneralError, ConflictError} from "./errors";
 import * as t from "typeforce";
 
+// const limiter = new Bottleneck({
+//     reservoir: 100, // 100 requests...
+//     reservoirRefreshAmount: 100,
+//     reservoirRefreshInterval: 10 * 1e3, // ...per 10s
+//     maxConcurrent: 5, // max. 5 simultaneous requests
+//     minTime: 10, // delay each request bx 10ms
+// });
+
 const debug = Debug("waas-js-sdk:main");
 
 export enum WalletVersion {
@@ -178,29 +186,29 @@ export class Waas extends WaasAxiosInstance {
 
             return response;
         }, async (e: AxiosError<IWaasError>) => {
-            if (e.response) {
-                const {response, message} = e;
-
-                debug("interceptors.response.error", {
-                    response: response.data,
-                    headers: filterHeaders(response.headers),
-                    message,
-                });
-
-                switch (e.response.status) {
-                    case 401:
-                        throw new AuthenticationError(response.data.message);
-                    case 409:
-                        throw new ConflictError(response.data.message);
-                    case 404:
-                        throw new NotFoundError(response.data.message);
-                    default:
-                        throw new GeneralError(response.data.message, response.status);
-                }
-
+            if (!e.response) {
+                throw e;
             }
 
-            throw e;
+            const {response, message} = e;
+
+            debug("interceptors.response.error", {
+                response: response.data,
+                headers: filterHeaders(response.headers),
+                message,
+            });
+
+            switch (e.response.status) {
+                case 401:
+                    throw new AuthenticationError(response.data.message);
+                case 409:
+                    throw new ConflictError(response.data.message);
+                case 404:
+                    throw new NotFoundError(response.data.message);
+                default:
+                    throw new GeneralError(response.data.message, response.status);
+            }
+
         });
 
         super(instance);
@@ -218,7 +226,9 @@ export class Waas extends WaasAxiosInstance {
      * @param [name] - wallet name
      */
     public wallet(name?: string): Wallet {
-        return new Wallet(this.axios, name);
+        const w = new Wallet(this.axios, name);
+
+        return w;
     }
 
     /**
@@ -226,7 +236,9 @@ export class Waas extends WaasAxiosInstance {
      * @param [txHash] - Ethereum transaction hash
      */
     public eth(txHash?: string): Ethereum {
-        return new Ethereum(this.axios, txHash);
+        const e = new Ethereum(this.axios, txHash);
+
+        return e;
     }
 
     /**
@@ -234,6 +246,8 @@ export class Waas extends WaasAxiosInstance {
      * @param [txHash] - Ethereum transaction hash
      */
     public btc(txHash?: string): Bitcoin {
-        return new Bitcoin(this.instance, txHash);
+        const b = new Bitcoin(this.axios, txHash);
+
+        return b;
     }
 }

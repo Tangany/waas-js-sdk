@@ -43,14 +43,6 @@ describe("Ethereum", function() {
         });
     });
 
-    describe("send", function() {
-        it("should execute the api call", async function() {
-            const stub = this.sandbox.stub(axios, "get");
-            await new Ethereum(axios, nonHash).get();
-            assert.strictEqual(stub.callCount, 1);
-        });
-    });
-
     describe("wait", function() {
         it("should timeout for non-existent transaction", async function() {
             const e = new Ethereum(axios, nonHash);

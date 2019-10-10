@@ -9,6 +9,7 @@ import {EthWallet} from "./eth-wallet";
 /**
  *  Instantiates a new wallet interface
  * @param instance - axios instance created by {@link Waas}
+ * @param limiter - Bottleneck limiter instance
  * @param  [wallet) - wallet name
  */
 export class Wallet extends WaasAxiosInstance {
@@ -36,9 +37,9 @@ export class Wallet extends WaasAxiosInstance {
             url += `?skiptoken=${skiptoken}`;
         }
 
-        return this.instance
-            .get(url)
-            ;
+        return this.wrap<IWalletList>(() => this.instance
+            .get(url),
+        );
     }
 
     /**
@@ -51,7 +52,7 @@ export class Wallet extends WaasAxiosInstance {
         t("?String", wallet);
         t("?Boolean", useHsm);
 
-        return this.instance
+        return this.wrap<IWallet>(() => this.instance
             .post("wallet", {
                 wallet,
                 useHsm,
@@ -62,8 +63,8 @@ export class Wallet extends WaasAxiosInstance {
                 }
 
                 throw new GeneralError(e);
-            })
-            ;
+            }),
+        );
     }
 
     /**
@@ -71,9 +72,9 @@ export class Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/wallet/delete-wallet}
      */
     public async delete(): Promise<ISoftDeletedWallet> {
-        return this.instance
-            .delete(`wallet/${this.wallet}`)
-            ;
+        return this.wrap<ISoftDeletedWallet>(() => this.instance
+            .delete(`wallet/${this.wallet}`),
+        );
     }
 
     /**
@@ -81,22 +82,26 @@ export class Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/wallet/get-wallet}
      */
     public async get(): Promise<IWallet> {
-        return this.instance
-            .get(`wallet/${this.wallet}`)
-            ;
+        return this.wrap<IWallet>(() => this.instance
+            .get(`wallet/${this.wallet}`),
+        );
     }
 
     /**
      * Returns wallet calls for the Ethereum blockchain
      */
     public eth(): EthWallet {
-        return new EthWallet(this.instance, this);
+        const ew = new EthWallet(this.instance, this);
+
+        return ew;
     }
 
     /**
      * Returns wallet calls for the Bitcoin blockchain
      */
     public btc(): BtcWallet {
-        return new BtcWallet(this.instance, this);
+        const btc = new BtcWallet(this.instance, this);
+
+        return btc;
     }
 }

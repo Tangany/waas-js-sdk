@@ -1,9 +1,11 @@
 import {AxiosInstance} from "axios";
+import Bottleneck from "bottleneck";
+import * as Debug from "debug";
 import * as t from "typeforce";
+import {LimiterEnabled} from "./limiter";
 import {MiningError, TimeoutError} from "./errors";
 import {IBlockchainTransactionStatus} from "./interfaces";
 import Timeout = NodeJS.Timeout;
-import * as Debug from "debug";
 
 const debug = Debug("waas-js-sdk:waas-axios-instance");
 
@@ -17,11 +19,12 @@ export interface IWaitForTxStatus {
     response: IBlockchainTransactionStatus;
 }
 
+@LimiterEnabled
 export abstract class WaasAxiosInstance {
-    protected readonly instance: AxiosInstance;
 
-    protected constructor(instance: AxiosInstance) {
-        this.instance = instance;
+    public limiter?: Bottleneck;
+
+    protected constructor(protected readonly instance: AxiosInstance) {
     }
 
     /**
@@ -79,4 +82,16 @@ export abstract class WaasAxiosInstance {
 
         })
 
+    /**
+     * wrap async call to the bottleneck limiter
+     * @param fn - function that returns a promise function. Pass the promise function's arguments via the functions argument
+     * @param args - promise function arguments
+     */
+    protected async wrap<T>(fn: (args: any) => Promise<T>, ...args: any): Promise<T> {
+        if (!this.limiter) {
+            throw new Error("Cannot wrap function without limiter instance");
+        }
+
+        return this.limiter.schedule(fn, args);
+    }
 }

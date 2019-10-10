@@ -42,7 +42,7 @@ export class EthErc20Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/get-token-balance}
      */
     public async get(): Promise<ITokenBalance> {
-        return this.instance.get(`eth/erc20/${this.address}/${this.wallet}`);
+        return this.wrap<ITokenBalance>(() => this.instance.get(`eth/erc20/${this.address}/${this.wallet}`));
     }
 
     /**
@@ -52,10 +52,11 @@ export class EthErc20Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/make-token-transaction}
      */
     public async send(to: string, amount: string): Promise<ITransaction> {
-        return this.instance
+        return this.wrap<ITransaction>(() => this.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/send`, this
-                .getRecipientsData(METHOD.TRANSFER)({to, amount}))
-            ;
+                .getRecipientsData(METHOD.TRANSFER)({to, amount}),
+            ),
+        );
     }
 
     /**
@@ -65,10 +66,11 @@ export class EthErc20Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-approve}
      */
     public async approve(to: string, amount: string): Promise<ITransaction> {
-        return this.instance
+        return this.wrap<ITransaction>(() => this.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/approve`, this
-                .getRecipientsData(METHOD.APPROVE)({to, amount}))
-            ;
+                .getRecipientsData(METHOD.APPROVE)({to, amount}),
+            ),
+        );
     }
 
     /**
@@ -78,10 +80,11 @@ export class EthErc20Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-transfer-from}
      */
     public async transferFrom(from: string, amount: string): Promise<ITransaction> {
-        return this.instance
+        return this.wrap<ITransaction>(() => this.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/transfer-from`, this
-                .getRecipientsData(METHOD.TRANSFER_FROM)({from, amount}))
-            ;
+                .getRecipientsData(METHOD.TRANSFER_FROM)({from, amount}),
+            ),
+        );
     }
 
     /**
@@ -90,10 +93,10 @@ export class EthErc20Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-burn}
      */
     public async burn(amount: string): Promise<ITransaction> {
-        return this.instance
+        return this.wrap<ITransaction>(() => this.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/burn`, this
-                .getRecipientsData(METHOD.BURN)({amount}))
-            ;
+                .getRecipientsData(METHOD.BURN)({amount})),
+        );
     }
 
     /**
@@ -103,10 +106,10 @@ export class EthErc20Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-mint}
      */
     public async mint(amount: string, to?: string): Promise<ITransaction> {
-        return this.instance
+        return this.wrap<ITransaction>(() => this.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/mint`, this
-                .getRecipientsData(METHOD.MINT)({amount, to}))
-            ;
+                .getRecipientsData(METHOD.MINT)({amount, to})),
+        );
     }
 
     /**

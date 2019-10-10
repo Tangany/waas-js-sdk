@@ -26,7 +26,7 @@ export class Ethereum extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum/get-eth-tx-status}
      */
     public async get(): Promise<IEthereumTransactionStatus> {
-        return this.instance.get(`eth/transaction/${this.transactionHash}`);
+        return this.wrap<IEthereumTransactionStatus>(() => this.instance.get(`eth/transaction/${this.transactionHash}`));
     }
 
     /**

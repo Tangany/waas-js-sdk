@@ -26,7 +26,7 @@ export class Bitcoin extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/get-btc-tx-status}
      */
     public async get(): Promise<IBitcoinTransactionStatus> {
-        return this.instance.get(`btc/transaction/${this.txHash}`);
+        return this.wrap<IBitcoinTransactionStatus>(() => this.instance.get(`btc/transaction/${this.txHash}`));
     }
 
     /**

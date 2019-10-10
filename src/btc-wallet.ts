@@ -25,7 +25,7 @@ export class BtcWallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/get-btc-balance}
      */
     public async get(): Promise<IWalletBalance> {
-        return this.instance.get(`btc/wallet/${this.wallet}`);
+        return this.wrap<IWalletBalance>(() =>  this.instance.get(`btc/wallet/${this.wallet}`));
     }
 
     /**
@@ -34,7 +34,7 @@ export class BtcWallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/make-btc-transaction}
      */
     public async send(recipients: IRecipient[] | IRecipient): Promise<ITransaction> {
-        return this.instance.post(`btc/wallet/${this.wallet}/send`, this.getRecipientsData(recipients));
+        return this.wrap<ITransaction>(() =>   this.instance.post(`btc/wallet/${this.wallet}/send`, this.getRecipientsData(recipients)));
     }
 
     /**
@@ -43,8 +43,8 @@ export class BtcWallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/estimate-btc-transaction}
      */
     public async estimateFee(recipientsObject: IRecipient[] | IRecipient): Promise<IBitcoinTransactionEstimation> {
-        return this.instance
-            .post(`btc/wallet/${this.wallet}/estimate-fee`, this.getRecipientsData(recipientsObject))
+        return this.wrap<IBitcoinTransactionEstimation>(() => this.instance
+            .post(`btc/wallet/${this.wallet}/estimate-fee`, this.getRecipientsData(recipientsObject)))
             ;
     }
 
