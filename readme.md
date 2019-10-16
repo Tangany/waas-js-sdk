@@ -167,6 +167,9 @@ https://tangany.docs.stoplight.io/api/bitcoin/
 })();
 ````
 
+## Changelog
+All notable changes to this project are documented in the [changelog](./CHANGELOG.MD)
+
 ## Testing
 Copy `.env.example` to `.env` and enter you WaaS subscription details to be able to run the [tests](./test). Use testnet faucets to charge a wallet with some crypto and paste the name to the `WALLET` variable.
 
