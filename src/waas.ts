@@ -242,8 +242,8 @@ export class Waas extends WaasAxiosInstance {
     }
 
     /**
-     * read eth based api calls
-     * @param [txHash] - Ethereum transaction hash
+     * read btc based api calls
+     * @param [txHash] - Bitcoin transaction hash
      */
     public btc(txHash?: string): Bitcoin {
         const b = new Bitcoin(this.axios, txHash);
