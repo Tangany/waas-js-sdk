@@ -43,26 +43,27 @@ export class Ethereum implements IWaasMethod {
      */
     public async wait(timeout = 20e3, ms = 4e2): Promise<IEthereumTransactionStatus> {
 
-        const call = () => this.get().then((res: IEthereumTransactionStatus) => {
+        const call = async () => this
+            .get()
+            .then((res: IEthereumTransactionStatus) => {
 
-            let status: IWaitForTxStatus["status"];
+                let status: IWaitForTxStatus["status"];
 
-            // tslint:disable-next-line:prefer-conditional-expression
-            if (typeof res.data.blockNr === "number") {
-                status = "confirmed";
-            } else if (res.data.isError) {
-                status = "error";
-            } else {
-                status = "pending";
-            }
+                // tslint:disable-next-line:prefer-conditional-expression
+                if (typeof res.data.blockNr === "number") {
+                    status = "confirmed";
+                } else if (res.data.isError) {
+                    status = "error";
+                } else {
+                    status = "pending";
+                }
 
-            return {
-                status,
-                response: res,
-            };
-        });
+                return {
+                    status,
+                    response: res,
+                };
+            });
 
         return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IEthereumTransactionStatus>;
-
     }
 }

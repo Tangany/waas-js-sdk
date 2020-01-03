@@ -2,6 +2,7 @@ const { Waas } = require("../dist");
 const { EthereumPublicNetwork } = require("../src/waas");
 const { config } = require("dotenv");
 const assert = require("assert");
+const { getRandomHex } = require("./helpers");
 const { resolve } = require("path");
 const debug = require("debug")("waas-js-sdk:ethereum-e2e");
 const path = resolve(process.cwd(), ".env");
@@ -37,6 +38,14 @@ describe("WaaS sample Ethereum workflow", function () {
 		vaultUrl: process.env.VAULT_URL,
 		ethereumNetwork: EthereumPublicNetwork.ROPSTEN, // All tests execute on the ropsten testnet
 	}, undefined, true);
+
+	it("should send a transaction with some data string and read it from the blockchain", async function () {
+		const data = getRandomHex(300);
+		const { data: { hash } } = await api.wallet(tokenWallet).eth().send({ to: "0x0000000000000000000000000000000000000000", amount: "0", data });
+		console.log({ hash, data });
+		const tx = await api.eth(hash).get();
+		assert.strictEqual(data, tx.data.data);
+	});
 
 	it("should list available wallets", async function () {
 		const allWallets = (await api.wallet().list()).data;

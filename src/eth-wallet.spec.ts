@@ -10,6 +10,7 @@ describe("EthWallet", function() {
     sandbox();
     const sampleWallet = "sample-wallet";
     const sampleAddress = "0xcbbe0c0454f3379ea8b0fbc8cf976a54154937c1";
+    const sampleAmount = "0.0002";
 
     beforeEach(function() {
         this.waas = this.sandbox.createStubInstance(Waas);
@@ -35,17 +36,22 @@ describe("EthWallet", function() {
     describe("send", function() {
         it("should throw for invalid recipients", async function() {
             const e = new EthWallet(this.waas, this.sandbox.createStubInstance(Wallet));
-            await assert.rejects(async () => e.send({to: sampleAddress, from: "abc"} as any));
-            await assert.rejects(async () => e.send({to: sampleAddress} as any));
-            await assert.rejects(async () => e.send({to: NaN, amount: "NaN"} as any));
-            await assert.rejects(async () => e.send({to: true, amount: true} as any));
+            await assert.rejects(async () => e.send({to: sampleAddress} as any), /Missing 'amount' argument/);
+            await assert.rejects(async () => e.send({
+                to: sampleAddress,
+                amount: sampleAmount,
+                from: "abc",
+            } as any), /Unexpected property "from"/);
+            await assert.rejects(async () => e.send({to: NaN, amount: "NaN"} as any), /Missing 'to' argument/);
+            await assert.rejects(async () => e.send({to: true, amount: true} as any), /Expected property "to" of type String, got Boolean true/);
+            await assert.rejects(async () => e.send({to: sampleAddress, amount: sampleAmount, data: true} as any), /Expected property "data" of type \?String, got Boolean true/);
         });
 
         it("should execute the call", async function() {
             const spy = this.waas.instance.post = this.sandbox.spy();
             const wallet = new Wallet(this.waas, sampleWallet);
             const r = new EthWallet(this.waas, wallet);
-            await r.send({to: sampleAddress, amount: "0.1"});
+            await r.send({to: sampleAddress, amount: "0.1", data: "0xf03"});
             assert.strictEqual(spy.callCount, 1, "invalid stub.callCount");
         });
     });
