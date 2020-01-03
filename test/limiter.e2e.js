@@ -2,11 +2,9 @@ const { getRandomEthereumAddress } = require("./helpers");
 const { Waas, ETHEREUM_PUBLIC_NETWORK, ETHEREUM_TX_SPEED } = require("../dist");
 const { config } = require("dotenv");
 const { resolve } = require("path");
-const debug = require("debug")("waas-js-sdk:wait-e2e");
 const assert = require("assert");
 const path = resolve(process.cwd(), ".env");
 
-process.env.DEBUG = "waas-js-sdk:*"; // force enable logging
 config({ path });
 
 console.info("this suite only works with a pre-set .env file with api credentials in project's root");
@@ -33,7 +31,7 @@ describe("limiter", function () {
 		const load = [];
 
 		for (let i = 0; i < 100; i++) {
-			load.push(api.wallet(wallet).eth().get().then(({ data }) => debug({ data })));
+			load.push(api.wallet(wallet).eth().get().then(({ data }) => console.log({ data })));
 		}
 		await Promise.all(load);
 	});
@@ -52,7 +50,7 @@ describe("limiter", function () {
 			load.push(api.wallet(wallet).eth()
 				.send({ amount: "0.00001", to })
 				.then(({ data: { hash } }) => {
-					debug({ to, hash });
+					console.log({ to, hash });
 
 					return hash;
 				}));
@@ -61,7 +59,7 @@ describe("limiter", function () {
 
 		for (const tx of hashes) {
 			const { data } = await api.eth(tx).get();
-			debug({ ...data, tx });
+			console.log({ ...data, tx });
 			assert.notStrictEqual(data.status, "unknown"); // each tx must propagate to the blockchain
 		}
 	});
