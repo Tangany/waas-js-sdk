@@ -10,10 +10,14 @@ process.env.DEBUG = "waas-js-sdk:*"; // force enable logging
 config({ path });
 
 console.info("this suite only works with a pre-set .env file with api credentials in project's root");
+["CLIENT_ID", "CLIENT_SECRET", "SUBSCRIPTION", "VAULT_URL", "E2E_WALLET", "E2E_TOKEN"].map(v => {
+	if (!process.env[v]) {
+		throw new Error(`process.env.${v} not defined`);
+	}
+});
 
 describe("limiter", function () {
-
-	const wallet = process.env.WALLET;
+	const wallet = process.env.E2E_WALLET;
 	const options = {
 		clientId: process.env.CLIENT_ID,
 		clientSecret: process.env.CLIENT_SECRET,

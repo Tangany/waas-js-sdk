@@ -10,34 +10,25 @@ process.env.DEBUG = "waas-js-sdk:*"; // force enable logging
 config({ path });
 
 console.info("this suite only works with a pre-set .env file with api credentials in project's root");
+["CLIENT_ID", "CLIENT_SECRET", "SUBSCRIPTION", "VAULT_URL", "E2E_WALLET", "E2E_TOKEN"].map(v => {
+	if (!process.env[v]) {
+		throw new Error(`process.env.${v} not defined`);
+	}
+});
 
 describe("WaaS sample Ethereum workflow", function () {
 	const timeout = 120e3;  // Ethereum testnet mining delay
 	this.timeout(timeout);
 	this.slow(timeout / 3);
 
-	const tokenWallet = process.env.WALLET; // Wallet that owns the ERC20 token
-	const tokenAddress = "0x0A35aA64eb710c97Fa14258243eeD09AB51a5b4E"; // ERC20 token address
-	let tokenWalletAddress; // Wallet address
+	const tokenAddress = process.env.E2E_TOKEN; // ERC20 token address
+	const tokenWallet = process.env.E2E_WALLET; // Wallet with some testnet balance that owns the ERC20 token
 	const tokenAmount = "0.0032"; // Token amount used for transactions
 	const etherAmount = "0.001"; // Token amount used for transactions
-
-	if (!process.env.CLIENT_ID) {
-		throw new Error("process.env.CLIENT_ID not defined");
-	}
-	if (!process.env.CLIENT_SECRET) {
-		throw new Error("process.env.CLIENT_SECRET not defined");
-	}
-	if (!process.env.SUBSCRIPTION) {
-		throw new Error("process.env.SUBSCRIPTION not defined");
-	}
-	if (!process.env.VAULT_URL) {
-		throw new Error("process.env.VAULT_URL not defined");
-	}
-
-	let createdWallet = "";
-	let createdWalletAddress = "";
-	let txHash = "";
+	let tokenWalletAddress; // Token wallet address
+	let createdWallet; // Random created wallet name
+	let createdWalletAddress; // Created wallet address
+	let txHash; // Tx hashes
 
 	const api = new Waas({
 		clientId: process.env.CLIENT_ID,
