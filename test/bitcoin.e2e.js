@@ -3,9 +3,7 @@ const { config } = require("dotenv");
 const assert = require("assert");
 const { resolve } = require("path");
 const path = resolve(process.cwd(), ".env");
-const debug = require("debug")("waas-js-sdk:bitcoin-e2e");
 
-process.env.DEBUG = "waas-js-sdk:*"; // force enable logging
 config({ path });
 
 console.info("this suite only works with a pre-set .env file with api credentials in project's root");
@@ -41,14 +39,14 @@ describe("WaaS sample Bitcoin workflow", function () {
 		assert.strictEqual(currency, "BTCTEST");
 		assert.ok(balance);
 		assert.ok(address);
-		debug(`Wallet holds ${balance} ${currency} `);
+		console.log(`Wallet holds ${balance} ${currency} `);
 	});
 
 	it("should estimate the fee for given tx", async function () {
 		const { fee, feeRate } = (await noConfirmationsBtcApi.wallet(wallet).btc().estimateFee(recipients)).data;
 		assert.ok(fee);
 		assert.ok(feeRate);
-		debug(`Estimated a total transaction fee of ${fee} for given recipients based on a feeRate of ${feeRate}`);
+		console.log(`Estimated a total transaction fee of ${fee} for given recipients based on a feeRate of ${feeRate}`);
 	});
 
 	let lastHash;
@@ -57,13 +55,13 @@ describe("WaaS sample Bitcoin workflow", function () {
 			[recipients, recipients]
 		)).data;
 		assert.ok(hash);
-		debug(`Sent with hash ${hash}`);
+		console.log(`Sent with hash ${hash}`);
 		lastHash = hash;
 	});
 
 	it("should fetch the tx details", async function () {
 		assert.ok(lastHash, "cannot run without previous tests");
 		const { confirmations, status } = (await noConfirmationsBtcApi.btc(lastHash).get()).data;
-		debug("inital tx status", { confirmations, status });
+		console.log("inital tx status", { confirmations, status });
 	});
 });

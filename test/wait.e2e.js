@@ -1,11 +1,9 @@
 const { Waas, ETHEREUM_PUBLIC_NETWORK, BITCOIN_NETWORK, BITCOIN_TX_CONFIRMATIONS, BITCOIN_TX_SPEED, TimeoutError } = require("../dist");
 const { config } = require("dotenv");
 const { resolve } = require("path");
-const debug = require("debug")("waas-js-sdk:wait-e2e");
 const assert = require("assert");
 const path = resolve(process.cwd(), ".env");
 
-process.env.DEBUG = "waas-js-sdk:*"; // force enable logging
 config({ path });
 
 console.info("this suite only works with a pre-set .env file with api credentials in project's root");
@@ -20,7 +18,6 @@ describe("wait", function () {
 	const wallet = process.env.E2E_WALLET;
 
 	describe("Ethereum", function () {
-
 		const options = {
 			clientId: process.env.CLIENT_ID,
 			clientSecret: process.env.CLIENT_SECRET,
@@ -39,7 +36,7 @@ describe("wait", function () {
 			const { hash } = (await api.wallet(wallet).eth().send({ to: newWalletAddress, amount: "0.000128" })).data;
 
 			const response = await api.eth(hash).wait(50e3);
-			debug(response.data);
+			console.log(response.data);
 
 			await api.wallet(newWallet).delete();
 		});
@@ -82,7 +79,7 @@ describe("wait", function () {
 			const { hash } = (await fastApi.wallet(wallet).btc().send({ to: newWalletAddress, amount: "0.000128" })).data;
 
 			const response = await safeApi.btc(hash).wait(60e3);
-			debug(response.data);
+			console.log(response.data);
 
 			await fastApi.wallet(newWallet).delete();
 		});
