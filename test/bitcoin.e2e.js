@@ -14,23 +14,23 @@ describe("WaaS sample Bitcoin workflow", function () {
 	const timeout = 20e3;
 	this.timeout(timeout);
 	this.slow(timeout / 4);
-	
+
 	const wallet = process.env.WALLET;
 	const recipients = {
 		amount: "0.000001",
 		to: "2NBDAdTp3gES9Aar5woJBuGZgiyPCP6trmk"
 	};
-	
+
 	const options = {
 		clientId: process.env.CLIENT_ID,
 		clientSecret: process.env.CLIENT_SECRET,
 		subscription: process.env.SUBSCRIPTION,
 		vaultUrl: process.env.VAULT_URL,
-		bitcoinNetwork: BITCOIN_NETWORK.TESTNET,
+		bitcoinNetwork: BITCOIN_NETWORK.TESTNET, // All tests execute on testnet3
 		bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.NONE
 	};
 	const noConfirmationsBtcApi = new Waas(options); // coins available regardless of mining status
-	
+
 	it("should get the Bitcoin specs for the current wallet", async function () {
 		const { currency, balance, address } = (await noConfirmationsBtcApi.wallet(wallet).btc().get()).data;
 		assert.strictEqual(currency, "BTCTEST");
@@ -38,14 +38,14 @@ describe("WaaS sample Bitcoin workflow", function () {
 		assert.ok(address);
 		debug(`Wallet holds ${balance} ${currency} `);
 	});
-	
+
 	it("should estimate the fee for given tx", async function () {
 		const { fee, feeRate } = (await noConfirmationsBtcApi.wallet(wallet).btc().estimateFee(recipients)).data;
 		assert.ok(fee);
 		assert.ok(feeRate);
 		debug(`Estimated a total transaction fee of ${fee} for given recipients based on a feeRate of ${feeRate}`);
 	});
-	
+
 	let lastHash;
 	it("should send some BTC to multiple recipients in a single tx", async function () {
 		const { hash } = (await noConfirmationsBtcApi.wallet(wallet).btc().send(
@@ -55,11 +55,10 @@ describe("WaaS sample Bitcoin workflow", function () {
 		debug(`Sent with hash ${hash}`);
 		lastHash = hash;
 	});
-	
+
 	it("should fetch the tx details", async function () {
 		assert.ok(lastHash, "cannot run without previous tests");
 		const { confirmations, status } = (await noConfirmationsBtcApi.btc(lastHash).get()).data;
-		assert.strictEqual(confirmations, 0);
 		debug("inital tx status", { confirmations, status });
 	});
 });

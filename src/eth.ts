@@ -1,17 +1,16 @@
-import {IWaitForTxStatus, WaasAxiosInstance} from "./waas-axios-instance";
-import {AxiosInstance} from "axios";
+import {IWaitForTxStatus, Waas} from "./waas";
 import {IEthereumTransactionStatus} from "./interfaces";
 import * as t from "typeforce";
+import {IWaasMethod} from "./waas-method";
 
 /**
  * Instantiates a new Ethereum interface
- * @param instance - axios instance created by {@link Waas}
+ * @param instance -  {@link Waas} instance
  * @param [txHash] - Ethereum transaction hash
  */
-export class Ethereum extends WaasAxiosInstance {
+export class Ethereum implements IWaasMethod {
 
-    constructor(instance: AxiosInstance, private readonly transactionHash?: string) {
-        super(instance);
+    constructor(public waas: Waas, private readonly transactionHash?: string) {
         t("?String", transactionHash);
     }
 
@@ -22,11 +21,18 @@ export class Ethereum extends WaasAxiosInstance {
     }
 
     /**
+     * Establish a sticky session with a Ethereum full node by fetching and setting affinity cookies for the current Waas instance
+     */
+    public async fetchAffinityCookie(): Promise<void> {
+        await this.waas.wrap<undefined>(() => this.waas.instance.head("eth/transaction/0x0000000000000000000000000000000000000000000000000000000000000000"));
+    }
+
+    /**
      * Returns the status for an Ethereum transaction. The transaction is not mined until a blockNr is assigned.
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum/get-eth-tx-status}
      */
     public async get(): Promise<IEthereumTransactionStatus> {
-        return this.wrap<IEthereumTransactionStatus>(() => this.instance.get(`eth/transaction/${this.transactionHash}`));
+        return this.waas.wrap<IEthereumTransactionStatus>(() => this.waas.instance.get(`eth/transaction/${this.transactionHash}`));
     }
 
     /**
@@ -56,7 +62,7 @@ export class Ethereum extends WaasAxiosInstance {
             };
         });
 
-        return this.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IEthereumTransactionStatus>;
+        return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IEthereumTransactionStatus>;
 
     }
 }

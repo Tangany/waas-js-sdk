@@ -59,8 +59,7 @@ describe("Waas", function() {
 
         it("should return a preconfigured AxiosInstance", async function() {
             const {axios: axiosInstance} = new Waas(auth);
-            this.sandbox.stub(axiosInstance, "get").resolves({response: {status: 202}});
-            await assert.doesNotReject(async () => axiosInstance.get("/"));
+            await assert.strictEqual(typeof axiosInstance.get,  "function");
         });
 
         describe("Errors", function() {

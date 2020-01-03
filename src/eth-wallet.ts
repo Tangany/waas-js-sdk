@@ -1,21 +1,20 @@
 import * as t from "typeforce";
-import {WaasAxiosInstance, recipientType} from "./waas-axios-instance";
-import {AxiosInstance} from "axios";
+import {recipientType, Waas} from "./waas";
 import {IWalletBalance, ITransaction, IRecipient} from "./interfaces";
 import {EthErc20Wallet} from "./eth-erc20-wallet";
+import {IWaasMethod} from "./waas-method";
 import {Wallet} from "./wallet";
 
 /**
- *  instantiates a new Ethereum wallet interface
+ * Instantiates a new Ethereum wallet interface
  * @param instance - axios instance created by {@link Waas}
  * @param limiter - Bottleneck limiter instance
  * @param walletInstance - instance of Wallet class
  */
-export class EthWallet extends WaasAxiosInstance {
+export class EthWallet implements IWaasMethod {
     private readonly walletInstance: Wallet;
 
-    constructor(instance: AxiosInstance, walletInstance: Wallet) {
-        super(instance);
+    constructor(public waas: Waas, walletInstance: Wallet) {
         this.walletInstance = walletInstance;
     }
 
@@ -30,7 +29,7 @@ export class EthWallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum/get-wallet-balance}
      */
     public async get(): Promise<IWalletBalance> {
-        return this.wrap<IWalletBalance>(() => this.instance
+        return this.waas.wrap<IWalletBalance>(() => this.waas.instance
             .get(`eth/wallet/${this.wallet}`),
         );
     }
@@ -52,7 +51,7 @@ export class EthWallet extends WaasAxiosInstance {
 
         t(recipientType, recipient, true);
 
-        return this.wrap<ITransaction>(() => this.instance
+        return this.waas.wrap<ITransaction>(() => this.waas.instance
             .post(`eth/wallet/${this.wallet}/send`, {
                 ...recipient,
             }),
@@ -65,8 +64,6 @@ export class EthWallet extends WaasAxiosInstance {
      * @param tokenAddress - Ethereum ERC20 token address for given eth network
      */
     public erc20(tokenAddress: string): EthErc20Wallet {
-        const erc20 = new EthErc20Wallet(this.instance, this.walletInstance, tokenAddress);
-
-        return erc20;
+        return new EthErc20Wallet(this.waas, this.walletInstance, tokenAddress);
     }
 }

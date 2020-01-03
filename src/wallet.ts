@@ -1,10 +1,10 @@
-import {AxiosInstance} from "axios";
 import * as t from "typeforce";
 import {BtcWallet} from "./btc-wallet";
 import {ConflictError, GeneralError} from "./errors";
-import {WaasAxiosInstance} from "./waas-axios-instance";
+import {Waas} from "./waas";
 import {ISoftDeletedWallet, IWallet, IWalletList} from "./interfaces";
 import {EthWallet} from "./eth-wallet";
+import {IWaasMethod} from "./waas-method";
 
 /**
  *  Instantiates a new wallet interface
@@ -12,9 +12,8 @@ import {EthWallet} from "./eth-wallet";
  * @param limiter - Bottleneck limiter instance
  * @param  [wallet) - wallet name
  */
-export class Wallet extends WaasAxiosInstance {
-    constructor(instance: AxiosInstance, private readonly name?: string) {
-        super(instance);
+export class Wallet implements IWaasMethod {
+    constructor(public waas: Waas, private readonly name?: string) {
         t("?String", name);
     }
 
@@ -37,7 +36,7 @@ export class Wallet extends WaasAxiosInstance {
             url += `?skiptoken=${skiptoken}`;
         }
 
-        return this.wrap<IWalletList>(() => this.instance
+        return this.waas.wrap.bind(this)<IWalletList>(() => this.waas.instance
             .get(url),
         );
     }
@@ -52,7 +51,7 @@ export class Wallet extends WaasAxiosInstance {
         t("?String", wallet);
         t("?Boolean", useHsm);
 
-        return this.wrap<IWallet>(() => this.instance
+        return this.waas.wrap<IWallet>(() => this.waas.instance
             .post("wallet", {
                 wallet,
                 useHsm,
@@ -72,7 +71,7 @@ export class Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/wallet/delete-wallet}
      */
     public async delete(): Promise<ISoftDeletedWallet> {
-        return this.wrap<ISoftDeletedWallet>(() => this.instance
+        return this.waas.wrap<ISoftDeletedWallet>(() => this.waas.instance
             .delete(`wallet/${this.wallet}`),
         );
     }
@@ -82,7 +81,7 @@ export class Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/wallet/get-wallet}
      */
     public async get(): Promise<IWallet> {
-        return this.wrap<IWallet>(() => this.instance
+        return this.waas.wrap<IWallet>(() => this.waas.instance
             .get(`wallet/${this.wallet}`),
         );
     }
@@ -91,7 +90,7 @@ export class Wallet extends WaasAxiosInstance {
      * Returns wallet calls for the Ethereum blockchain
      */
     public eth(): EthWallet {
-        const ew = new EthWallet(this.instance, this);
+        const ew = new EthWallet(this.waas, this);
 
         return ew;
     }
@@ -100,7 +99,7 @@ export class Wallet extends WaasAxiosInstance {
      * Returns wallet calls for the Bitcoin blockchain
      */
     public btc(): BtcWallet {
-        const btc = new BtcWallet(this.instance, this);
+        const btc = new BtcWallet(this.waas, this);
 
         return btc;
     }

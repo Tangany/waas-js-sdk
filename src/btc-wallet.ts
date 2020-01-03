@@ -1,6 +1,6 @@
-import {WaasAxiosInstance, recipientType} from "./waas-axios-instance";
-import {AxiosInstance} from "axios";
+import {recipientType, Waas} from "./waas";
 import {IBitcoinTransactionEstimation, IRecipient, ITransaction, IWalletBalance} from "./interfaces";
+import {IWaasMethod} from "./waas-method";
 import {Wallet} from "./wallet";
 import * as t from "typeforce";
 
@@ -9,9 +9,8 @@ import * as t from "typeforce";
  * @param instance - axios instance created by {@link Waas}
  * @param walletInstance - instance of Wallet class
  */
-export class BtcWallet extends WaasAxiosInstance {
-    constructor(instance: AxiosInstance, private readonly walletInstance: Wallet) {
-        super(instance);
+export class BtcWallet implements IWaasMethod {
+    constructor(public waas: Waas, private readonly walletInstance: Wallet) {
     }
 
     public get wallet() {
@@ -25,7 +24,7 @@ export class BtcWallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/get-btc-balance}
      */
     public async get(): Promise<IWalletBalance> {
-        return this.wrap<IWalletBalance>(() =>  this.instance.get(`btc/wallet/${this.wallet}`));
+        return this.waas.wrap<IWalletBalance>(() => this.waas.instance.get(`btc/wallet/${this.wallet}`));
     }
 
     /**
@@ -34,7 +33,7 @@ export class BtcWallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/make-btc-transaction}
      */
     public async send(recipients: IRecipient[] | IRecipient): Promise<ITransaction> {
-        return this.wrap<ITransaction>(() =>   this.instance.post(`btc/wallet/${this.wallet}/send`, this.getRecipientsData(recipients)));
+        return this.waas.wrap<ITransaction>(() => this.waas.instance.post(`btc/wallet/${this.wallet}/send`, this.getRecipientsData(recipients)));
     }
 
     /**
@@ -43,7 +42,7 @@ export class BtcWallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/estimate-btc-transaction}
      */
     public async estimateFee(recipientsObject: IRecipient[] | IRecipient): Promise<IBitcoinTransactionEstimation> {
-        return this.wrap<IBitcoinTransactionEstimation>(() => this.instance
+        return this.waas.wrap<IBitcoinTransactionEstimation>(() => this.waas.instance
             .post(`btc/wallet/${this.wallet}/estimate-fee`, this.getRecipientsData(recipientsObject)))
             ;
     }

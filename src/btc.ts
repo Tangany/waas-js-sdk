@@ -1,17 +1,16 @@
-import {AxiosInstance} from "axios";
 import * as t from "typeforce";
 import {IBitcoinTransactionStatus} from "./interfaces";
-import {WaasAxiosInstance} from "./waas-axios-instance";
+import {Waas} from "./waas";
+import {IWaasMethod} from "./waas-method";
 
-export class Bitcoin extends WaasAxiosInstance {
+export class Bitcoin implements IWaasMethod {
 
     /**
      * Instantiates a new Bitcoin interface
-     * @param instance - axios instance created by {@link Waas}
+     * @param waas - {@link Waas} instance
      * @param [transactionHash] - Bitcoin transaction hash
      */
-    constructor(instance: AxiosInstance, private readonly transactionHash?: string) {
-        super(instance);
+    constructor(public waas: Waas, private readonly transactionHash?: string) {
         t("?String", transactionHash);
     }
 
@@ -26,7 +25,14 @@ export class Bitcoin extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/get-btc-tx-status}
      */
     public async get(): Promise<IBitcoinTransactionStatus> {
-        return this.wrap<IBitcoinTransactionStatus>(() => this.instance.get(`btc/transaction/${this.txHash}`));
+        return this.waas.wrap<IBitcoinTransactionStatus>(() => this.waas.instance.get(`btc/transaction/${this.txHash}`));
+    }
+
+    /**
+     * Establish a sticky session with a Ethereum full node by fetching and setting affinity cookies for the current Waas instance
+     */
+    public async fetchAffinityCookie(): Promise<void> {
+        await this.waas.wrap(() => this.waas.instance.head("btc/transaction/0000000000000000000000000000000000000000000000000000000000000000"));
     }
 
     /**
@@ -44,6 +50,6 @@ export class Bitcoin extends WaasAxiosInstance {
             };
         });
 
-        return this.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IBitcoinTransactionStatus>;
+        return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IBitcoinTransactionStatus>;
     }
 }
