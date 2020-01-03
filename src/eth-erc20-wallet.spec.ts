@@ -49,7 +49,7 @@ describe("EthErc20Wallet", function() {
     describe("send", function() {
         it("should execute the call", async function() {
             const r = new EthErc20Wallet(this.waas, this.walletInstance, sampleToken);
-            await r.send(sampleAddress, "23.010298");
+            await r.send({to: sampleAddress, amount: "23.010298"});
             assert.strictEqual(this.spy.callCount, 1);
         });
     });
@@ -57,8 +57,8 @@ describe("EthErc20Wallet", function() {
     describe("approve", function() {
         it("should execute the call", async function() {
             const r = new EthErc20Wallet(this.waas, this.walletInstance, sampleToken);
-            await r.approve(sampleAddress, "23.010298");
-            await r.approve(sampleAddress, "1");
+            await r.approve({to: sampleAddress, amount: "23.010298"});
+            await r.approve({to: sampleAddress, amount: "1"});
             assert.strictEqual(this.spy.callCount, 2);
         });
     });
@@ -66,7 +66,7 @@ describe("EthErc20Wallet", function() {
     describe("transferFrom", function() {
         it("should execute the call", async function() {
             const r = new EthErc20Wallet(this.waas, this.walletInstance, sampleToken);
-            await r.transferFrom(sampleAddress, "0.0138");
+            await r.transferFrom({from: sampleAddress, amount: "23.010298"});
             assert.strictEqual(this.spy.callCount, 1);
         });
     });
@@ -74,14 +74,14 @@ describe("EthErc20Wallet", function() {
     describe("burn", function() {
         it("should execute the call", async function() {
             const r = new EthErc20Wallet(this.waas, this.walletInstance, sampleToken);
-            await r.burn("18");
+            await r.burn({amount: "1"});
             assert.strictEqual(this.spy.callCount, 1);
         });
     });
     describe("mint", function() {
         it("should execute the call", async function() {
             const r = new EthErc20Wallet(this.waas, this.walletInstance, sampleToken);
-            await r.mint("18");
+            await r.mint({amount: "18"});
             assert.strictEqual(this.spy.callCount, 1);
         });
     });
