@@ -108,7 +108,7 @@ https://tangany.docs.stoplight.io/api/ethereum/
 (async () => {
     const api = new Waas(options).wallet("my-wallet");
     // send Ether
-    const { hash } = (await api.eth().send({to: someOtherWalletAddress, amount: "0.043"})).data;
+    const { hash } = (await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"})).data;
     // get eth balance and wallet address
     const { currency, balance, address } = (await api.eth().get()).data;
 })();

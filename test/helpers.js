@@ -33,5 +33,6 @@ function * getRandomEthereumAddress (skip = false) {
 }
 
 module.exports = {
-	getRandomEthereumAddress
+	getRandomEthereumAddress,
+	getRandomHex
 };

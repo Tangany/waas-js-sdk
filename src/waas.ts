@@ -73,6 +73,12 @@ export const recipientType = t.compile({
     amount: "String",
 });
 
+export const ethereumRecipientType = t.compile({
+    to: "String",
+    amount: "String",
+    data: "?String",
+});
+
 export interface IWaitForTxStatus {
     status: "confirmed" | "pending" | "error";
     response: IBlockchainTransactionStatus;

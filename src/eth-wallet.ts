@@ -1,6 +1,6 @@
 import * as t from "typeforce";
-import {recipientType, Waas} from "./waas";
-import {IWalletBalance, ITransaction, IRecipient} from "./interfaces";
+import {ethereumRecipientType, Waas} from "./waas";
+import {IWalletBalance, ITransaction, IEthereumRecipient} from "./interfaces";
 import {EthErc20Wallet} from "./eth-erc20-wallet";
 import {IWaasMethod} from "./waas-method";
 import {Wallet} from "./wallet";
@@ -36,12 +36,10 @@ export class EthWallet implements IWaasMethod {
 
     /**
      * Send Ether to address from given wallet
-     * @param recipient - Recipient configuration
-     * @param recipient.to - Recipient's Ethereum address
-     * @param recipient.amount - Amount of Ether to send
+     * @param recipient - {@link IEthereumRecipient}
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum/make-wallet-transaction}
      */
-    public async send(recipient: IRecipient): Promise<ITransaction> {
+    public async send(recipient: IEthereumRecipient): Promise<ITransaction> {
         if (!recipient.to) {
             throw new Error("Missing 'to' argument");
         }
@@ -49,14 +47,13 @@ export class EthWallet implements IWaasMethod {
             throw new Error("Missing 'amount' argument");
         }
 
-        t(recipientType, recipient, true);
+        t(ethereumRecipientType, recipient, true);
 
         return this.waas.wrap<ITransaction>(() => this.waas.instance
             .post(`eth/wallet/${this.wallet}/send`, {
                 ...recipient,
             }),
-        )
-            ;
+        );
     }
 
     /**

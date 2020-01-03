@@ -74,6 +74,7 @@ export interface IEthereumTransactionStatus extends AxiosResponse {
     data: {
         isError: boolean;
         blockNr: number | null;
+        data: string | null;
     };
 }
 
@@ -105,6 +106,16 @@ export interface IBitcoinTransactionEstimation extends AxiosResponse {
 export interface IRecipient {
     to: string;
     amount: string;
+}
+
+/**
+ * Represents a transaction recipient configuration
+ * @param to - Recipient ethereum address
+ * @param amount - Float Ether amount formatted as a string
+ * @param [data] - Ethereum transaction data payload
+ */
+export interface IEthereumRecipient extends IRecipient {
+    data?: string;
 }
 
 export interface IWaasError {
