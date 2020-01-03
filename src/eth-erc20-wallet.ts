@@ -1,5 +1,5 @@
 import * as t from "typeforce";
-import {ITokenBalance, ITransaction} from "./interfaces";
+import {IRecipient, ITokenBalance, ITransaction} from "./interfaces";
 import {recipientType, Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
 import {Wallet} from "./wallet";
@@ -40,14 +40,13 @@ export class EthErc20Wallet implements IWaasMethod {
 
     /**
      * Send ERC20 tokens from given wallet to an Ethereum address
-     * @param to - Ethereum address of the token recipient. Not to confuse with the token address
-     * @param amount - Float amount of tokens formatted as a string
+     * @param recipient - {@link IRecipient}
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/make-token-transaction}
      */
-    public async send(to: string, amount: string): Promise<ITransaction> {
+    public async send(recipient: IRecipient): Promise<ITransaction> {
         return this.waas.wrap<ITransaction>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/send`, this
-                .getRecipientsData(METHOD.TRANSFER)({to, amount}),
+                .getRecipientsData(METHOD.TRANSFER)(recipient),
             ),
         );
     }
@@ -58,7 +57,7 @@ export class EthErc20Wallet implements IWaasMethod {
      * @param amount - Float amount of tokens formatted as a string
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-approve}
      */
-    public async approve(to: string, amount: string): Promise<ITransaction> {
+    public async approve({to, amount}: { to: string, amount: string }): Promise<ITransaction> {
         return this.waas.wrap<ITransaction>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/approve`, this
                 .getRecipientsData(METHOD.APPROVE)({to, amount}),
@@ -72,7 +71,7 @@ export class EthErc20Wallet implements IWaasMethod {
      * @param amount - Float amount of tokens to withdraw formatted as a string
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-transfer-from}
      */
-    public async transferFrom(from: string, amount: string): Promise<ITransaction> {
+    public async transferFrom({from, amount}: { from: string, amount: string }): Promise<ITransaction> {
         return this.waas.wrap<ITransaction>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/transfer-from`, this
                 .getRecipientsData(METHOD.TRANSFER_FROM)({from, amount}),
@@ -85,7 +84,7 @@ export class EthErc20Wallet implements IWaasMethod {
      * @param amount - Float amount of tokens to burn from the wallet formatted as a string
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-burn}
      */
-    public async burn(amount: string): Promise<ITransaction> {
+    public async burn({amount}: { amount: string }): Promise<ITransaction> {
         return this.waas.wrap<ITransaction>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/burn`, this
                 .getRecipientsData(METHOD.BURN)({amount})),
@@ -98,7 +97,7 @@ export class EthErc20Wallet implements IWaasMethod {
      * @param [to] - Ethereum address to assign the mined tokens to. If omitted, tokens are assigned to the wallet address
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-mint}
      */
-    public async mint(amount: string, to?: string): Promise<ITransaction> {
+    public async mint({amount, to}: { amount: string, to?: string }): Promise<ITransaction> {
         return this.waas.wrap<ITransaction>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/mint`, this
                 .getRecipientsData(METHOD.MINT)({amount, to})),

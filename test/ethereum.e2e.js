@@ -96,7 +96,7 @@ describe("WaaS sample Ethereum workflow", function () {
 
 	it("should send a few tokens to the created wallet", async function () {
 		assert.ok(createdWalletAddress, "cannot run without previous tests");
-		const { hash } = (await api.wallet(tokenWallet).eth().erc20(tokenAddress).send(createdWalletAddress, tokenAmount)).data;
+		const { hash } = (await api.wallet(tokenWallet).eth().erc20(tokenAddress).send({ to: createdWalletAddress, amount: tokenAmount })).data;
 		assert.ok(hash);
 		txHash = hash;
 		debug(`sent ${tokenAmount} token to created walled with hash`, hash);
@@ -133,14 +133,14 @@ describe("WaaS sample Ethereum workflow", function () {
 	it("should approve to the master wallet to withdraw tokens from the new wallet", async function () {
 		tokenWalletAddress = (await api.wallet(tokenWallet).eth().get()).data.address;
 		debug("tokenMasterWalletAddress", tokenWalletAddress);
-		const { hash } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).approve(tokenWalletAddress, tokenAmount)).data;
-		debug(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
+		console.log("tokenMasterWalletAddress", tokenWalletAddress);
+		const { hash } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).approve({ to: tokenWalletAddress, amount: tokenAmount })).data;
 		await api.eth(hash).wait(timeout);
 	});
 
 	it("should withdraw the approved token amount from the new wallet", async function () {
-		const { hash } = (await api.wallet(tokenWallet).eth().erc20(tokenAddress).transferFrom(createdWalletAddress, tokenAmount)).data;
-		debug(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
+		const { hash } = (await api.wallet(tokenWallet).eth().erc20(tokenAddress).transferFrom({ from: createdWalletAddress, amount: tokenAmount })).data;
+		console.log(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
 		await api.eth(hash).wait(timeout);
 		const { balance } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).get()).data;
 		assert.strictEqual(balance, "0");
@@ -148,8 +148,8 @@ describe("WaaS sample Ethereum workflow", function () {
 	});
 
 	it("should mint tokens to new wallet", async function () {
-		const { hash } = (await api.wallet(tokenWallet).eth().erc20(tokenAddress).mint(tokenAmount, createdWalletAddress)).data;
-		debug(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
+		const { hash } = (await api.wallet(tokenWallet).eth().erc20(tokenAddress).mint({ amount: tokenAmount, to: createdWalletAddress })).data;
+		console.log(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
 		await api.eth(hash).wait(timeout);
 		const { balance } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).get()).data;
 		assert.strictEqual(balance, tokenAmount);
@@ -157,8 +157,8 @@ describe("WaaS sample Ethereum workflow", function () {
 	});
 
 	it("should burn tokens from new wallet", async function () {
-		const { hash } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).burn(tokenAmount)).data;
-		debug(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
+		const { hash } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).burn({ amount: tokenAmount })).data;
+		console.log(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
 		await api.eth(hash).wait(timeout);
 		const { balance } = (await api.wallet(createdWallet).eth().erc20(tokenAddress).get()).data;
 		assert.strictEqual(balance, "0");
