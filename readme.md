@@ -96,7 +96,7 @@ https://tangany.docs.stoplight.io/api/wallet/
     const api = new Waas(options).eth(txHash);
     // get transaction status
     const { blockNr, isError } = (await api.get()).data;
-    // wait until the transaction is mined
+    // poll until the transaction is mined (for max 60 seconds)
     await api.wait(60e3);
 })();
 ````
@@ -121,17 +121,17 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 (async () => {
     const api = new Waas(options).wallet("my-wallet").eth().erc20(tokenAddress);
     // send token
-    const { hash } = (await api.send(someOtherWalletAddress, "0.043")).data;
+    const { hash } = (await api.send({to: someOtherWalletAddress, amount: "0.043"})).data;
     // get token balance
     const { currency, balance, address } = (await api.get()).data;
      // mint token
-    await api.mint("12.291", someOtherWalletAddress); // assuming myWalletAddress is erc20token's minter
+    await api.mint({amount: "12.291", to: someOtherWalletAddress}); // assuming myWalletAddress is erc20token's minter
     // approve token withdrawal
-    await api.approve(someOtherWalletAddress, "213");
+    await api.approve({to: someOtherWalletAddress, amount: "213"});
     // withdraw pre-approved tokens
-    await new Waas(options).wallet("some-other-wallet").eth().erc20(tokenAddress).transferFrom(myWalletAddress, "213");
+    await new Waas(options).wallet("some-other-wallet").eth().erc20(tokenAddress).transferFrom({from: myWalletAddress, amount: "213"});
     // burn token
-    await new Waas(options).wallet("some-other-wallet").eth().erc20(tokenAddress).burn("2");
+    await new Waas(options).wallet("some-other-wallet").eth().erc20(tokenAddress).burn({amount: "2"});
 })();
 ````
 
@@ -142,8 +142,8 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
     const api = new Waas(options).btc(hash);
     // get transaction status
     const { confirmations, status } = (await api.get()).data;
-    // wait until the transaction is mined
-    await api.wait(20e3, 1e3);
+    // poll every second until the transaction is mined (for max 720 seconds)
+    await api.wait(720e3, 1e3);
 })();
 ````
 
@@ -165,7 +165,7 @@ https://tangany.docs.stoplight.io/api/bitcoin/
 ````
 
 ## Affinity Cookies
-WaaS employes its own load-balanced full nodes backend to transmit transactions to the blockchains. Due to the nature of blockchain, full nodes sync their states only in the event of a new block. One implication of this behavior is that sending multiple transactions from the same wallet during a time frame of a single block may lead to an overlap of backend memory pool assignments which subsequent may result in transactions being cancelled and discarded from the blockchain.
+WaaS employs its own load-balanced full-node backend to transmit transactions to the blockchains. Due to the nature of blockchain, full nodes sync their states only in the event of a new block. One implication of this behavior is that sending multiple transactions from the same wallet during a time frame of a single block may lead to an overlap of backend memory pool assignments which subsequent may result in transactions being cancelled and discarded from the blockchain.
 
 E.g. two Ethereum transactions sent to different full nodes from the same wallet shortly one after the other may be assigned the same nonce number by two different full nodes in the backend resulting in Ethereum, by specification, cancelling the former of the two transactions.
 
