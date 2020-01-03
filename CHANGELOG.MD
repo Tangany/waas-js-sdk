@@ -5,11 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Changed
 ### Fixed
 - Fixed the issue where each daisy-chained subclass of WaaS maintained its own exclusive limiter instance
 ### Added
-- Added support for `HEAD /eth/transaction/{{txid}}` to fetch affinity cookies
+- Added methods for fetching affinity cookies
+- Added sending data from EthereumWallet
+
+### Changed
+* 🚨 Breaking: changed accepted function arguments in `EthErc20Wallet.send`, `EthErc20Wallet.approve`, `EthErc20Wallet.transferFrom`, `EthErc20Wallet.burn` & `EthErc20Wallet.mint` to accept object-type argument matching the style of `BitcoinWallet.send` &`EthereumWallet.send`
 
 ## [1.0.0-beta.3]
 ### Added
