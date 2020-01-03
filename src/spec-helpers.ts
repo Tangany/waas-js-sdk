@@ -7,7 +7,6 @@ import {createSandbox} from "sinon";
 export const sandbox = () => {
     beforeEach(function() {
         this.sandbox = createSandbox({});
-
     });
 
     afterEach(function() {

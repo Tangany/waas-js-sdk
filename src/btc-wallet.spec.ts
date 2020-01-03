@@ -2,31 +2,34 @@ import axios from "axios";
 import {BtcWallet} from "./btc-wallet";
 import * as assert from "assert";
 import {sandbox} from "./spec-helpers";
+import {Waas} from "./waas";
 import {Wallet} from "./wallet";
 
 sandbox();
 
 describe("BtcWallet", function() {
     const sampleWallet = "my-wallet";
-    const to = "1bc0xed";
+    const to = "0xb0x3d";
     const amount = "0.12";
     const recipient = {to, amount};
 
     beforeEach(function() {
-        this.stub = this.sandbox.stub(axios, "create");
+        this.waas = this.sandbox.createStubInstance(Waas);
+        this.waas.wrap = (fn: any) => fn();
+        this.waas.instance = this.sandbox.stub(axios, "create");
     });
 
     it("should construct an instance", function() {
-        assert.ok(new BtcWallet(axios, new Wallet(axios, sampleWallet)));
+        assert.ok(new BtcWallet(this.waas, new Wallet(this.waas, sampleWallet)));
     });
 
     describe("wallet", function() {
         it("should throw for missing wallet name", function() {
-            assert.throws(() => new BtcWallet(axios, new Wallet(axios)).wallet);
+            assert.throws(() => new BtcWallet(this.waas, new Wallet(this.waas)).wallet, /Expected String, got undefined/);
         });
 
         it("should throw for invalid wallet name", function() {
-            assert.throws(() => new BtcWallet(axios, new Wallet(axios, -1.2e3 as any)).wallet);
+            assert.throws(() => new BtcWallet(this.waas, new Wallet(this.waas, -1.2e3 as any)).wallet, /Expected \?String, got Number/);
         });
 
         it("should return the wallet name", function() {
@@ -36,25 +39,25 @@ describe("BtcWallet", function() {
 
     describe("get", function() {
         it("should execute the api call", async function() {
-            const stub = this.sandbox.stub(axios, "get");
-            await new BtcWallet(axios, new Wallet(axios, sampleWallet)).get();
-            assert.strictEqual(stub.callCount, 1);
+            const spy = this.waas.instance.get = this.sandbox.spy();
+            await new BtcWallet(this.waas, new Wallet(this.waas, sampleWallet)).get();
+            assert.strictEqual(spy.callCount, 1);
         });
     });
 
     describe("send", function() {
         it("should execute the api call", async function() {
-            const stub = this.sandbox.stub(axios, "post");
-            await new BtcWallet(axios, new Wallet(axios, sampleWallet)).send([recipient, recipient]);
-            assert.strictEqual(stub.callCount, 1);
+            const spy = this.waas.instance.post = this.sandbox.spy();
+            await new BtcWallet(this.waas, new Wallet(this.waas, sampleWallet)).send([recipient, recipient]);
+            assert.strictEqual(spy.callCount, 1);
         });
     });
 
     describe("estimateFee", function() {
         it("should execute the api call", async function() {
-            const stub = this.sandbox.stub(axios, "post");
-            await new BtcWallet(axios, new Wallet(axios, sampleWallet)).estimateFee(recipient);
-            assert.strictEqual(stub.callCount, 1);
+            const spy = this.waas.instance.post = this.sandbox.spy();
+            await new BtcWallet(this.waas, new Wallet(this.waas, sampleWallet)).estimateFee(recipient);
+            assert.strictEqual(spy.callCount, 1);
         });
     });
 

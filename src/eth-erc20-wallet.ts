@@ -1,7 +1,7 @@
-import {AxiosInstance} from "axios";
 import * as t from "typeforce";
 import {ITokenBalance, ITransaction} from "./interfaces";
-import {WaasAxiosInstance, recipientType} from "./waas-axios-instance";
+import {recipientType, Waas} from "./waas";
+import {IWaasMethod} from "./waas-method";
 import {Wallet} from "./wallet";
 
 enum METHOD {
@@ -18,7 +18,7 @@ enum METHOD {
  * @param walletInstance - Instance of Wallet class
  * @param address - ERC20 token contract address
  */
-export class EthErc20Wallet extends WaasAxiosInstance {
+export class EthErc20Wallet implements IWaasMethod {
 
     get wallet() {
         t("String", this.walletInstance.wallet);
@@ -26,15 +26,8 @@ export class EthErc20Wallet extends WaasAxiosInstance {
         return this.walletInstance.wallet;
     }
 
-    public readonly address: string;
-    public readonly walletInstance: Wallet;
-
-    constructor(instance: AxiosInstance, walletInstance: Wallet, address: string) {
-        super(instance);
-        this.walletInstance = walletInstance;
-
+    constructor(public waas: Waas, public readonly walletInstance: Wallet, public readonly address: string) {
         t("String", address);
-        this.address = address;
     }
 
     /**
@@ -42,7 +35,7 @@ export class EthErc20Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/get-token-balance}
      */
     public async get(): Promise<ITokenBalance> {
-        return this.wrap<ITokenBalance>(() => this.instance.get(`eth/erc20/${this.address}/${this.wallet}`));
+        return this.waas.wrap<ITokenBalance>(() => this.waas.instance.get(`eth/erc20/${this.address}/${this.wallet}`));
     }
 
     /**
@@ -52,7 +45,7 @@ export class EthErc20Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/make-token-transaction}
      */
     public async send(to: string, amount: string): Promise<ITransaction> {
-        return this.wrap<ITransaction>(() => this.instance
+        return this.waas.wrap<ITransaction>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/send`, this
                 .getRecipientsData(METHOD.TRANSFER)({to, amount}),
             ),
@@ -66,7 +59,7 @@ export class EthErc20Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-approve}
      */
     public async approve(to: string, amount: string): Promise<ITransaction> {
-        return this.wrap<ITransaction>(() => this.instance
+        return this.waas.wrap<ITransaction>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/approve`, this
                 .getRecipientsData(METHOD.APPROVE)({to, amount}),
             ),
@@ -80,7 +73,7 @@ export class EthErc20Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-transfer-from}
      */
     public async transferFrom(from: string, amount: string): Promise<ITransaction> {
-        return this.wrap<ITransaction>(() => this.instance
+        return this.waas.wrap<ITransaction>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/transfer-from`, this
                 .getRecipientsData(METHOD.TRANSFER_FROM)({from, amount}),
             ),
@@ -93,7 +86,7 @@ export class EthErc20Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-burn}
      */
     public async burn(amount: string): Promise<ITransaction> {
-        return this.wrap<ITransaction>(() => this.instance
+        return this.waas.wrap<ITransaction>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/burn`, this
                 .getRecipientsData(METHOD.BURN)({amount})),
         );
@@ -106,7 +99,7 @@ export class EthErc20Wallet extends WaasAxiosInstance {
      * @see {@link https://tangany.docs.stoplight.io/api/ethereum-erc20/execute-eth-erc20-mint}
      */
     public async mint(amount: string, to?: string): Promise<ITransaction> {
-        return this.wrap<ITransaction>(() => this.instance
+        return this.waas.wrap<ITransaction>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/mint`, this
                 .getRecipientsData(METHOD.MINT)({amount, to})),
         );
