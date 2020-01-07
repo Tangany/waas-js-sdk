@@ -9,7 +9,7 @@ import {
     BitcoinTxSpeed,
     EthereumPublicNetwork,
     EthereumTxSpeed,
-    Waas,
+    Waas, ApiVersion,
 } from "./waas";
 import {Wallet} from "./wallet";
 import * as moxios from "moxios";
@@ -36,6 +36,8 @@ describe("Waas", function() {
             bitcoinTxConfirmations: BlockchainTxConfirmations.SECURE,
             bitcoinMaxFeeRate: 600,
         }));
+        assert.ok(new Waas(auth, "https://some-dev-url" as ApiVersion));
+        assert.ok(new Waas(auth, undefined, false));
     });
 
     it("should throw for missing or invalid authentication", function() {
@@ -59,7 +61,7 @@ describe("Waas", function() {
 
         it("should return a preconfigured AxiosInstance", async function() {
             const {axios: axiosInstance} = new Waas(auth);
-            await assert.strictEqual(typeof axiosInstance.get,  "function");
+            await assert.strictEqual(typeof axiosInstance.get, "function");
         });
 
         describe("Errors", function() {
