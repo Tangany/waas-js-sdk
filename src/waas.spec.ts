@@ -5,7 +5,7 @@ import {Ethereum} from "./eth";
 import {sandbox} from "./spec-helpers";
 import {
     BitcoinNetwork,
-    BitcoinTxConfirmations,
+    BlockchainTxConfirmations,
     BitcoinTxSpeed,
     EthereumPublicNetwork,
     EthereumTxSpeed,
@@ -33,7 +33,7 @@ describe("Waas", function() {
             ethereumTxSpeed: EthereumTxSpeed.DEFAULT,
             bitcoinNetwork: BitcoinNetwork.BITCOIN,
             bitcoinTxSpeed: BitcoinTxSpeed.FAST,
-            bitcoinTxConfirmations: BitcoinTxConfirmations.SECURE,
+            bitcoinTxConfirmations: BlockchainTxConfirmations.SECURE,
             bitcoinMaxFeeRate: 600,
         }));
     });

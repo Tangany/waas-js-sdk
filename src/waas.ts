@@ -2,7 +2,7 @@ import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} fro
 import Bottleneck from "bottleneck";
 import * as Debug from "debug";
 import {Bitcoin} from "./btc";
-import {IBlockchainTransactionStatus, IWaasError} from "./interfaces";
+import {BlockchainTransactionStatuses, IBlockchainTransactionStatus, IWaasError} from "./interfaces";
 import {limiter} from "./limiter";
 import {Wallet} from "./wallet";
 import {Ethereum} from "./eth";
@@ -38,7 +38,7 @@ export enum BitcoinNetwork {
     TESTNET = "testnet",
 }
 
-export enum BitcoinTxConfirmations {
+export enum BlockchainTxConfirmations {
     NONE = "none",
     DEFAULT = "default",
     SECURE = "secure",
@@ -62,8 +62,9 @@ interface IWaaSOptions {
     vaultUrl?: string;
     ethereumNetwork?: EthereumPublicNetwork | string;
     ethereumTxSpeed?: EthereumTxSpeed;
+    ethereumTxConfirmations?: BlockchainTxConfirmations;
     bitcoinNetwork?: BitcoinNetwork;
-    bitcoinTxConfirmations?: BitcoinTxConfirmations;
+    bitcoinTxConfirmations?: BlockchainTxConfirmations;
     bitcoinTxSpeed?: BitcoinTxSpeed;
     bitcoinMaxFeeRate?: number;
 }
@@ -80,7 +81,7 @@ export const ethereumRecipientType = t.compile({
 });
 
 export interface IWaitForTxStatus {
-    status: "confirmed" | "pending" | "error";
+    status: BlockchainTransactionStatuses;
     response: IBlockchainTransactionStatus;
 }
 
@@ -92,6 +93,7 @@ export interface IWaitForTxStatus {
  * @param options.subscription - Subscription code
  * @param options.vaultUrl - Tangany vault url
  * @param options.ethereumNetwork - Public Ethereum network name (@see https://tangany.docs.stoplight.io/api/models/ethereum-public-network) or private Ethereum network url (@see https://tangany.docs.stoplight.io/api/models/ethereum-private-network)
+ * @param options.ethereumTxConfirmations - Amount of block confirmations required to consider an Ethereum transaction as valid
  * @param options.ethereumTxSpeed - Amount of additional gas fee that is added to the base gas fee for the given Ethereum network to speed up the mining process of the transaction
  * @param options.bitcoinNetwork - Public Bitcoin network name (@see https://tangany.docs.stoplight.io/api/models/bitcoin-network)
  * @param options.bitcoinTxConfirmations - Amount of block confirmations required for Bitcoin balance outputs to be included in the total wallet balance calculation
@@ -223,6 +225,9 @@ export class Waas {
         }
         if (options.ethereumNetwork) {
             api.headers["tangany-ethereum-network"] = options.ethereumNetwork;
+        }
+        if (options.ethereumTxConfirmations) {
+            api.headers["tangany-ethereum-tx-confirmations"] = options.ethereumTxConfirmations;
         }
         if (options.ethereumTxSpeed) {
             api.headers["tangany-ethereum-tx-speed"] = options.ethereumTxSpeed;

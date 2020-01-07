@@ -102,9 +102,10 @@ describe("WaaS sample Ethereum workflow", function () {
 
 	it("should get the transaction status for the hash", async function () {
 		assert.ok(txHash, "cannot run without previous tests");
-		const { blockNr, isError } = (await api.eth(txHash).get()).data;
-		console.log("inital tx status", { blockNr, isError });
+		const { blockNr, isError, data, confirmations, status } = (await api.eth(txHash).get()).data;
+		console.log("inital tx status", { blockNr, isError, data, confirmations, status });
 		assert.strictEqual(isError, false);
+		assert.notStrictEqual(status, "unknown");
 	});
 
 	it("should wait for the transaction to get mined", async function () {
