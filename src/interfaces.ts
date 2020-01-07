@@ -1,6 +1,8 @@
 import {AxiosResponse} from "axios";
 import {WalletSecurity, WalletVersion} from "./waas";
 
+export type BlockchainTransactionStatuses = "unknown" | "pending" | "confirmed" | "error";
+
 /**
  * Represents the response of a ERC20 token wallet balance
  */
@@ -74,6 +76,8 @@ export interface IEthereumTransactionStatus extends AxiosResponse {
     data: {
         isError: boolean;
         blockNr: number | null;
+        status: BlockchainTransactionStatuses;
+        confirmations: number | null;
         data: string | null;
     };
 }
@@ -83,8 +87,9 @@ export interface IEthereumTransactionStatus extends AxiosResponse {
  */
 export interface IBitcoinTransactionStatus extends AxiosResponse {
     data: {
-        status: "pending" | "confirmed" | "error";
-        confirmations: number;
+        status: BlockchainTransactionStatuses;
+        confirmations: number | null;
+        blockNr: number | null
     };
 }
 
