@@ -1,16 +1,24 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 ### Fixed
-- Fixed the issue where each daisy-chained subclass of WaaS maintained its own exclusive limiter instance
 ### Added
-- Added methods for fetching affinity cookies
-- Added sending data from EthereumWallet
+### Changed
 
+## [1.0.0-beta.5]
+### Fixed
+* Moved unproductive package (moxios) to devDependencies
+
+## [1.0.0-beta.4]
+### Fixed
+* Fixed the issue where each daisy-chained subclass of WaaS maintained its own exclusive limiter instance
+### Added
+* Added methods for fetching affinity cookies
+* Added sending data from EthereumWallet
+* Added `ethereumTxConfirmations` option
 ### Changed
 * 🚨 Breaking: changed accepted function arguments in `EthErc20Wallet.send`, `EthErc20Wallet.approve`, `EthErc20Wallet.transferFrom`, `EthErc20Wallet.burn` & `EthErc20Wallet.mint` to accept object-type argument matching the style of `BitcoinWallet.send` &`EthereumWallet.send`
 
