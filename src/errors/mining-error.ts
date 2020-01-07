@@ -10,9 +10,9 @@ export class MiningError extends HttpError {
 }
 
 export function isEthereumMiningErrorData(txData: IBlockchainTransactionStatus): txData is IEthereumTransactionStatus {
-    return txData.data.hasOwnProperty("blockNr");
+    return txData.data.hasOwnProperty("isError");
 }
 
 export function isBitcoinMiningErrorData(txData: IBlockchainTransactionStatus): txData is IBitcoinTransactionStatus {
-    return txData.data.hasOwnProperty("status");
+    return !isEthereumMiningErrorData(txData);
 }
