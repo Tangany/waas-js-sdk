@@ -1,8 +1,9 @@
 import * as assert from "assert";
-import axios from "axios"
+import axios from "axios";
 import {MiningError, TimeoutError} from "./errors";
 import {isBitcoinMiningErrorData} from "./errors/mining-error";
 import {Ethereum} from "./eth";
+import {IEthereumTransactionStatus} from "./interfaces";
 import {sandbox} from "./spec-helpers";
 import {Waas} from "./waas";
 
@@ -68,10 +69,11 @@ describe("Ethereum", function() {
                 .catch((r: MiningError) => {
                     assert.ok(r instanceof MiningError);
                     if (isBitcoinMiningErrorData(r.txData)) {
-                        throw  new Error("invalid error type");
+                        throw new Error("invalid error type");
                     }
-                    assert.strictEqual(r.txData.data.isError, true);
-                    assert.strictEqual(r.txData.data.blockNr, undefined);
+                    const txData = (r.txData) as IEthereumTransactionStatus;
+                    assert.strictEqual(txData.data.isError, true);
+                    assert.strictEqual(txData.data.blockNr, undefined);
                 });
         });
         it("should throw while the 'get' call", async function() {
