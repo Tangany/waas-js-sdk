@@ -200,13 +200,10 @@ export class Waas {
         const api: AxiosRequestConfig = {
             baseURL: (() => {
                 switch (version) {
-                    case "1.2.1" as ApiVersion:
-                        return "https://api.tangany.com/v1.2.1";
-                    case "dev" as ApiVersion:
-                        return "http://127.0.0.1:7071/api";
                     case ApiVersion.V1:
-                    default:
                         return "https://api.tangany.com/v1";
+                    default:
+                        return version;
                 }
             })(),
             headers: {
