@@ -1,9 +1,9 @@
 import * as t from "typeforce";
 import {BtcWallet} from "./btc-wallet";
 import {ConflictError, GeneralError} from "./errors";
-import {Waas} from "./waas";
-import {ISoftDeletedWallet, IWallet, IWalletList} from "./interfaces";
 import {EthWallet} from "./eth-wallet";
+import {ISoftDeletedWallet, IWallet, IWalletList} from "./interfaces";
+import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
 
 /**
@@ -51,19 +51,20 @@ export class Wallet implements IWaasMethod {
         t("?String", wallet);
         t("?Boolean", useHsm);
 
-        return this.waas.wrap<IWallet>(() => this.waas.instance
-            .post("wallet", {
-                wallet,
-                useHsm,
-            })
-            .catch(e => {
-                if (e.response && e.response.status === 409) {
-                    throw new ConflictError("Cannot overwrite existing wallet");
-                }
+        try {
+            return this.waas.wrap<IWallet>(() => this.waas.instance
+                .post("wallet", {
+                    wallet,
+                    useHsm,
+                }),
+            );
+        } catch (e) {
+            if (e.response && e.response.status === 409) {
+                throw new ConflictError("Cannot overwrite existing wallet");
+            }
 
-                throw new GeneralError(e);
-            }),
-        );
+            throw new GeneralError(e);
+        }
     }
 
     /**

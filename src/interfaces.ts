@@ -1,4 +1,3 @@
-import {AxiosResponse} from "axios";
 import {WalletSecurity, WalletVersion} from "./waas";
 
 export type BlockchainTransactionStatuses = "unknown" | "pending" | "confirmed" | "error";
@@ -6,65 +5,52 @@ export type BlockchainTransactionStatuses = "unknown" | "pending" | "confirmed" 
 /**
  * Represents the response of a ERC20 token wallet balance
  */
-export interface ITokenBalance extends AxiosResponse {
-    data: {
-        balance: string;
-        currency: string;
-    };
+export interface ITokenBalance {
+    balance: string;
+    currency: string;
 }
 
 /**
  * Represents a wallet list operation response
  */
-export interface ITransaction extends AxiosResponse {
-    data: {
-        hash: string;
-    };
+export interface ITransaction {
+    hash: string;
 }
 
 /**
  * Represents a wallet response
  */
-export interface IWallet extends AxiosResponse {
-    data: {
-        wallet: string;
-        security: WalletSecurity;
-        updated: string;
-        created: string;
-        version: string | WalletVersion.LATEST;
-    };
-
+export interface IWallet {
+    wallet: string;
+    security: WalletSecurity;
+    updated: string;
+    created: string;
+    version: string | WalletVersion.LATEST;
 }
 
 /**
  * Represents a wallet list operation response
  */
-export interface IWalletList extends AxiosResponse {
-    data: {
-        list: IWallet[];
-        skiptoken: string;
-    };
+export interface IWalletList {
+    list: IWallet[];
+    skiptoken: string;
 }
 
 /**
  * Represents the response of a soft-deleted wallet
  */
-export interface ISoftDeletedWallet extends AxiosResponse {
-    data: {
-        recoveryId: string;
-        scheduledPurgeDate: string;
-    };
+export interface ISoftDeletedWallet {
+    recoveryId: string;
+    scheduledPurgeDate: string;
 }
 
 /**
  * Represents the response of a Blockchain wallet balance
  */
-export interface IWalletBalance extends AxiosResponse {
-    data: {
-        address: string;
-        balance: string;
-        currency: string;
-    };
+export interface IWalletBalance {
+    address: string;
+    balance: string;
+    currency: string;
 }
 
 export type IBlockchainTransactionStatus = IEthereumTransactionStatus | IBitcoinTransactionStatus;
@@ -72,35 +58,29 @@ export type IBlockchainTransactionStatus = IEthereumTransactionStatus | IBitcoin
 /**
  * Represents the transaction status response for the Ethereum network
  */
-export interface IEthereumTransactionStatus extends AxiosResponse {
-    data: {
-        isError: boolean;
-        blockNr: number | null;
-        status: BlockchainTransactionStatuses;
-        confirmations: number | null;
-        data: string | null;
-    };
+export interface IEthereumTransactionStatus {
+    isError: boolean;
+    blockNr: number | null;
+    status: BlockchainTransactionStatuses;
+    confirmations: number | null;
+    data: string | null;
 }
 
 /**
  * Represents the transaction status response for the Bitcoin network
  */
-export interface IBitcoinTransactionStatus extends AxiosResponse {
-    data: {
-        status: BlockchainTransactionStatuses;
-        confirmations: number | null;
-        blockNr: number | null
-    };
+export interface IBitcoinTransactionStatus {
+    status: BlockchainTransactionStatuses;
+    confirmations: number | null;
+    blockNr: number | null;
 }
 
 /**
  * Represents a Bitcoin transaction estimation
  */
-export interface IBitcoinTransactionEstimation extends AxiosResponse {
-    data: {
-        fee: string;
-        feeRate: number;
-    };
+export interface IBitcoinTransactionEstimation {
+    fee: string;
+    feeRate: number;
 }
 
 /**

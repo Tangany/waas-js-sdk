@@ -143,7 +143,7 @@ export class Waas {
             const poll = async (): Promise<void> => {
                 debug("waiting for getter call");
                 const {status, response} = await statusGetterCall();
-                debug("received getter response", {status}, response.data);
+                debug("received getter response", {status}, response);
 
                 switch (status) {
                     case "confirmed":
@@ -287,7 +287,7 @@ export class Waas {
                     instance.defaults.headers.cookie = cookie;
                 }
 
-                return response;
+                return data;
             },
             async (e: AxiosError<IWaasError>) => {
                 if (!e.response) {

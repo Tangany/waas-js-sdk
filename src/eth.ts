@@ -50,9 +50,9 @@ export class Ethereum implements IWaasMethod {
                 let status: IWaitForTxStatus["status"];
 
                 // tslint:disable-next-line:prefer-conditional-expression
-                if (typeof res.data.blockNr === "number") {
+                if (typeof res.blockNr === "number") {
                     status = "confirmed";
-                } else if (res.data.isError) {
+                } else if (res.isError) {
                     status = "error";
                 } else {
                     status = "pending";

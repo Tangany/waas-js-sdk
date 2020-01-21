@@ -22,7 +22,7 @@ describe("limiter", function () {
 		const load = [];
 
 		for (let i = 0; i < 100; i++) {
-			load.push(api.wallet(wallet).eth().get().then(({ data }) => console.log({ data })));
+			load.push(api.wallet(wallet).eth().get().then(res => console.log({ res })));
 		}
 		await Promise.all(load);
 	});
@@ -41,7 +41,7 @@ describe("limiter", function () {
 
 			load.push(api.wallet(wallet).eth()
 				.send({ amount: "0.00001", to })
-				.then(({ data: { hash } }) => {
+				.then(({ hash }) => {
 					console.log({ to, hash });
 
 					return hash;
@@ -50,9 +50,9 @@ describe("limiter", function () {
 		const hashes = await Promise.all(load); // send all at once via the limiter
 
 		for (const tx of hashes) {
-			const { data } = await api.eth(tx).get();
-			console.log({ ...data, tx });
-			assert.notStrictEqual(data.status, "unknown"); // each tx must propagate to the blockchain
+			const res = await api.eth(tx).get();
+			console.log({ ...res, tx });
+			assert.notStrictEqual(res.status, "unknown"); // each tx must propagate to the blockchain
 		}
 	});
 });

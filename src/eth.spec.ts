@@ -51,19 +51,19 @@ describe("Ethereum", function() {
         it("should timeout for non-existent transaction", async function() {
             const e = new Ethereum(this.waas, nonHash);
             // tslint:disable-next-line:no-null-keyword
-            this.sandbox.stub(Ethereum.prototype, "get").resolves({data: {isError: false, blockNr: null}});
+            this.sandbox.stub(Ethereum.prototype, "get").resolves({isError: false, blockNr: null});
 
             await assert.rejects(async () => e.wait(5), TimeoutError);
         });
         it("should resolve for a successful transaction", async function() {
             const e = new Ethereum(this.waas, nonHash);
-            this.sandbox.stub(Ethereum.prototype, "get").resolves({data: {isError: false, blockNr: 777}});
+            this.sandbox.stub(Ethereum.prototype, "get").resolves({isError: false, blockNr: 777});
 
             await assert.doesNotReject(async () => e.wait());
         });
         it("should reject for a unsuccessful transaction", async function() {
             const e = new Ethereum(this.waas, nonHash);
-            this.sandbox.stub(Ethereum.prototype, "get").resolves({data: {isError: true, blockNr: undefined}});
+            this.sandbox.stub(Ethereum.prototype, "get").resolves({isError: true, blockNr: undefined});
             await e.wait()
                 .then(() => assert.fail("should have failed"))
                 .catch((r: MiningError) => {
@@ -72,8 +72,8 @@ describe("Ethereum", function() {
                         throw new Error("invalid error type");
                     }
                     const txData = (r.txData) as IEthereumTransactionStatus;
-                    assert.strictEqual(txData.data.isError, true);
-                    assert.strictEqual(txData.data.blockNr, undefined);
+                    assert.strictEqual(txData.isError, true);
+                    assert.strictEqual(txData.blockNr, undefined);
                 });
         });
         it("should throw while the 'get' call", async function() {
