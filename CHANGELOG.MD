@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 ### Added
 ### Changed
+* Allow omitting all `Waas` arguments and authenticate through environment variables TANGANY_CLIENT_ID`, `TANGANY_CLIENT_SECRET`, `TANGANY_SUBSCRIPTION` & `TANGANY_VAULT_URL`
 
 ## [1.0.0-beta.5]
 ### Fixed
