@@ -1,13 +1,13 @@
 import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} from "axios";
 import Bottleneck from "bottleneck";
 import * as Debug from "debug";
+import * as t from "typeforce";
 import {Bitcoin} from "./btc";
+import {AuthenticationError, ConflictError, GeneralError, MiningError, NotFoundError, TimeoutError} from "./errors";
+import {Ethereum} from "./eth";
 import {BlockchainTransactionStatuses, IBlockchainTransactionStatus, IWaasError} from "./interfaces";
 import {limiter} from "./limiter";
 import {Wallet} from "./wallet";
-import {Ethereum} from "./eth";
-import {AuthenticationError, NotFoundError, GeneralError, ConflictError, TimeoutError, MiningError} from "./errors";
-import * as t from "typeforce";
 import Timeout = NodeJS.Timeout;
 
 const debug = Debug("waas-js-sdk:main");
@@ -56,10 +56,10 @@ export enum ApiVersion {
 }
 
 interface IWaaSOptions {
-    clientId: string;
-    clientSecret: string;
-    subscription: string;
-    vaultUrl?: string;
+    clientId?: string;
+    clientSecret?: string;
+    subscription?: string;
+    vaultUrl?: string; // can be omitted for non-custodian calls (e.g. check transaction status)
     ethereumNetwork?: EthereumPublicNetwork | string;
     ethereumTxSpeed?: EthereumTxSpeed;
     ethereumTxConfirmations?: BlockchainTxConfirmations;
@@ -169,15 +169,22 @@ export class Waas {
     public instance: AxiosInstance;
     public limiter?: Bottleneck;
 
-    constructor(options: IWaaSOptions, version = ApiVersion.V1, limiterEnabled = true) {
+    constructor(options?: IWaaSOptions, version = ApiVersion.V1, limiterEnabled = true) {
+        const _options: IWaaSOptions = {
+            clientId: process.env.TANGANY_CLIENT_ID as string,
+            clientSecret: process.env.TANGANY_CLIENT_SECRET as string,
+            subscription: process.env.TANGANY_SUBSCRIPTION as string,
+            vaultUrl: process.env.TANGANY_VAULT_URL as string,
+            ...options,
+        };
 
-        if (!options.clientId) {
+        if (!_options.clientId) {
             throw new AuthenticationError("Missing variable 'clientId'");
         }
-        if (!options.clientSecret) {
+        if (!_options.clientSecret) {
             throw new AuthenticationError("Missing variable 'clientSecret'");
         }
-        if (!options.subscription) {
+        if (!_options.subscription) {
             throw new AuthenticationError("Missing variable 'subscription'");
         }
 
@@ -193,7 +200,7 @@ export class Waas {
             bitcoinTxConfirmations: "?String",
             bitcoinMaxFeeRate: "?Number",
             version: "?Number",
-        }, options, true);
+        }, _options, true);
 
         axios.defaults.withCredentials = true;
 
@@ -207,9 +214,9 @@ export class Waas {
                 }
             })(),
             headers: {
-                "tangany-client-id": options.clientId,
-                "tangany-client-secret": options.clientSecret,
-                "tangany-subscription": options.subscription,
+                "tangany-client-id": _options.clientId,
+                "tangany-client-secret": _options.clientSecret,
+                "tangany-subscription": _options.subscription,
                 "common": {
                     Accept: "application/json",
                 },
@@ -217,29 +224,29 @@ export class Waas {
             responseType: "json",
         };
 
-        if (options.vaultUrl) {
-            api.headers["tangany-vault-url"] = options.vaultUrl;
+        if (_options.vaultUrl) {
+            api.headers["tangany-vault-url"] = _options.vaultUrl;
         }
-        if (options.ethereumNetwork) {
-            api.headers["tangany-ethereum-network"] = options.ethereumNetwork;
+        if (_options.ethereumNetwork) {
+            api.headers["tangany-ethereum-network"] = _options.ethereumNetwork;
         }
-        if (options.ethereumTxConfirmations) {
-            api.headers["tangany-ethereum-tx-confirmations"] = options.ethereumTxConfirmations;
+        if (_options.ethereumTxConfirmations) {
+            api.headers["tangany-ethereum-tx-confirmations"] = _options.ethereumTxConfirmations;
         }
-        if (options.ethereumTxSpeed) {
-            api.headers["tangany-ethereum-tx-speed"] = options.ethereumTxSpeed;
+        if (_options.ethereumTxSpeed) {
+            api.headers["tangany-ethereum-tx-speed"] = _options.ethereumTxSpeed;
         }
-        if (options.bitcoinNetwork) {
-            api.headers["tangany-bitcoin-network"] = options.bitcoinNetwork;
+        if (_options.bitcoinNetwork) {
+            api.headers["tangany-bitcoin-network"] = _options.bitcoinNetwork;
         }
-        if (options.bitcoinTxSpeed) {
-            api.headers["tangany-bitcoin-tx-speed"] = options.bitcoinTxSpeed;
+        if (_options.bitcoinTxSpeed) {
+            api.headers["tangany-bitcoin-tx-speed"] = _options.bitcoinTxSpeed;
         }
-        if (options.bitcoinTxConfirmations) {
-            api.headers["tangany-bitcoin-tx-confirmations"] = options.bitcoinTxConfirmations;
+        if (_options.bitcoinTxConfirmations) {
+            api.headers["tangany-bitcoin-tx-confirmations"] = _options.bitcoinTxConfirmations;
         }
-        if (options.bitcoinMaxFeeRate) {
-            api.headers["tangany-bitcoin-max-fee-rate"] = options.bitcoinMaxFeeRate;
+        if (_options.bitcoinMaxFeeRate) {
+            api.headers["tangany-bitcoin-max-fee-rate"] = _options.bitcoinMaxFeeRate;
         }
 
         const instance = axios.create(api);

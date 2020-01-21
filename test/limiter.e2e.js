@@ -3,24 +3,15 @@ const { Waas, ETHEREUM_PUBLIC_NETWORK, ETHEREUM_TX_SPEED } = require("../dist");
 const { config } = require("dotenv");
 const { resolve } = require("path");
 const assert = require("assert");
+const { checkEnvVars } = require("./helpers");
 const path = resolve(process.cwd(), ".env");
 
 config({ path });
-
-console.info("this suite only works with a pre-set .env file with api credentials in project's root");
-["CLIENT_ID", "CLIENT_SECRET", "SUBSCRIPTION", "VAULT_URL", "E2E_WALLET", "E2E_TOKEN"].map(v => {
-	if (!process.env[v]) {
-		throw new Error(`process.env.${v} not defined`);
-	}
-});
+checkEnvVars();
 
 describe("limiter", function () {
 	const wallet = process.env.E2E_WALLET;
 	const options = {
-		clientId: process.env.CLIENT_ID,
-		clientSecret: process.env.CLIENT_SECRET,
-		subscription: process.env.SUBSCRIPTION,
-		vaultUrl: process.env.VAULT_URL,
 		ethereumNetwork: ETHEREUM_PUBLIC_NETWORK.ROPSTEN, // All tests execute on the ropsten testnet
 	};
 
@@ -43,8 +34,9 @@ describe("limiter", function () {
 		const ethereumAddressGen = getRandomEthereumAddress();
 		await api.eth().fetchAffinityCookie(); // maintain connection to the same ethereum full node endpoint
 		const load = [];
+		const amount = 25; // amount of ethereum transactions to send
 
-		for (let i = 0; i < 25; i++) {
+		for (let i = 0; i < amount; i++) {
 			const to = ethereumAddressGen.next().value; // generate a sequence of pseudo-random ethereum addresses
 
 			load.push(api.wallet(wallet).eth()

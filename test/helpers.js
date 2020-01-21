@@ -32,7 +32,20 @@ function * getRandomEthereumAddress (skip = false) {
 	}
 }
 
+/**
+ * checks for the WaaS authentication headers in the environment variables and throws an error if not present
+ */
+function checkEnvVars(){
+	console.info("this suite only works with a pre-set .env file with api credentials in project's root");
+	["TANGANY_CLIENT_ID", "TANGANY_CLIENT_SECRET", "TANGANY_SUBSCRIPTION", "TANGANY_VAULT_URL", "E2E_WALLET", "E2E_TOKEN"].map(v => {
+		if (!process.env[v]) {
+			throw new Error(`process.env.${v} not defined`);
+		}
+	});
+}
+
 module.exports = {
 	getRandomEthereumAddress,
-	getRandomHex
+	getRandomHex,
+	checkEnvVars,
 };

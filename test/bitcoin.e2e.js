@@ -1,17 +1,12 @@
 const { Waas, BITCOIN_NETWORK, BITCOIN_TX_CONFIRMATIONS } = require("../dist");
 const { config } = require("dotenv");
 const assert = require("assert");
+const { checkEnvVars } = require("./helpers");
 const { resolve } = require("path");
 const path = resolve(process.cwd(), ".env");
 
 config({ path });
-
-console.info("this suite only works with a pre-set .env file with api credentials in project's root");
-["CLIENT_ID", "CLIENT_SECRET", "SUBSCRIPTION", "VAULT_URL", "E2E_WALLET"].map(v => {
-	if (!process.env[v]) {
-		throw new Error(`process.env.${v} not defined`);
-	}
-});
+checkEnvVars();
 
 describe("WaaS sample Bitcoin workflow", function () {
 	const timeout = 20e3;
@@ -25,10 +20,6 @@ describe("WaaS sample Bitcoin workflow", function () {
 	};
 
 	const options = {
-		clientId: process.env.CLIENT_ID,
-		clientSecret: process.env.CLIENT_SECRET,
-		subscription: process.env.SUBSCRIPTION,
-		vaultUrl: process.env.VAULT_URL,
 		bitcoinNetwork: BITCOIN_NETWORK.TESTNET, // All tests execute on testnet3
 		bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.NONE
 	};
