@@ -2,16 +2,11 @@ const { Waas, ETHEREUM_PUBLIC_NETWORK, BITCOIN_NETWORK, BITCOIN_TX_CONFIRMATIONS
 const { config } = require("dotenv");
 const { resolve } = require("path");
 const assert = require("assert");
+const { checkEnvVars } = require("./helpers");
 const path = resolve(process.cwd(), ".env");
 
 config({ path });
-
-console.info("this suite only works with a pre-set .env file with api credentials in project's root");
-["CLIENT_ID", "CLIENT_SECRET", "SUBSCRIPTION", "VAULT_URL", "E2E_WALLET", "E2E_TOKEN"].map(v => {
-	if (!process.env[v]) {
-		throw new Error(`process.env.${v} not defined`);
-	}
-});
+checkEnvVars();
 
 describe("wait", function () {
 
@@ -19,10 +14,6 @@ describe("wait", function () {
 
 	describe("Ethereum", function () {
 		const options = {
-			clientId: process.env.CLIENT_ID,
-			clientSecret: process.env.CLIENT_SECRET,
-			subscription: process.env.SUBSCRIPTION,
-			vaultUrl: process.env.VAULT_URL,
 			ethereumNetwork: ETHEREUM_PUBLIC_NETWORK.ROPSTEN, // All tests execute on the ropsten testnet
 		};
 
@@ -58,10 +49,6 @@ describe("wait", function () {
 
 	describe("Bitcoin", function () {
 		const options = {
-			clientId: process.env.CLIENT_ID,
-			clientSecret: process.env.CLIENT_SECRET,
-			subscription: process.env.SUBSCRIPTION,
-			vaultUrl: process.env.VAULT_URL,
 			bitcoinNetwork: BITCOIN_NETWORK.TESTNET,
 			bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.NONE,
 			bitcoinTxSpeed: BITCOIN_TX_SPEED.FAST,

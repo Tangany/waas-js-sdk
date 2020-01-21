@@ -40,6 +40,22 @@ describe("Waas", function() {
         assert.ok(new Waas(auth, undefined, false));
     });
 
+    it("should construct an instance with environment variables", function() {
+        this.sandbox.stub(process, "env").value({
+            TANGANY_CLIENT_ID: auth.clientId,
+            TANGANY_CLIENT_SECRET: auth.clientSecret,
+            TANGANY_SUBSCRIPTION: auth.subscription,
+        });
+        assert.ok(new Waas());
+        assert.ok(new Waas({
+            ethereumNetwork: EthereumPublicNetwork.ROPSTEN,
+        }));
+    });
+
+    it("should fail constructing a new instance due to missing authentication", function() {
+        assert.throws(() => new Waas(), /Missing variable 'clientId'/);
+    });
+
     it("should throw for missing or invalid authentication", function() {
         assert.throws(() => new Waas({} as any));
         assert.throws(() => new Waas({...auth, clientId: ""}));

@@ -11,6 +11,7 @@
 [![WaaS API version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/sdk-badge.svg?sanitize=true)](https://tangany.docs.stoplight.io/)
 
 ## Getting started
+
 Install the [npm package]
 ```
 npm install @tangany/waas-js-sdk
@@ -19,18 +20,7 @@ npm install @tangany/waas-js-sdk
 Configure the SDK
 ```javascript
 const { Waas } = require("@tangany/waas-js-sdk");
-
-// load the environment variables via e.g. dotenv
-const dotenv = require("dotenv");
-dotenv.config();
-
-// pass the configuration to instantiate the SDK
-const api = new Waas({
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
-        subscription: process.env.SUBSCRIPTION,
-        vaultUrl: "https://my-vault.some.cloud.tld"
-    });
+const api = new Waas();
 
 // e.g. fetch all client wallets
 (async () => {
@@ -52,20 +42,36 @@ const api = new Waas({
 ```
 
 ### Constructor options
-WaaS configuration headers are passed as options into the constructor.
+All configuration headers are optional and can be passed via a configuration object to the `Waas` constructor.
+If either the authentication headers or the whole configuration object is omitted from the constructor, the authentication headers are automatically fetched from the environment variables `TANGANY_CLIENT_ID`, `TANGANY_CLIENT_SECRET`, `TANGANY_SUBSCRIPTION` & `TANGANY_VAULT_URL`.
 
-option | description | mandatory
+Hence each of the following invocations are valid:
+```
+new Waas(); // authentication headers are fetched from the environment variables
+new Waas({ ethereumNetwork: "ropsten" }); // authentication headers are fetched from the environment variables and merged with the configuration headers argument
+new Waas({
+    clientId: process.env.MY_CLIENT_ID,
+    clientSecret: process.env.MY_CLIENT_SECRET,
+    subscription: process.env.MY_SECRET,
+    ethereumNetwork: "ropsten",
+    ...myOtherOptions
+}); // all configuration headers are passed manually
+```
+#### Available configuration headers
+
+option | description | default value
 --- | --- | ---
-clientId | Service to service authentication client ID | ✔
-clientSecret | Service to service authentication client secret | ✔
-subscription | Product subscription key | ✔
-vaultUrl | Tangany vault url. Example: `https://my-vault.some.cloud.tld` | ✔
-ethereumNetwork | Public Ethereum network to operate in (`mainnet`, `ropsten`) or private Ethereum network Custom RPC URL for a private Ethereum network to operate in (example: `http://somenetwork.example.org:8540`). Defaults to `mainnet`|
-ethereumTxSpeed |  Additional gas fee that is added to the base gas fee for the given Ethereum network to speed up the mining process of the transaction. The usage of `none` value may result in the transaction never gets mined and is only intended to use for custom Ethereum networks that employ zero gas price policies. The speed levels correspond with following Ethereum fees (in gwei): `none`: 0, `slow`: 2, `default`: 5, `fast`: 15. Defaults to `default`. |
-bitcoinNetwork | Public Bitcoin network name. Supported networks: `bitcoin`, `testnet`. Defaults to `bitcoin` |
-bitcoinTxConfirmations | Minimum amount of block confirmations required for Bitcoin balance outputs ("utxo", "coins") to be included in the total wallet balance calculation. The exclusion of unconfirmed outputs prevents the posthumous invalidation of own wallet transaction by the parent utxo sending party. The levels correspond with following target block confirmations amount (# of confirmations): `none`: 0, `default`: 1, `secure`: 6. Defaults to `default`. |
-bitcoinTxSpeed | Defines the target amount of blocks for the transaction to be included to the Bitcoin network. Faster inclusion requires a higher transaction fee. The fee is calculated in real time based on the network state and can be limited by the `header-bitcoin-max-fee-rate` option. The effective transaction delay can be calculated by multiplying the target confirmation blocks with the Bitcoin block time of 10 minutes (e.g. `slow` yields an block inclusion time of approx. 4h). The speed levels correspond with following block times (target blocks): `slow`: 24, `default`: 6, `fast`: 2.  Defaults to `default` |
-bitcoinMaxFeeRate | Defines the maximum allowed fee rate in satoshi per byte for a Bitcoin transaction. Prevents from spending absurdly high transaction fees during block fee peaks |
+clientId | Service to service authentication client ID | process.env.TANGANY_CLIENT_ID |
+clientSecret | Service to service authentication client secret | process.env.TANGANY_CLIENT_SECRET |
+subscription | Product subscription key | process.env.TANGANY_SUBSCRIPTION |
+vaultUrl | Tangany vault URL required for all wallet-based calls. Example: `https://my-vault.some.cloud.tld` | process.env.TANGANY_VAULT_URL |
+ethereumNetwork | Public Ethereum network to operate in (`mainnet`, `ropsten`) or private Ethereum network Custom RPC URL for a private Ethereum network to operate in (example: `http://somenetwork.example.org:8540`) | `mainnet` |
+ethereumTxConfirmations |  Amount of block confirmations required to consider an Ethereum transaction as valid. The levels correspond with following target block confirmations amounts (# of confirmations): `none`: 0, `default`: 1, `secure`: 12  | `default` |
+ethereumTxSpeed |  Additional gas fee that is added to the base gas fee for the given Ethereum network to speed up the mining process of the transaction. The usage of `none` value may result in the transaction never gets mined and is only intended to use for custom Ethereum networks that employ zero gas price policies. The speed levels correspond with following Ethereum fees (in gwei): `none`: 0, `slow`: 2, `default`: 5, `fast`: 15 | `default` |
+bitcoinNetwork | Public Bitcoin network name. Supported networks: `bitcoin`, `testnet` | `bitcoin` |
+bitcoinTxConfirmations | Minimum amount of block confirmations required for Bitcoin balance outputs ("utxo", "coins") to be included in the total wallet balance calculation. The exclusion of unconfirmed outputs prevents the posthumous invalidation of own wallet transaction by the parent utxo sending party. The levels correspond with following target block confirmations amounts (# of confirmations): `none`: 0, `default`: 1, `secure`: 6 | `default` |
+bitcoinTxSpeed | Defines the target amount of blocks for the transaction to be included to the Bitcoin network. Faster inclusion requires a higher transaction fee. The fee is calculated in real time based on the network state and can be limited by the `header-bitcoin-max-fee-rate` option. The effective transaction delay can be calculated by multiplying the target confirmation blocks with the Bitcoin block time of 10 minutes (e.g. `slow` yields an block inclusion time of approx. 4h). The speed levels correspond with following block times (target blocks): `slow`: 24, `default`: 6, `fast`: 2 | `default` |
+bitcoinMaxFeeRate | Defines the maximum allowed fee rate in satoshi per byte for a Bitcoin transaction. Prevents from spending absurdly high transaction fees during block fee peaks | 500 |
 
 ###  More examples
 For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2e.js))
@@ -77,7 +83,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 ````javascript
 
 (async () => {
-    const api = new Waas(options);
+    const api = new Waas();
     // list all wallets
     const { list } = (await api.wallet().list()).data;
     //  create a new wallet
@@ -93,7 +99,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 *Ethereum calls that are not wallet based*
 ````javascript
 (async () => {
-    const api = new Waas(options).eth(txHash);
+    const api = new Waas().eth(txHash);
     // get transaction status
     const { blockNr, isError } = (await api.get()).data;
     // poll until the transaction is mined (for max 60 seconds)
@@ -106,7 +112,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 https://tangany.docs.stoplight.io/api/ethereum/
 ````javascript
 (async () => {
-    const api = new Waas(options).wallet("my-wallet");
+    const api = new Waas().wallet("my-wallet");
     // send Ether
     const { hash } = (await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"})).data;
     // get eth balance and wallet address
@@ -119,7 +125,7 @@ https://tangany.docs.stoplight.io/api/ethereum/
 https://tangany.docs.stoplight.io/api/ethereum-erc20
 ````javascript
 (async () => {
-    const api = new Waas(options).wallet("my-wallet").eth().erc20(tokenAddress);
+    const api = new Waas().wallet("my-wallet").eth().erc20(tokenAddress);
     // send token
     const { hash } = (await api.send({to: someOtherWalletAddress, amount: "0.043"})).data;
     // get token balance
@@ -129,9 +135,9 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
     // approve token withdrawal
     await api.approve({to: someOtherWalletAddress, amount: "213"});
     // withdraw pre-approved tokens
-    await new Waas(options).wallet("some-other-wallet").eth().erc20(tokenAddress).transferFrom({from: myWalletAddress, amount: "213"});
+    await new Waas().wallet("some-other-wallet").eth().erc20(tokenAddress).transferFrom({from: myWalletAddress, amount: "213"});
     // burn token
-    await new Waas(options).wallet("some-other-wallet").eth().erc20(tokenAddress).burn({amount: "2"});
+    await new Waas().wallet("some-other-wallet").eth().erc20(tokenAddress).burn({amount: "2"});
 })();
 ````
 
@@ -139,7 +145,7 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 *Bitcoin calls that are not wallet based*
 ````javascript
 (async () => {
-    const api = new Waas(options).btc(hash);
+    const api = new Waas().btc(hash);
     // get transaction status
     const { confirmations, status } = (await api.get()).data;
     // poll every second until the transaction is mined (for max 720 seconds)
@@ -152,7 +158,7 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 https://tangany.docs.stoplight.io/api/bitcoin/
 ````javascript
 (async () => {
-    const api = new Waas(options).wallet("my-wallet");
+    const api = new Waas().wallet("my-wallet");
     // estimate fee for a transaction
     const { fee, feeRate } = (await api.btc().estimateFee({to: someAddress, amount: "0.021"})).data;
     // send BTC to a single recipient

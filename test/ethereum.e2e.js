@@ -2,18 +2,13 @@ const { Waas } = require("../dist");
 const { EthereumPublicNetwork } = require("../src/waas");
 const { config } = require("dotenv");
 const assert = require("assert");
+const { checkEnvVars } = require("./helpers");
 const { getRandomHex } = require("./helpers");
 const { resolve } = require("path");
 const path = resolve(process.cwd(), ".env");
 
 config({ path });
-
-console.info("this suite only works with a pre-set .env file with api credentials in project's root");
-["CLIENT_ID", "CLIENT_SECRET", "SUBSCRIPTION", "VAULT_URL", "E2E_WALLET", "E2E_TOKEN"].map(v => {
-	if (!process.env[v]) {
-		throw new Error(`process.env.${v} not defined`);
-	}
-});
+checkEnvVars();
 
 describe("WaaS sample Ethereum workflow", function () {
 	const timeout = 120e3;
@@ -30,10 +25,6 @@ describe("WaaS sample Ethereum workflow", function () {
 	let txHash; // Tx hashes
 
 	const api = new Waas({
-		clientId: process.env.CLIENT_ID,
-		clientSecret: process.env.CLIENT_SECRET,
-		subscription: process.env.SUBSCRIPTION,
-		vaultUrl: process.env.VAULT_URL,
 		ethereumNetwork: EthereumPublicNetwork.ROPSTEN, // All tests execute on the ropsten testnet
 	}, undefined, true);
 
