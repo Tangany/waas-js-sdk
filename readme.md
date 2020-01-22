@@ -7,19 +7,19 @@
 
 node.js wrapper for [Tangany WaaS](https://tangany.com)
 
-[![NPM version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/package-badge.svg?sanitize=true)](https://www.npmjs.com/package/@tangany/waas-js-sdk)
+[![NPM version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/package-badge.svg?sanitize=true)](https://www.npmjs.com/package/@tangany/waas)
 [![WaaS API version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/sdk-badge.svg?sanitize=true)](https://tangany.docs.stoplight.io/)
 
 ## Getting started
 
 Install the [npm package]
 ```
-npm install @tangany/waas-js-sdk
+npm install @tangany/waas
 ```
 
 Configure the SDK
 ```javascript
-const { Waas } = require("@tangany/waas-js-sdk");
+const { Waas } = require("@tangany/waas");
 const api = new Waas();
 
 // e.g. fetch all client wallets
@@ -218,4 +218,4 @@ Full API documentation is available at https://tangany.docs.stoplight.io/
 </p>
 </div>
 
-[npm package]: https://www.npmjs.com/package/@tangany/waas-js-sdk
+[npm package]: https://www.npmjs.com/package/@tangany/waas
