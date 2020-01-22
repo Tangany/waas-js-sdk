@@ -36,7 +36,7 @@ export class Wallet implements IWaasMethod {
             url += `?skiptoken=${skiptoken}`;
         }
 
-        return this.waas.wrap.bind(this)<IWalletList>(() => this.waas.instance
+        return this.waas.wrap<IWalletList>(() => this.waas.instance
             .get(url),
         );
     }
@@ -51,20 +51,22 @@ export class Wallet implements IWaasMethod {
         t("?String", wallet);
         t("?Boolean", useHsm);
 
-        try {
-            return this.waas.wrap<IWallet>(() => this.waas.instance
+        return this.waas
+            .wrap<IWallet>(() => this.waas.instance
                 .post("wallet", {
                     wallet,
                     useHsm,
-                }),
-            );
-        } catch (e) {
-            if (e.response && e.response.status === 409) {
-                throw new ConflictError("Cannot overwrite existing wallet");
-            }
+                })
+            )
+            .catch(e => {
+                if (e.response && e.response.status === 409) {
+                    throw new ConflictError("Cannot overwrite existing wallet");
+                }
 
-            throw new GeneralError(e);
-        }
+                throw new GeneralError(e);
+            })
+            ;
+
     }
 
     /**
