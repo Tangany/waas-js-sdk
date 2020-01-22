@@ -1,5 +1,5 @@
-import axios from "axios"
-import {EthErc20Wallet} from "./eth-erc20-wallet"
+import axios from "axios";
+import {EthErc20Wallet} from "./eth-erc20-wallet";
 import {sandbox} from "./spec-helpers";
 import * as assert from "assert";
 import {Waas} from "./waas";

@@ -9,7 +9,7 @@ config({ path });
 checkEnvVars();
 
 describe("WaaS sample Bitcoin workflow", function () {
-	const timeout = 20e3;
+	const timeout = 40e3;
 	this.timeout(timeout);
 	this.slow(timeout / 4);
 
@@ -25,8 +25,12 @@ describe("WaaS sample Bitcoin workflow", function () {
 	};
 	const noConfirmationsBtcApi = new Waas(options); // coins available regardless of mining status
 
+	it("should fetch the affinity cookie", async function () {
+		await noConfirmationsBtcApi.btc().fetchAffinityCookie();
+	});
+
 	it("should get the Bitcoin specs for the current wallet", async function () {
-		const { currency, balance, address } = (await noConfirmationsBtcApi.wallet(wallet).btc().get()).data;
+		const { currency, balance, address } = await noConfirmationsBtcApi.wallet(wallet).btc().get();
 		assert.strictEqual(currency, "BTCTEST");
 		assert.ok(balance);
 		assert.ok(address);
@@ -34,7 +38,7 @@ describe("WaaS sample Bitcoin workflow", function () {
 	});
 
 	it("should estimate the fee for given tx", async function () {
-		const { fee, feeRate } = (await noConfirmationsBtcApi.wallet(wallet).btc().estimateFee(recipients)).data;
+		const { fee, feeRate } = await noConfirmationsBtcApi.wallet(wallet).btc().estimateFee(recipients);
 		assert.ok(fee);
 		assert.ok(feeRate);
 		console.log(`Estimated a total transaction fee of ${fee} for given recipients based on a feeRate of ${feeRate}`);
@@ -42,9 +46,9 @@ describe("WaaS sample Bitcoin workflow", function () {
 
 	let lastHash;
 	it("should send some BTC to multiple recipients in a single tx", async function () {
-		const { hash } = (await noConfirmationsBtcApi.wallet(wallet).btc().send(
+		const { hash } = await noConfirmationsBtcApi.wallet(wallet).btc().send(
 			[recipients, recipients]
-		)).data;
+		);
 		assert.ok(hash);
 		console.log(`Sent with hash ${hash}`);
 		lastHash = hash;
@@ -52,7 +56,7 @@ describe("WaaS sample Bitcoin workflow", function () {
 
 	it("should fetch the tx details", async function () {
 		assert.ok(lastHash, "cannot run without previous tests");
-		const { confirmations, status, blockNr } = (await noConfirmationsBtcApi.btc(lastHash).get()).data;
+		const { confirmations, status, blockNr } = await noConfirmationsBtcApi.btc(lastHash).get();
 		console.log("inital tx status", { confirmations, status, blockNr });
 		assert.notStrictEqual(status, "unknown");
 	});

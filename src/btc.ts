@@ -45,7 +45,7 @@ export class Bitcoin implements IWaasMethod {
         const call = () => this.get().then((s: IBitcoinTransactionStatus) => {
 
             return {
-                status: s.data.status,
+                status: s.status,
                 response: s,
             };
         });

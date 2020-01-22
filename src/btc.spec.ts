@@ -52,10 +52,8 @@ describe("Bitcoin", function() {
             const e = new Bitcoin(this.waas, nonHash);
             // tslint:disable-next-line:no-null-keyword
             this.sandbox.stub(Bitcoin.prototype, "get").resolves({
-                data: {
                     status: "pending",
                     confirmations: undefined,
-                },
             });
 
             await assert.rejects(async () => e.wait(5), TimeoutError);
@@ -63,15 +61,15 @@ describe("Bitcoin", function() {
 
         it("should resolve for a successful transaction", async function() {
             const e = new Bitcoin(this.waas, nonHash);
-            this.sandbox.stub(Bitcoin.prototype, "get").resolves({data: {status: "confirmed", confirmations: 213}});
+            this.sandbox.stub(Bitcoin.prototype, "get").resolves({status: "confirmed", confirmations: 213});
 
             await assert.doesNotReject(async () => e.wait());
-            assert.strictEqual((await e.wait()).data.confirmations, 213);
+            assert.strictEqual((await e.wait()).confirmations, 213);
         });
 
         it("should reject for a unsuccessful transaction", async function() {
             const e = new Bitcoin(this.waas, nonHash);
-            this.sandbox.stub(Bitcoin.prototype, "get").resolves({data: {status: "error", confirmations: undefined}});
+            this.sandbox.stub(Bitcoin.prototype, "get").resolves( {status: "error", confirmations: undefined});
             await e.wait()
                 .then(() => assert.fail("should have failed"))
                 .catch((r: MiningError) => {
@@ -79,8 +77,8 @@ describe("Bitcoin", function() {
                     if (!isBitcoinMiningErrorData(r.txData)) {
                         throw new Error("invalid type");
                     }
-                    assert.strictEqual(r.txData.data.status, "error");
-                    assert.strictEqual(r.txData.data.confirmations, undefined);
+                    assert.strictEqual(r.txData.status, "error");
+                    assert.strictEqual(r.txData.confirmations, undefined);
                 });
         });
     });

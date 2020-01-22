@@ -2,10 +2,10 @@
   <a href="https://tangany.com">
     <img src="https://raw.githubusercontent.com/Tangany/cloud-wallet/master/docs/tangany.gif"  alt="Tangany" width="50%" />
   </a>
-  <h1>Official Javascript SDK for Tangany Wallet as a Service API</h1>
+  <h1>Tangany Wallet as a Service SDK</h1>
 </div>
 
-[Axios](https://github.com/axios/axios) based node.js wrapper for [Tangany WaaS](https://tangany.com)
+node.js wrapper for [Tangany WaaS](https://tangany.com)
 
 [![NPM version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/package-badge.svg?sanitize=true)](https://www.npmjs.com/package/@tangany/waas-js-sdk)
 [![WaaS API version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/sdk-badge.svg?sanitize=true)](https://tangany.docs.stoplight.io/)
@@ -27,10 +27,10 @@ const api = new Waas();
    let skiptoken = undefined;
 
     async function listNextPage () {
-        const {data} = await api.wallet().list(skiptoken);
-        skiptoken = data.skiptoken;
+        const res = await api.wallet().list(skiptoken);
+        skiptoken = res.skiptoken;
 
-        return data;
+        return res;
     }
 
     do {
@@ -85,13 +85,13 @@ https://tangany.docs.stoplight.io/api/wallet/
 (async () => {
     const api = new Waas();
     // list all wallets
-    const { list } = (await api.wallet().list()).data;
+    const { list } = await api.wallet().list();
     //  create a new wallet
-    const { wallet, security } = (await api.wallet().create("some-other-wallet", false)).data;
+    const { wallet, security } = await api.wallet().create("some-other-wallet", false);
     //  fetch a wallet
-    const { created } = (await api.wallet(wallet).get()).data;
+    const { created } = await api.wallet(wallet).get();
     //  delete a wallet
-    const { scheduledPurgeDate, recoveryId } = (await api.wallet(wallet).delete()).data;
+    const { scheduledPurgeDate, recoveryId } = await api.wallet(wallet).delete();
 })();
 ````
 
@@ -101,7 +101,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 (async () => {
     const api = new Waas().eth(txHash);
     // get transaction status
-    const { blockNr, isError } = (await api.get()).data;
+    const { blockNr, isError } = await api.get();
     // poll until the transaction is mined (for max 60 seconds)
     await api.wait(60e3);
 })();
@@ -114,9 +114,9 @@ https://tangany.docs.stoplight.io/api/ethereum/
 (async () => {
     const api = new Waas().wallet("my-wallet");
     // send Ether
-    const { hash } = (await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"})).data;
+    const { hash } = await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // get eth balance and wallet address
-    const { currency, balance, address } = (await api.eth().get()).data;
+    const { currency, balance, address } = await api.eth().get();
 })();
 ````
 
@@ -127,9 +127,9 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 (async () => {
     const api = new Waas().wallet("my-wallet").eth().erc20(tokenAddress);
     // send token
-    const { hash } = (await api.send({to: someOtherWalletAddress, amount: "0.043"})).data;
+    const { hash } = await api.send({to: someOtherWalletAddress, amount: "0.043"});
     // get token balance
-    const { currency, balance, address } = (await api.get()).data;
+    const { currency, balance, address } = await api.get();
      // mint token
     await api.mint({amount: "12.291", to: someOtherWalletAddress}); // assuming myWalletAddress is erc20token's minter
     // approve token withdrawal
@@ -147,7 +147,7 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 (async () => {
     const api = new Waas().btc(hash);
     // get transaction status
-    const { confirmations, status } = (await api.get()).data;
+    const { confirmations, status } = await api.get();
     // poll every second until the transaction is mined (for max 720 seconds)
     await api.wait(720e3, 1e3);
 })();
@@ -160,13 +160,13 @@ https://tangany.docs.stoplight.io/api/bitcoin/
 (async () => {
     const api = new Waas().wallet("my-wallet");
     // estimate fee for a transaction
-    const { fee, feeRate } = (await api.btc().estimateFee({to: someAddress, amount: "0.021"})).data;
+    const { fee, feeRate } = await api.btc().estimateFee({to: someAddress, amount: "0.021"});
     // send BTC to a single recipient
-    const { hash } = (await api.btc().send({to: someAddress, amount: "0.021"})).data;
+    const { hash } = await api.btc().send({to: someAddress, amount: "0.021"});
     // send BTC to multiple recipients
     await api.btc().send([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
     // get BTC balance and wallet address
-    const { balance,address,currency } = (await api.btc().get()).data;
+    const { balance,address,currency } = await api.btc().get();
 })();
 ````
 
