@@ -49,7 +49,7 @@
   },
   "homepage": "https://github.com/Tangany/waas-js-sdk#readme",
   "devDependencies": {
-    "@tangany/tslint-config": "^1.1.1",
+    "@tangany/tslint-config": "^2.0.0",
     "@types/debug": "^4.1.5",
     "@types/dotenv": "^8.2.0",
     "@types/mocha": "^5.2.7",
