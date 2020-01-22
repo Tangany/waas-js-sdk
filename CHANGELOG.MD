@@ -7,8 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 ### Added
 ### Changed
+* Renamed the npm package to `@tangany/waas` & deprecated the old package `@tangany/waas-js-sdk`
 * Allow omitting all `Waas` arguments and authenticate through environment variables TANGANY_CLIENT_ID`, `TANGANY_CLIENT_SECRET`, `TANGANY_SUBSCRIPTION` & `TANGANY_VAULT_URL`
 * 🚨 Breaking: Removed the AxiosResponse layer from all endpoints. All calls now return the HTTP response data instead of the AxiosResponse type
+* 🚨 Breaking: Drop support for Node.js below version 8.6
 
 ## [1.0.0-beta.5]
 ### Fixed
