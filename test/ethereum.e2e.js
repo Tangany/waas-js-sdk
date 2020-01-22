@@ -11,7 +11,7 @@ config({ path });
 checkEnvVars();
 
 describe("WaaS sample Ethereum workflow", function () {
-	const timeout = 120e3;
+	const timeout = 160e3;
 	this.timeout(timeout);
 	this.slow(timeout / 3);
 
@@ -30,9 +30,9 @@ describe("WaaS sample Ethereum workflow", function () {
 
 	it("should send a transaction with some data string and read it from the blockchain", async function () {
 		const data = getRandomHex(300);
-		const {  hash  } = await api.wallet(tokenWallet).eth().send({ to: "0x0000000000000000000000000000000000000000", amount: "0", data });
-		console.log({ hash, data });
+		const { hash } = await api.wallet(tokenWallet).eth().send({ to: "0x0000000000000000000000000000000000000000", amount: "0", data });
 		const tx = await api.eth(hash).get();
+		console.log({ hash, data: tx.data });
 		assert.strictEqual(data, tx.data);
 	});
 

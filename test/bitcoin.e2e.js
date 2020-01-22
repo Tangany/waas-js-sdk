@@ -9,7 +9,7 @@ config({ path });
 checkEnvVars();
 
 describe("WaaS sample Bitcoin workflow", function () {
-	const timeout = 20e3;
+	const timeout = 40e3;
 	this.timeout(timeout);
 	this.slow(timeout / 4);
 
@@ -24,6 +24,10 @@ describe("WaaS sample Bitcoin workflow", function () {
 		bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.NONE
 	};
 	const noConfirmationsBtcApi = new Waas(options); // coins available regardless of mining status
+
+	it("should fetch the affinity cookie", async function () {
+		await noConfirmationsBtcApi.btc().fetchAffinityCookie();
+	});
 
 	it("should get the Bitcoin specs for the current wallet", async function () {
 		const { currency, balance, address } = await noConfirmationsBtcApi.wallet(wallet).btc().get();
