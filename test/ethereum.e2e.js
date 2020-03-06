@@ -15,8 +15,8 @@ describe("WaaS sample Ethereum workflow", function () {
 	this.timeout(timeout);
 	this.slow(timeout / 3);
 
-	const tokenAddress = process.env.E2E_TOKEN; // ERC20 token address
-	const tokenWallet = process.env.E2E_WALLET; // Wallet with some testnet balance that owns the ERC20 token
+	const tokenAddress = process.env.E2E_TOKEN; // mintable ERC20 token address
+	const tokenWallet = process.env.E2E_WALLET; // Wallet with some testnet balance that owns the mintable ERC20 token
 	const tokenAmount = "0.0032"; // Token amount used for transactions
 	const etherAmount = "0.001"; // Token amount used for transactions
 	let tokenWalletAddress; // Token wallet address
@@ -153,6 +153,16 @@ describe("WaaS sample Ethereum workflow", function () {
 		const { balance } = await api.wallet(createdWallet).eth().erc20(tokenAddress).get();
 		assert.strictEqual(balance, "0");
 		console.log(`new token balance: ${balance}`);
+	});
+
+	it("should interact with a smart contract using the data interface", async function () {
+		const { hash } = await api.wallet(tokenWallet).eth().send({
+			to: tokenAddress,
+			amount: "0",
+			data: "0x40c10f1900000000000000000000000076f0ce0ee55bf1aae0adf85a2cd348b8dd3583760000000000000000000000000000000000000000000000000de0b6b3a7640000" // mint 1 token to 0x76f0ce0ee55bf1aae0adf85a2cd348b8dd358376
+		});
+		console.log(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
+		await api.eth(hash).wait(timeout);
 	});
 
 	it("should delete the new wallet", async function () {
