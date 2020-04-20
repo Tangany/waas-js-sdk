@@ -1,6 +1,6 @@
+import {BlockchainWallet} from "./blockchain-wallet"
 import {recipientType, Waas} from "./waas";
 import {IBitcoinTransactionEstimation, IRecipient, ITransaction, IWalletBalance} from "./interfaces";
-import {IWaasMethod} from "./waas-method";
 import {Wallet} from "./wallet";
 import * as t from "typeforce";
 
@@ -9,14 +9,9 @@ import * as t from "typeforce";
  * @param instance - axios instance created by {@link Waas}
  * @param walletInstance - instance of Wallet class
  */
-export class BtcWallet implements IWaasMethod {
-    constructor(public waas: Waas, private readonly walletInstance: Wallet) {
-    }
-
-    public get wallet() {
-        t("String", this.walletInstance.wallet);
-
-        return this.walletInstance.wallet;
+export class BtcWallet extends BlockchainWallet {
+    constructor(waas: Waas, walletInstance: Wallet) {
+        super(waas, walletInstance);
     }
 
     /**

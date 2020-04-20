@@ -1,7 +1,7 @@
 import * as t from "typeforce";
+import {BlockchainWallet} from "./blockchain-wallet"
 import {IRecipient, ITokenBalance, ITransaction} from "./interfaces";
 import {recipientType, Waas} from "./waas";
-import {IWaasMethod} from "./waas-method";
 import {Wallet} from "./wallet";
 
 enum METHOD {
@@ -18,15 +18,10 @@ enum METHOD {
  * @param walletInstance - Instance of Wallet class
  * @param address - ERC20 token contract address
  */
-export class EthErc20Wallet implements IWaasMethod {
+export class EthErc20Wallet extends BlockchainWallet {
 
-    get wallet() {
-        t("String", this.walletInstance.wallet);
-
-        return this.walletInstance.wallet;
-    }
-
-    constructor(public waas: Waas, public readonly walletInstance: Wallet, public readonly address: string) {
+    constructor(waas: Waas, walletInstance: Wallet, public readonly address: string) {
+        super(waas, walletInstance);
         t("String", address);
     }
 

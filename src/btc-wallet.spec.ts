@@ -23,20 +23,6 @@ describe("BtcWallet", function() {
         assert.ok(new BtcWallet(this.waas, new Wallet(this.waas, sampleWallet)));
     });
 
-    describe("wallet", function() {
-        it("should throw for missing wallet name", function() {
-            assert.throws(() => new BtcWallet(this.waas, new Wallet(this.waas)).wallet, /Expected String, got undefined/);
-        });
-
-        it("should throw for invalid wallet name", function() {
-            assert.throws(() => new BtcWallet(this.waas, new Wallet(this.waas, -1.2e3 as any)).wallet, /Expected \?String, got Number/);
-        });
-
-        it("should return the wallet name", function() {
-            assert.strictEqual(new BtcWallet(this.stub, new Wallet(this.stub, sampleWallet)).wallet, sampleWallet);
-        });
-    });
-
     describe("get", function() {
         it("should execute the api call", async function() {
             const spy = this.waas.instance.get = this.sandbox.spy();

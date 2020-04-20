@@ -1,9 +1,9 @@
 import * as t from "typeforce";
+import {BlockchainWallet} from "./blockchain-wallet"
 import {Request} from "./request"
 import {ethereumRecipientType, Waas} from "./waas";
 import {IWalletBalance, ITransaction, IEthereumRecipient} from "./interfaces";
 import {EthErc20Wallet} from "./eth-erc20-wallet";
-import {IWaasMethod} from "./waas-method";
 import {Wallet} from "./wallet";
 
 /**
@@ -12,17 +12,10 @@ import {Wallet} from "./wallet";
  * @param limiter - Bottleneck limiter instance
  * @param walletInstance - instance of Wallet class
  */
-export class EthWallet implements IWaasMethod {
-    private readonly walletInstance: Wallet;
+export class EthWallet extends BlockchainWallet {
 
-    constructor(public waas: Waas, walletInstance: Wallet) {
-        this.walletInstance = walletInstance;
-    }
-
-    get wallet() {
-        t("String", this.walletInstance.wallet);
-
-        return this.walletInstance.wallet;
+    constructor(waas: Waas, walletInstance: Wallet) {
+        super(waas, walletInstance);
     }
 
     /**
