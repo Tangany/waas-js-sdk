@@ -173,6 +173,14 @@ describe("WaaS sample Ethereum workflow", function () {
 		console.log(`asynchronous transaction request '${request.id}' started. Waiting for the process to finish...`);
 	});
 
+	it("should create a signed transaction that can be manually transmitted", async function () {
+		const { rawTransaction } = await api.wallet(tokenWallet).eth().sign({
+			to: createdWalletAddress,
+			amount: etherAmount
+		});
+		console.log(`signing endpoint returned '${rawTransaction}'`);
+	});
+
 	it("should delete the new wallet", async function () {
 		const { recoveryId, scheduledPurgeDate } = await api.wallet(createdWallet).delete();
 		assert.ok(recoveryId);

@@ -1,6 +1,6 @@
 import {BlockchainWallet} from "./blockchain-wallet"
 import {recipientType, Waas} from "./waas";
-import {IBitcoinTransactionEstimation, IRecipient, ITransaction, IWalletBalance} from "./interfaces";
+import {IBitcoinTransactionEstimation, ITransmittableTransaction, IRecipient, ITransaction, IWalletBalance} from "./interfaces";
 import {Wallet} from "./wallet";
 import * as t from "typeforce";
 
@@ -29,6 +29,16 @@ export class BtcWallet extends BlockchainWallet {
      */
     public async send(recipients: IRecipient[] | IRecipient): Promise<ITransaction> {
         return this.waas.wrap<ITransaction>(() => this.waas.instance.post(`btc/wallet/${this.wallet}/send`, this.getRecipientsData(recipients)));
+    }
+
+    /**
+     * Creates an RLP encoded transaction that is already signed and can be manually transmitted
+     * to compatible blockchain networks at a later stage.
+     * @param recipients - Recipient configuration
+     */
+    public async sign(recipients: IRecipient[] | IRecipient): Promise<ITransmittableTransaction> {
+        return this.waas.wrap<ITransmittableTransaction>(() => this.waas.instance
+            .post(`btc/wallet/${this.wallet}/sign`, this.getRecipientsData(recipients)));
     }
 
     /**

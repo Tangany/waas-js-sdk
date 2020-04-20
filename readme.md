@@ -117,6 +117,8 @@ https://tangany.docs.stoplight.io/api/ethereum/
     const { hash } = await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // send Ether asynchronously (see examples for request interface to retrieve status details)
     const req = await api.eth().sendAsync({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
+    // create a signed transaction that can be manually transmitted
+    const { rawTransaction } = await api.eth().sign({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // get eth balance and wallet address
     const { currency, balance, address } = await api.eth().get();
 })();
@@ -180,6 +182,8 @@ https://tangany.docs.stoplight.io/api/bitcoin/
     const { hash } = await api.btc().send({to: someAddress, amount: "0.021"});
     // send BTC to multiple recipients
     await api.btc().send([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
+    // create a signed transaction that can be manually transmitted
+    const { rawTransaction } = await api.btc().sign({to: someAddress, amount: "0.021"});
     // get BTC balance and wallet address
     const { balance,address,currency } = await api.btc().get();
 })();

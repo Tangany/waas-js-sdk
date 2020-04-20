@@ -70,6 +70,18 @@ describe("EthWallet", function() {
         });
     });
 
+    describe("sign", function() {
+        it("should execute the api call", async function() {
+            const postSpy = this.waas.instance.post = this.sandbox.stub();
+            const wallet = new Wallet(this.waas, sampleWallet);
+            const ew = new EthWallet(this.waas, wallet);
+            const validateSpy = this.sandbox.spy(ew, "validateRecipient");
+            await ew.sign({to: sampleAddress, amount: sampleAmount});
+            assert.strictEqual(validateSpy.callCount, 1);
+            assert.strictEqual(postSpy.callCount, 1);
+        });
+    });
+
     describe("erc20", function() {
         it("should return an EthErc20Token instance", async function() {
             const wallet = new Wallet(this.waas, sampleWallet);

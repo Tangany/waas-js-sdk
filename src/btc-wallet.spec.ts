@@ -39,6 +39,14 @@ describe("BtcWallet", function() {
         });
     });
 
+    describe("sign", function() {
+        it("should execute the api call", async function() {
+            const spy = this.waas.instance.post = this.sandbox.spy();
+            await new BtcWallet(this.waas, new Wallet(this.waas, sampleWallet)).sign([recipient, recipient]);
+            assert.strictEqual(spy.callCount, 1);
+        });
+    });
+
     describe("estimateFee", function() {
         it("should execute the api call", async function() {
             const spy = this.waas.instance.post = this.sandbox.spy();

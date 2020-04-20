@@ -3,7 +3,7 @@ import {BlockchainWallet} from "./blockchain-wallet"
 import {EthContractWallet} from "./eth-contract-wallet"
 import {Request} from "./request"
 import {ethereumRecipientType, Waas} from "./waas";
-import {IWalletBalance, ITransaction, IEthereumRecipient} from "./interfaces";
+import {IWalletBalance, ITransaction, IEthereumRecipient, ITransmittableTransaction} from "./interfaces";
 import {EthErc20Wallet} from "./eth-erc20-wallet";
 import {Wallet} from "./wallet";
 
@@ -57,6 +57,20 @@ export class EthWallet extends BlockchainWallet {
         );
         const id = this.extractRequestId(rawResponse);
         return new Request(this.waas, id);
+    }
+
+    /**
+     * Creates an RLP encoded transaction that is already signed and can be manually transmitted
+     * to compatible blockchain networks at a later stage.
+     * @param recipient - {@link IEthereumRecipient}
+     */
+    public async sign(recipient: IEthereumRecipient): Promise<ITransmittableTransaction> {
+        this.validateRecipient(recipient);
+        return this.waas.wrap<ITransmittableTransaction>(() => this.waas.instance
+            .post(`eth/wallet/${this.wallet}/sign`, {
+                ...recipient,
+            }),
+        );
     }
 
     /**

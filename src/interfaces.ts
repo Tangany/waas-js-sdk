@@ -124,6 +124,13 @@ export interface IAsyncRequestStatus {
 }
 
 /**
+ * Represents an RLP encoded transaction that is already signed
+ */
+export interface ITransmittableTransaction {
+    rawTransaction: string;
+}
+
+/**
  * Represents the configuration of a Smart Contract method call
  */
 export interface IContractMethod {
