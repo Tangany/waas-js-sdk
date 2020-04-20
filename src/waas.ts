@@ -95,10 +95,10 @@ export interface IWaitForTxStatus {
  * @param options.clientSecret - Subscription client secret
  * @param options.subscription - Subscription code
  * @param options.vaultUrl - Tangany vault url
- * @param options.ethereumNetwork - Public Ethereum network name (@see https://tangany.docs.stoplight.io/api/models/ethereum-public-network) or private Ethereum network url (@see https://tangany.docs.stoplight.io/api/models/ethereum-private-network)
+ * @param options.ethereumNetwork - Public Ethereum network name or private Ethereum network url
  * @param options.ethereumTxConfirmations - Amount of block confirmations required to consider an Ethereum transaction as valid
  * @param options.ethereumTxSpeed - Amount of additional gas fee that is added to the base gas fee for the given Ethereum network to speed up the mining process of the transaction
- * @param options.bitcoinNetwork - Public Bitcoin network name (@see https://tangany.docs.stoplight.io/api/models/bitcoin-network)
+ * @param options.bitcoinNetwork - Public Bitcoin network name
  * @param options.bitcoinTxConfirmations - Amount of block confirmations required for Bitcoin balance outputs to be included in the total wallet balance calculation
  * @param options.bitcoinTxSpeed - Target amount of block confirmations for the transaction to be included to the Bitcoin network
  * @param options.bitcoinMaxFeeRate - Maximum allowed fee rate in satoshi per byte for a Bitcoin transaction

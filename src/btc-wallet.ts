@@ -16,7 +16,7 @@ export class BtcWallet extends BlockchainWallet {
 
     /**
      * Returns wallet metrics for the Bitcoin blockchain (BTC balance, wallet address)
-     * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/get-btc-balance}
+     * @see [docs]{@link https://docs.tangany.com/?version=latest#ccedf387-e9f9-4118-985c-d434e762b6fe}
      */
     public async get(): Promise<IWalletBalance> {
         return this.waas.wrap<IWalletBalance>(() => this.waas.instance.get(`btc/wallet/${this.wallet}`));
@@ -25,7 +25,7 @@ export class BtcWallet extends BlockchainWallet {
     /**
      * Send BTC to address from current wallet
      * @param recipients - Recipient configuration
-     * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/make-btc-transaction}
+     * @see [docs]{@link https://docs.tangany.com/?version=latest#62b0f6e4-641b-4230-8cf2-1cb8b2181812}
      */
     public async send(recipients: IRecipient[] | IRecipient): Promise<ITransaction> {
         return this.waas.wrap<ITransaction>(() => this.waas.instance.post(`btc/wallet/${this.wallet}/send`, this.getRecipientsData(recipients)));
@@ -35,6 +35,7 @@ export class BtcWallet extends BlockchainWallet {
      * Creates an RLP encoded transaction that is already signed and can be manually transmitted
      * to compatible blockchain networks at a later stage.
      * @param recipients - Recipient configuration
+     * @see [docs]{@link https://docs.tangany.com/?version=latest#53017845-c0e8-4100-bb24-6168b00bd225}
      */
     public async sign(recipients: IRecipient[] | IRecipient): Promise<ITransmittableTransaction> {
         return this.waas.wrap<ITransmittableTransaction>(() => this.waas.instance
@@ -44,7 +45,7 @@ export class BtcWallet extends BlockchainWallet {
     /**
      * Estimate sending fee in BTC for given recipients
      * @param recipientsObject - a recipients configuration object
-     * @see {@link https://tangany.docs.stoplight.io/api/bitcoin/estimate-btc-transaction}
+     * @see [docs]{@link https://docs.tangany.com/?version=latest#7272d8f1-38d5-4ee7-9c69-2154405bb83b}
      */
     public async estimateFee(recipientsObject: IRecipient[] | IRecipient): Promise<IBitcoinTransactionEstimation> {
         return this.waas.wrap<IBitcoinTransactionEstimation>(() => this.waas.instance
@@ -55,7 +56,7 @@ export class BtcWallet extends BlockchainWallet {
     /**
      * @deprecated do not use outside of unit tests
      */
-        // tslint:disable-next-line:variable-name
+    // tslint:disable-next-line:variable-name
     public __test_getRecipientsData = (...args: any) => this.getRecipientsData.apply(this, args);
 
     /**

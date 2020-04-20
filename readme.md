@@ -8,7 +8,7 @@
 node.js wrapper for [Tangany WaaS](https://tangany.com)
 
 [![NPM version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/package-badge.svg?sanitize=true)](https://www.npmjs.com/package/@tangany/waas)
-[![WaaS API version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/sdk-badge.svg?sanitize=true)](https://tangany.docs.stoplight.io/)
+[![WaaS API version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/sdk-badge.svg?sanitize=true)](https://docs.tangany.com/?version=latest)
 
 ## Getting started
 
@@ -79,11 +79,8 @@ bitcoinMaxFeeRate | Defines the maximum allowed fee rate in satoshi per byte for
 For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2e.js))
 
 #### Wallet interface
-*Global wallet management*
-https://tangany.docs.stoplight.io/api/wallet/
-
+[*Global wallet management*](https://docs.tangany.com/?version=latest#39e3a3fe-42fa-4188-b64a-12d8258ad98d)
 ````javascript
-
 (async () => {
     const api = new Waas();
     // list all wallets
@@ -98,7 +95,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 ````
 
 #### General Ethereum interface
-*Ethereum calls that are not wallet based*
+[*Ethereum calls that are not wallet based*](https://docs.tangany.com/?version=latest#7b314b47-012c-4baa-b928-dd32c7db1e41)
 ````javascript
 (async () => {
     const api = new Waas().eth(txHash);
@@ -110,8 +107,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 ````
 
 #### Ethereum interface for wallet
-*Wallet based Ethereum calls*
-https://tangany.docs.stoplight.io/api/ethereum/
+[*Wallet based Ethereum calls*](https://docs.tangany.com/?version=latest#4a31e7ea-f62b-44db-81bd-b6802099955e)
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet");
@@ -127,8 +123,7 @@ https://tangany.docs.stoplight.io/api/ethereum/
 ````
 
 #### Ethereum ERC20 token interface for wallet
-*Wallet based calls for Ethereum ERC20 token management*
-https://tangany.docs.stoplight.io/api/ethereum-erc20
+[*Wallet based calls for Ethereum ERC20 token management*](https://docs.tangany.com/?version=latest#1cbcb11f-f2ca-4334-82b3-9729f4d5e7d8)
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet").eth().erc20(tokenAddress);
@@ -161,7 +156,7 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 ````
 
 #### General Bitcoin interface
-*Bitcoin calls that are not wallet based*
+[*Bitcoin calls that are not wallet based*](https://docs.tangany.com/?version=latest#2fe57cbc-410e-4141-8161-fd335cfc05c8)
 ````javascript
 (async () => {
     const api = new Waas().btc(hash);
@@ -173,8 +168,7 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 ````
 
 #### Bitcoin interface for wallet
-*Wallet based Bitcoin calls*
-https://tangany.docs.stoplight.io/api/bitcoin/
+[*Wallet based Bitcoin calls*](https://docs.tangany.com/?version=latest#11dafda1-03e7-4911-b18f-091e4e2dd94e)
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet");
@@ -237,7 +231,7 @@ DEBUG=waas-js-sdk:*
 ```
 
 ## API documentation
-Full API documentation is available at https://tangany.docs.stoplight.io/
+Full API documentation is available at https://docs.tangany.com
 
 ***
 <div align="center">
