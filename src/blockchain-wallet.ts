@@ -16,4 +16,19 @@ export abstract class BlockchainWallet implements IWaasMethod {
         return this.walletInstance.wallet;
     }
 
+    /**
+     * Determines the request id from an server response to an asynchronous request.
+     * The server always returns the location of the server resource that represents the status of the
+     * asynchronous request. From this, only the ID is extracted.
+     * @param serverResponse - Object that represents the raw server response of an asynchronous endpoint
+     */
+    protected extractRequestId(serverResponse: { [key: string]: any }): string {
+        const {statusUri} = serverResponse;
+        const matches = statusUri?.match(/(?!.*\/).+/);
+        if (!matches || matches.length > 1) {
+            throw new Error("The API call for asynchronously sending a transaction has returned an unexpected format");
+        }
+        return matches[0];
+    }
+
 }

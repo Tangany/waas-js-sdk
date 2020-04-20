@@ -1,5 +1,6 @@
 import * as t from "typeforce";
 import {BlockchainWallet} from "./blockchain-wallet"
+import {EthContractWallet} from "./eth-contract-wallet"
 import {Request} from "./request"
 import {ethereumRecipientType, Waas} from "./waas";
 import {IWalletBalance, ITransaction, IEthereumRecipient} from "./interfaces";
@@ -54,16 +55,7 @@ export class EthWallet extends BlockchainWallet {
                 ...recipient,
             }),
         );
-
-        // Sending a request to an asynchronous endpoint always results in a quick API response containing the status location of the asynchronous process.
-        // Therefore, extract the id from the original API response
-        const {statusUri} = rawResponse;
-        const matches = statusUri?.match(/(?!.*\/).+/);
-        if(!matches || matches.length > 1){
-            throw new Error("The API call for asynchronously sending a transaction has returned an unexpected format");
-        }
-        const id = matches[0];
-
+        const id = this.extractRequestId(rawResponse);
         return new Request(this.waas, id);
     }
 
@@ -73,6 +65,13 @@ export class EthWallet extends BlockchainWallet {
      */
     public erc20(tokenAddress: string): EthErc20Wallet {
         return new EthErc20Wallet(this.waas, this.walletInstance, tokenAddress);
+    }
+
+    /**
+     * Returns wallet calls for universal Smart Contract method calling
+     */
+    public contract(address: string): EthContractWallet {
+        return new EthContractWallet(this.waas, this.walletInstance, address);
     }
 
     /**

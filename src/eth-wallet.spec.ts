@@ -1,4 +1,5 @@
 import axios from "axios";
+import {EthContractWallet} from "./eth-contract-wallet"
 import {EthErc20Wallet} from "./eth-erc20-wallet";
 import {sandbox} from "./spec-helpers";
 import * as assert from "assert";
@@ -108,6 +109,15 @@ describe("EthWallet", function() {
                     amount: sampleAmount,
                     from: "abc",}),
                 /Unexpected property "from"/);
+        });
+    });
+
+    describe("contract", function() {
+        it("should return an EthContractWallet instance", function() {
+            const wallet = new Wallet(this.waas, sampleWallet);
+            const ethWallet = new EthWallet(this.waas, wallet);
+            const contractWallet = ethWallet.contract("0xC32AE45504Ee9482db99CfA21066A59E877Bc0e6");
+            assert.ok(contractWallet instanceof EthContractWallet);
         });
     });
 });

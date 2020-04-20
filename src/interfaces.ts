@@ -122,3 +122,11 @@ export interface IAsyncRequestStatus {
     updated: Date,
     output: null | { [k: string]: any }
 }
+
+/**
+ * Represents the configuration of a Smart Contract method call
+ */
+export interface IContractMethod {
+    function: string,
+    inputs: string[],
+}

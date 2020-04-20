@@ -143,6 +143,19 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 })();
 ````
 
+#### Universal Ethereum Smart Contract interface for wallet
+[*Wallet based calls for universal smart contract token management*](https://docs.tangany.com/?version=9bc7df56-b03b-4b25-9697-59aea9774174#945c237f-5273-4e85-bf9d-1ba2b132df17)
+````javascript
+(async () => {
+    const api = new Waas().wallet("my-wallet").eth().contract(tokenAddress);
+    // send token asynchronously (see examples for request interface to retrieve status details)
+    const req = api.sendAsync({
+        function: "transfer(address,uint256)",
+        inputs: [someOtherWalletAddress, "2500000000000000"]
+    });
+})();
+````
+
 #### General Bitcoin interface
 *Bitcoin calls that are not wallet based*
 ````javascript
