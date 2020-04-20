@@ -67,6 +67,8 @@ describe("Waas", function() {
     it("should throw for invalid options", function() {
         assert.throws(() => new Waas({...auth, vaultUrl: true} as any));
         assert.throws(() => new Waas({...auth, ethereumNetwork: 23} as any));
+        assert.throws(() => new Waas({...auth, ethereumGasPrice: 12345678} as any));
+        assert.throws(() => new Waas({...auth, useGasTank: "yes"} as any));
         assert.throws(() => new Waas({...auth, ethereumTxSpeed: eval} as any));
         assert.throws(() => new Waas({...auth, bitcoinNetwork: 1} as any));
         assert.throws(() => new Waas({...auth, bitcoinTxSpeed: Symbol} as any));
