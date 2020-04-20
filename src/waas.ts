@@ -7,6 +7,7 @@ import {AuthenticationError, ConflictError, GeneralError, MiningError, NotFoundE
 import {Ethereum} from "./eth";
 import {BlockchainTransactionStatuses, IBlockchainTransactionStatus, IWaasError} from "./interfaces";
 import {limiter} from "./limiter";
+import {Request} from "./request"
 import {Wallet} from "./wallet";
 import Timeout = NodeJS.Timeout;
 
@@ -350,6 +351,14 @@ export class Waas {
         const b = new Bitcoin(this, txHash);
 
         return b;
+    }
+
+    /**
+     * read api calls for asynchronous requests
+     * @param id - Unique identifier for an asynchronous request
+     */
+    public request(id: string): Request {
+        return new Request(this, id);
     }
 
     /**

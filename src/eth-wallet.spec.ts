@@ -34,25 +34,38 @@ describe("EthWallet", function() {
     });
 
     describe("send", function() {
-        it("should throw for invalid recipients", async function() {
-            const e = new EthWallet(this.waas, this.sandbox.createStubInstance(Wallet));
-            await assert.rejects(async () => e.send({to: sampleAddress} as any), /Missing 'amount' argument/);
-            await assert.rejects(async () => e.send({
+        it("should execute the call", async function() {
+            const postSpy = this.waas.instance.post = this.sandbox.spy();
+            const wallet = new Wallet(this.waas, sampleWallet);
+            const r = new EthWallet(this.waas, wallet);
+            const validateSpy = this.sandbox.spy(r, "validateRecipient");
+            await r.send({to: sampleAddress, amount: "0.1", data: "0xf03"});
+            assert.strictEqual(postSpy.callCount, 1);
+            assert.strictEqual(validateSpy.callCount, 1);
+        });
+    });
+
+    describe("sendAsync", function() {
+        it("should throw for unexpected API response", async function() {
+            this.waas.instance.post = async () => Promise.resolve({anotherProperty: "invalid key and value"});
+            const wallet = new Wallet(this.waas, sampleWallet);
+            const ethWallet = new EthWallet(this.waas, wallet);
+            await assert.rejects(async () => ethWallet.sendAsync({
                 to: sampleAddress,
-                amount: sampleAmount,
-                from: "abc",
-            } as any), /Unexpected property "from"/);
-            await assert.rejects(async () => e.send({to: NaN, amount: "NaN"} as any), /Missing 'to' argument/);
-            await assert.rejects(async () => e.send({to: true, amount: true} as any), /Expected property "to" of type String, got Boolean true/);
-            await assert.rejects(async () => e.send({to: sampleAddress, amount: sampleAmount, data: true} as any), /Expected property "data" of type \?String, got Boolean true/);
+                amount: sampleAmount
+            }), /returned an unexpected format/);
         });
 
         it("should execute the call", async function() {
-            const spy = this.waas.instance.post = this.sandbox.spy();
+            const sampleRequestId = "71c4f385a4124239b6c968e47ea95f73";
+            const postStub = this.waas.instance.post = this.sandbox.stub().resolves({statusUri: `request/${sampleRequestId}`});
             const wallet = new Wallet(this.waas, sampleWallet);
             const r = new EthWallet(this.waas, wallet);
-            await r.send({to: sampleAddress, amount: "0.1", data: "0xf03"});
-            assert.strictEqual(spy.callCount, 1, "invalid stub.callCount");
+            const validateSpy = this.sandbox.spy(r, "validateRecipient");
+            const request = await r.sendAsync({to: sampleAddress, amount: "0.1", data: "0xf03"});
+            assert.strictEqual(validateSpy.callCount, 1);
+            assert.strictEqual(postStub.callCount, 1);
+            assert.strictEqual(request.id, sampleRequestId);
         });
     });
 
@@ -62,6 +75,39 @@ describe("EthWallet", function() {
             const r = new EthWallet(this.waas, wallet);
             const erc = r.erc20(sampleAddress);
             assert.ok(erc instanceof EthErc20Wallet);
+        });
+    });
+
+    describe("validateRecipient", function(){
+        it("should throw for missing arguments", function() {
+            const wallet = new Wallet(this.waas, sampleWallet);
+            const ethWallet = new EthWallet(this.waas, wallet);
+            assert.throws(
+                () => ethWallet.__test_validateRecipient({to: sampleAddress}),
+                /Missing 'amount' argument/);
+            assert.throws(
+                () => ethWallet.__test_validateRecipient({to: NaN, amount: "NaN"}),
+                /Missing 'to' argument/);
+        });
+
+        it("should throw for invalid types", function() {
+            const wallet = new Wallet(this.waas, sampleWallet);
+            const ethWallet = new EthWallet(this.waas, wallet);
+            assert.throws(
+                () => ethWallet.__test_validateRecipient({to: true, amount: true}),
+                /Expected property "to" of type String, got Boolean true/);
+            assert.throws(
+                () => ethWallet.__test_validateRecipient({
+                    to: sampleAddress,
+                    amount: sampleAmount,
+                    data: true}),
+                /Expected property "data" of type \?String, got Boolean true/);
+            assert.throws(
+                () => ethWallet.__test_validateRecipient({
+                    to: sampleAddress,
+                    amount: sampleAmount,
+                    from: "abc",}),
+                /Unexpected property "from"/);
         });
     });
 });

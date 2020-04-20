@@ -2,6 +2,7 @@ import * as assert from "assert";
 import {Bitcoin} from "./btc";
 import {AuthenticationError, ConflictError, GeneralError, NotFoundError} from "./errors";
 import {Ethereum} from "./eth";
+import {Request} from "./request"
 import {sandbox} from "./spec-helpers";
 import {
     BitcoinNetwork,
@@ -157,6 +158,13 @@ describe("Waas", function() {
         it("should return a Bitcoin instance", async function() {
             const w = new Waas(auth);
             assert.ok(w.btc() instanceof Bitcoin);
+        });
+    });
+
+    describe("request", function() {
+        it("should return a Request instance", function() {
+            const w = new Waas(auth);
+            assert.ok(w.request("71c4f385a4124239b6c968e47ea95f73") instanceof Request);
         });
     });
 })

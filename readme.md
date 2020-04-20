@@ -115,6 +115,8 @@ https://tangany.docs.stoplight.io/api/ethereum/
     const api = new Waas().wallet("my-wallet");
     // send Ether
     const { hash } = await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
+    // send Ether asynchronously (see examples for request interface to retrieve status details)
+    const req = await api.eth().sendAsync({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // get eth balance and wallet address
     const { currency, balance, address } = await api.eth().get();
 })();
@@ -167,6 +169,26 @@ https://tangany.docs.stoplight.io/api/bitcoin/
     await api.btc().send([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
     // get BTC balance and wallet address
     const { balance,address,currency } = await api.btc().get();
+})();
+````
+
+#### Request interface
+[*Calls to obtain the status of asynchronous requests*](https://docs.tangany.com/?version=9bc7df56-b03b-4b25-9697-59aea9774174#a6351116-3e2c-4f02-add8-d424c6212f60)
+````javascript
+(async () => {
+    const api = new Waas();
+    // execute an arbitrary call to an asynchronous endpoint
+    const req = await api.wallet("my-wallet").eth().sendAsync({to: someOtherWalletAddress, amount: "0.539"});
+    // retrieve status details
+    const { process, status, output } = await req.get();
+    // transaction hash is available in the status field as soon as the transaction is executed
+    const { hash } = status;
+    // once it is confirmed, further details are available as output of the request
+    if (process === "Completed") {
+        const { hash, blockNr, data, status } = output;
+    }
+    // obtain the status of a given request id
+    const anotherStatus = await api.request("a2e19473b9ec44cf97f71c9d4615e364").get();
 })();
 ````
 
