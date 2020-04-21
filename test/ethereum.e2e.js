@@ -36,20 +36,6 @@ describe("WaaS sample Ethereum workflow", function () {
 		assert.strictEqual(data, tx.data);
 	});
 
-	it("should list available wallets", async function () {
-		const allWallets = await api.wallet().list();
-		assert.ok(allWallets.list.length);
-		console.log("wallets list", allWallets);
-
-		if (allWallets.skiptoken) {
-			console.log(`fetching next list page for skiptoken`);
-			const nextList = await api.wallet().list(allWallets.skiptoken);
-			assert.ok(nextList.list.length);
-			assert.strictEqual(allWallets.list.find(l => l.wallet === nextList.list[0].wallet), undefined);
-			console.log("wallet list next page", nextList);
-		}
-	});
-
 	it("should create a new wallet", async function () {
 		const { security, created, version, wallet, updated } = await api.wallet().create();
 		assert.ok(security);
