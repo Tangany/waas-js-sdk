@@ -29,7 +29,7 @@ describe("WaaS sample Ethereum workflow", function () {
 	}, undefined, true);
 
 	it("should send a transaction with some data string and read it from the blockchain", async function () {
-		const data = getRandomHex(300);
+		const data = "0x" + getRandomHex(300);
 		const { hash } = await api.wallet(tokenWallet).eth().send({ to: "0x0000000000000000000000000000000000000000", amount: "0", data });
 		const tx = await api.eth(hash).get();
 		console.log({ hash, data: tx.data });
