@@ -59,11 +59,11 @@ export class Wallet implements IWaasMethod {
                 })
             )
             .catch(e => {
-                if (e.response && e.response.status === 409) {
-                    throw new ConflictError("Cannot overwrite existing wallet");
+                if (e.status === 409) {
+                    throw new ConflictError(e.message);
                 }
 
-                throw new GeneralError(e);
+                throw new GeneralError(e.message, e.status);
             })
             ;
 

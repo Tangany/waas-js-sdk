@@ -29,25 +29,11 @@ describe("WaaS sample Ethereum workflow", function () {
 	}, undefined, true);
 
 	it("should send a transaction with some data string and read it from the blockchain", async function () {
-		const data = getRandomHex(300);
+		const data = "0x" + getRandomHex(300);
 		const { hash } = await api.wallet(tokenWallet).eth().send({ to: "0x0000000000000000000000000000000000000000", amount: "0", data });
 		const tx = await api.eth(hash).get();
 		console.log({ hash, data: tx.data });
 		assert.strictEqual(data, tx.data);
-	});
-
-	it("should list available wallets", async function () {
-		const allWallets = await api.wallet().list();
-		assert.ok(allWallets.list.length);
-		console.log("wallets list", allWallets);
-
-		if (allWallets.skiptoken) {
-			console.log(`fetching next list page for skiptoken`);
-			const nextList = await api.wallet().list(allWallets.skiptoken);
-			assert.ok(nextList.list.length);
-			assert.strictEqual(allWallets.list.find(l => l.wallet === nextList.list[0].wallet), undefined);
-			console.log("wallet list next page", nextList);
-		}
 	});
 
 	it("should create a new wallet", async function () {
