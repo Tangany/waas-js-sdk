@@ -14,6 +14,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   * `ethereumGasPrice` & `useGasTank` header
 ### Changed
 
+## [1.0.0-beta.7]
+### Fixed
+* Fixed the `Wallet` interface throwing a GeneralError instead of ConflictError on wallet naming conflicts
+### Added
+* Added [E2E code examples](./test/wallet.e2e.js) for a WaaS Wallet based workflow
+### Changed
+
 ## [1.0.0-beta.6]
 ### Fixed
 ### Added

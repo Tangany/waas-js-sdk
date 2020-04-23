@@ -37,7 +37,7 @@ describe("Wallet", function() {
 
         it("should throw a ConflictError for an occupied wallet name", async function() {
             const stub = this.waas.instance.post = this.sandbox.stub().rejects({
-                response: {message: "ConflictError", status: 409},
+                message: "ConflictError", status: 409
             });
             const w = new Wallet(this.waas);
             await assert.rejects(async () => w.create(dummyWalletName), ConflictError);
@@ -45,11 +45,21 @@ describe("Wallet", function() {
         });
 
         it("should throw a GeneralError for any other errors", async function() {
+            const status = 418;
+            const message = "ban earl grey";
             const stub = this.waas.instance.post = this.sandbox.stub().rejects({
-                response: {status: 418},
+                status,
+                message
             });
             const w = new Wallet(this.waas);
-            await assert.rejects(async () => w.create(dummyWalletName), GeneralError);
+            await w.create(dummyWalletName)
+                .then(() => assert.fail("should have rejected"))
+                .catch(e => {
+                    assert.ok(e instanceof GeneralError);
+                    assert.strictEqual(e.status, status)
+                    assert.strictEqual(e.message, message)
+                });
+
             assert.strictEqual(stub.callCount, 1);
         });
     });
