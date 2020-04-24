@@ -40,6 +40,14 @@ describe("Ethereum", function() {
     });
 
     describe("get", function() {
+        it("should throw for missing transaction hash", function(){
+            const eth = new Ethereum(this.waas);
+            // The method should call the getter (with type check) instead of the instance variable, which may be undefined
+            const spy = this.sandbox.spy(eth, "txHash", ["get"]).get;
+            assert.throws(() => eth.txHash);
+            assert.ok(spy.calledOnce);
+        });
+
         it("should execute the api call", async function() {
             const spy = this.waas.instance.get = this.sandbox.spy();
             await new Ethereum(this.waas, nonHash).get();
