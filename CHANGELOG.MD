@@ -8,9 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 ### Changed
 
+## [1.0.0-beta.9]
+### Fixed
+* Fixed undefined hash parameter in ethereum transaction status request
+### Added
+### Changed
+
 ## [1.0.0-beta.8]
 ### Fixed
-- Fixed invalid ethereum data string in a failing E2E test
+* Fixed invalid ethereum data string in a failing E2E test
 ### Added
 * Supporting [WaaS 1.4](https://tangany.com/blog/release-notes-1-4/):
   * Ethereum and Bitcoin signing
