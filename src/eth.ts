@@ -32,7 +32,7 @@ export class Ethereum implements IWaasMethod {
      * @see [docs]{@link https://docs.tangany.com/?version=latest#5b262285-c8a0-4e36-8a41-4a2b1f0cdb1b}
      */
     public async get(): Promise<IEthereumTransactionStatus> {
-        return this.waas.wrap<IEthereumTransactionStatus>(() => this.waas.instance.get(`eth/transaction/${this.transactionHash}`));
+        return this.waas.wrap<IEthereumTransactionStatus>(() => this.waas.instance.get(`eth/transaction/${this.txHash}`));
     }
 
     /**
