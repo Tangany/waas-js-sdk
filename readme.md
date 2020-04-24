@@ -8,7 +8,7 @@
 node.js wrapper for [Tangany WaaS](https://tangany.com)
 
 [![NPM version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/package-badge.svg?sanitize=true)](https://www.npmjs.com/package/@tangany/waas)
-[![WaaS API version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/sdk-badge.svg?sanitize=true)](https://tangany.docs.stoplight.io/)
+[![WaaS API version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/sdk-badge.svg?sanitize=true)](https://docs.tangany.com/?version=latest)
 
 ## Getting started
 
@@ -68,6 +68,8 @@ vaultUrl | Tangany vault URL required for all wallet-based calls. Example: `http
 ethereumNetwork | Public Ethereum network to operate in (`mainnet`, `ropsten`) or private Ethereum network Custom RPC URL for a private Ethereum network to operate in (example: `http://somenetwork.example.org:8540`) | `mainnet` |
 ethereumTxConfirmations |  Amount of block confirmations required to consider an Ethereum transaction as valid. The levels correspond with following target block confirmations amounts (# of confirmations): `none`: 0, `default`: 1, `secure`: 12  | `default` |
 ethereumTxSpeed |  Additional gas fee that is added to the base gas fee for the given Ethereum network to speed up the mining process of the transaction. The usage of `none` value may result in the transaction never gets mined and is only intended to use for custom Ethereum networks that employ zero gas price policies. The speed levels correspond with following Ethereum fees (in gwei): `none`: 0, `slow`: 2, `default`: 5, `fast`: 15 | `default` |
+ethereumGasPrice | Enforces custom base transaction fee in wei. This prevents the dynamic gas price calculation by the network and nullifies `ethereumTxSpeed`. Example: `7000000000` | `auto` |
+useGasTank | Allows to pre-fund the transaction fee for the desired wallet transaction. Supported values: `false`, `true` | `false`
 bitcoinNetwork | Public Bitcoin network name. Supported networks: `bitcoin`, `testnet` | `bitcoin` |
 bitcoinTxConfirmations | Minimum amount of block confirmations required for Bitcoin balance outputs ("utxo", "coins") to be included in the total wallet balance calculation. The exclusion of unconfirmed outputs prevents the posthumous invalidation of own wallet transaction by the parent utxo sending party. The levels correspond with following target block confirmations amounts (# of confirmations): `none`: 0, `default`: 1, `secure`: 6 | `default` |
 bitcoinTxSpeed | Defines the target amount of blocks for the transaction to be included to the Bitcoin network. Faster inclusion requires a higher transaction fee. The fee is calculated in real time based on the network state and can be limited by the `header-bitcoin-max-fee-rate` option. The effective transaction delay can be calculated by multiplying the target confirmation blocks with the Bitcoin block time of 10 minutes (e.g. `slow` yields an block inclusion time of approx. 4h). The speed levels correspond with following block times (target blocks): `slow`: 24, `default`: 6, `fast`: 2 | `default` |
@@ -77,11 +79,8 @@ bitcoinMaxFeeRate | Defines the maximum allowed fee rate in satoshi per byte for
 For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2e.js))
 
 #### Wallet interface
-*Global wallet management*
-https://tangany.docs.stoplight.io/api/wallet/
-
+[*Global wallet management*](https://docs.tangany.com/?version=latest#39e3a3fe-42fa-4188-b64a-12d8258ad98d)
 ````javascript
-
 (async () => {
     const api = new Waas();
     // list all wallets
@@ -96,7 +95,7 @@ https://tangany.docs.stoplight.io/api/wallet/
 ````
 
 #### General Ethereum interface
-*Ethereum calls that are not wallet based*
+[*Ethereum calls that are not wallet based*](https://docs.tangany.com/?version=latest#7b314b47-012c-4baa-b928-dd32c7db1e41)
 ````javascript
 (async () => {
     const api = new Waas().eth(txHash);
@@ -108,21 +107,23 @@ https://tangany.docs.stoplight.io/api/wallet/
 ````
 
 #### Ethereum interface for wallet
-*Wallet based Ethereum calls*
-https://tangany.docs.stoplight.io/api/ethereum/
+[*Wallet based Ethereum calls*](https://docs.tangany.com/?version=latest#4a31e7ea-f62b-44db-81bd-b6802099955e)
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet");
     // send Ether
     const { hash } = await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
+    // send Ether asynchronously (see examples for request interface to retrieve status details)
+    const req = await api.eth().sendAsync({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
+    // create a signed transaction that can be manually transmitted
+    const { rawTransaction } = await api.eth().sign({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // get eth balance and wallet address
     const { currency, balance, address } = await api.eth().get();
 })();
 ````
 
 #### Ethereum ERC20 token interface for wallet
-*Wallet based calls for Ethereum ERC20 token management*
-https://tangany.docs.stoplight.io/api/ethereum-erc20
+[*Wallet based calls for Ethereum ERC20 token management*](https://docs.tangany.com/?version=latest#1cbcb11f-f2ca-4334-82b3-9729f4d5e7d8)
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet").eth().erc20(tokenAddress);
@@ -141,8 +142,21 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 })();
 ````
 
+#### Universal Ethereum Smart Contract interface for wallet
+[*Wallet based calls for universal smart contract token management*](https://docs.tangany.com/?version=9bc7df56-b03b-4b25-9697-59aea9774174#945c237f-5273-4e85-bf9d-1ba2b132df17)
+````javascript
+(async () => {
+    const api = new Waas().wallet("my-wallet").eth().contract(tokenAddress);
+    // send token asynchronously (see examples for request interface to retrieve status details)
+    const req = api.sendAsync({
+        function: "transfer(address,uint256)",
+        inputs: [someOtherWalletAddress, "2500000000000000"]
+    });
+})();
+````
+
 #### General Bitcoin interface
-*Bitcoin calls that are not wallet based*
+[*Bitcoin calls that are not wallet based*](https://docs.tangany.com/?version=latest#2fe57cbc-410e-4141-8161-fd335cfc05c8)
 ````javascript
 (async () => {
     const api = new Waas().btc(hash);
@@ -154,8 +168,7 @@ https://tangany.docs.stoplight.io/api/ethereum-erc20
 ````
 
 #### Bitcoin interface for wallet
-*Wallet based Bitcoin calls*
-https://tangany.docs.stoplight.io/api/bitcoin/
+[*Wallet based Bitcoin calls*](https://docs.tangany.com/?version=latest#11dafda1-03e7-4911-b18f-091e4e2dd94e)
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet");
@@ -165,8 +178,30 @@ https://tangany.docs.stoplight.io/api/bitcoin/
     const { hash } = await api.btc().send({to: someAddress, amount: "0.021"});
     // send BTC to multiple recipients
     await api.btc().send([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
+    // create a signed transaction that can be manually transmitted
+    const { rawTransaction } = await api.btc().sign({to: someAddress, amount: "0.021"});
     // get BTC balance and wallet address
     const { balance,address,currency } = await api.btc().get();
+})();
+````
+
+#### Request interface
+[*Calls to obtain the status of asynchronous requests*](https://docs.tangany.com/?version=9bc7df56-b03b-4b25-9697-59aea9774174#a6351116-3e2c-4f02-add8-d424c6212f60)
+````javascript
+(async () => {
+    const api = new Waas();
+    // execute an arbitrary call to an asynchronous endpoint
+    const req = await api.wallet("my-wallet").eth().sendAsync({to: someOtherWalletAddress, amount: "0.539"});
+    // retrieve status details
+    const { process, status, output } = await req.get();
+    // transaction hash is available in the status field as soon as the transaction is executed
+    const { hash } = status;
+    // once it is confirmed, further details are available as output of the request
+    if (process === "Completed") {
+        const { hash, blockNr, data, status } = output;
+    }
+    // obtain the status of a given request id
+    const anotherStatus = await api.request("a2e19473b9ec44cf97f71c9d4615e364").get();
 })();
 ````
 
@@ -196,7 +231,7 @@ DEBUG=waas-js-sdk:*
 ```
 
 ## API documentation
-Full API documentation is available at https://tangany.docs.stoplight.io/
+Full API documentation is available at https://docs.tangany.com
 
 ***
 <div align="center">

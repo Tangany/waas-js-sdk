@@ -4,7 +4,7 @@ const
 	, axios = require("axios")
 ;
 (async function () {
-	const { data: oas } = await axios.get("https://tangany.docs.stoplight.io/api/api.tangany.com.oas2.json");
+	const { data: oas } = await axios.get("https://cwstorecdn0.blob.core.windows.net/web/waas.oas3.json");
 	const version = oas.info.version;
 	if (!version) {
 		console.error(oas);

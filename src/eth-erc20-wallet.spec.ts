@@ -27,18 +27,6 @@ describe("EthErc20Wallet", function() {
         assert.throws(() => new EthErc20Wallet(this.waas, this.walletInstance, 123 as any));
     });
 
-    describe("wallet", function() {
-        it("should reject for missing wallet", async function() {
-            assert.throws(() => new EthErc20Wallet(this.waas, this.walletInstance, undefined as any).wallet);
-        });
-        it("should reject for invalid wallet", async function() {
-            assert.throws(() => new EthErc20Wallet(this.waas, this.walletInstance, console.log.bind(this) as any).wallet);
-        });
-        it("should return the wallet", async function() {
-            assert.strictEqual(new EthErc20Wallet(this.waas, this.walletInstance, sampleWallet).wallet, sampleWallet);
-        });
-    });
-
     describe("get", function() {
         it("should execute the api call", async function() {
             await new EthErc20Wallet(this.waas, this.walletInstance, sampleToken).get();

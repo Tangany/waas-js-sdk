@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Fixed
+- Fixed invalid ethereum data string in a failing E2E test
+### Added
+* Supporting [WaaS 1.4](https://tangany.com/blog/release-notes-1-4/):
+  * Ethereum and Bitcoin signing
+  * Asynchronous sending and request status
+  * Universal Ethereum smart contracts
+  * `ethereumGasPrice` & `useGasTank` header
+### Changed
+
 ## [1.0.0-beta.7]
 ### Fixed
 * Fixed the `Wallet` interface throwing a GeneralError instead of ConflictError on wallet naming conflicts

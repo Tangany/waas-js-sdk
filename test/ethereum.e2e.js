@@ -18,7 +18,7 @@ describe("WaaS sample Ethereum workflow", function () {
 	const tokenAddress = process.env.E2E_TOKEN; // mintable ERC20 token address
 	const tokenWallet = process.env.E2E_WALLET; // Wallet with some testnet balance that owns the mintable ERC20 token
 	const tokenAmount = "0.0032"; // Token amount used for transactions
-	const etherAmount = "0.001"; // Token amount used for transactions
+	const etherAmount = "0.001"; // Ether amount used for transactions
 	let tokenWalletAddress; // Token wallet address
 	let createdWallet; // Random created wallet name
 	let createdWalletAddress; // Created wallet address
@@ -149,6 +149,22 @@ describe("WaaS sample Ethereum workflow", function () {
 		});
 		console.log(`transaction made with txhash ${hash}. Waiting for the transaction to get mined...`);
 		await api.eth(hash).wait(timeout);
+	});
+
+	it("should interact with a smart contract using the universal contract endpoint", async function () {
+		const request = await api.wallet(tokenWallet).eth().contract(tokenAddress).sendAsync({
+			function: "transfer(address,uint256)",
+			inputs: [createdWalletAddress, "2500000000000000"]
+		});
+		console.log(`asynchronous transaction request '${request.id}' started. Waiting for the process to finish...`);
+	});
+
+	it("should create a signed transaction that can be manually transmitted", async function () {
+		const { rawTransaction } = await api.wallet(tokenWallet).eth().sign({
+			to: createdWalletAddress,
+			amount: etherAmount
+		});
+		console.log(`signing endpoint returned '${rawTransaction}'`);
 	});
 
 	it("should delete the new wallet", async function () {

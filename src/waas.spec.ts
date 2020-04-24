@@ -2,6 +2,7 @@ import * as assert from "assert";
 import {Bitcoin} from "./btc";
 import {AuthenticationError, ConflictError, GeneralError, NotFoundError} from "./errors";
 import {Ethereum} from "./eth";
+import {Request} from "./request"
 import {sandbox} from "./spec-helpers";
 import {
     BitcoinNetwork,
@@ -66,6 +67,8 @@ describe("Waas", function() {
     it("should throw for invalid options", function() {
         assert.throws(() => new Waas({...auth, vaultUrl: true} as any));
         assert.throws(() => new Waas({...auth, ethereumNetwork: 23} as any));
+        assert.throws(() => new Waas({...auth, ethereumGasPrice: 12345678} as any));
+        assert.throws(() => new Waas({...auth, useGasTank: "yes"} as any));
         assert.throws(() => new Waas({...auth, ethereumTxSpeed: eval} as any));
         assert.throws(() => new Waas({...auth, bitcoinNetwork: 1} as any));
         assert.throws(() => new Waas({...auth, bitcoinTxSpeed: Symbol} as any));
@@ -157,6 +160,13 @@ describe("Waas", function() {
         it("should return a Bitcoin instance", async function() {
             const w = new Waas(auth);
             assert.ok(w.btc() instanceof Bitcoin);
+        });
+    });
+
+    describe("request", function() {
+        it("should return a Request instance", function() {
+            const w = new Waas(auth);
+            assert.ok(w.request("71c4f385a4124239b6c968e47ea95f73") instanceof Request);
         });
     });
 })

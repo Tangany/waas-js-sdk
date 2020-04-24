@@ -60,4 +60,9 @@ describe("WaaS sample Bitcoin workflow", function () {
 		console.log("inital tx status", { confirmations, status, blockNr });
 		assert.notStrictEqual(status, "unknown");
 	});
+
+	it("should create a signed transaction that can be manually transmitted", async function () {
+		const { rawTransaction } = await noConfirmationsBtcApi.wallet(wallet).btc().sign(recipients);
+		console.log(`signing endpoint returned '${rawTransaction}'`);
+	});
 });

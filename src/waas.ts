@@ -7,6 +7,7 @@ import {AuthenticationError, ConflictError, GeneralError, MiningError, NotFoundE
 import {Ethereum} from "./eth";
 import {BlockchainTransactionStatuses, IBlockchainTransactionStatus, IWaasError} from "./interfaces";
 import {limiter} from "./limiter";
+import {Request} from "./request"
 import {Wallet} from "./wallet";
 import Timeout = NodeJS.Timeout;
 
@@ -63,6 +64,8 @@ interface IWaaSOptions {
     ethereumNetwork?: EthereumPublicNetwork | string;
     ethereumTxSpeed?: EthereumTxSpeed;
     ethereumTxConfirmations?: BlockchainTxConfirmations;
+    ethereumGasPrice?: string;
+    useGasTank?: boolean;
     bitcoinNetwork?: BitcoinNetwork;
     bitcoinTxConfirmations?: BlockchainTxConfirmations;
     bitcoinTxSpeed?: BitcoinTxSpeed;
@@ -92,10 +95,10 @@ export interface IWaitForTxStatus {
  * @param options.clientSecret - Subscription client secret
  * @param options.subscription - Subscription code
  * @param options.vaultUrl - Tangany vault url
- * @param options.ethereumNetwork - Public Ethereum network name (@see https://tangany.docs.stoplight.io/api/models/ethereum-public-network) or private Ethereum network url (@see https://tangany.docs.stoplight.io/api/models/ethereum-private-network)
+ * @param options.ethereumNetwork - Public Ethereum network name or private Ethereum network url
  * @param options.ethereumTxConfirmations - Amount of block confirmations required to consider an Ethereum transaction as valid
  * @param options.ethereumTxSpeed - Amount of additional gas fee that is added to the base gas fee for the given Ethereum network to speed up the mining process of the transaction
- * @param options.bitcoinNetwork - Public Bitcoin network name (@see https://tangany.docs.stoplight.io/api/models/bitcoin-network)
+ * @param options.bitcoinNetwork - Public Bitcoin network name
  * @param options.bitcoinTxConfirmations - Amount of block confirmations required for Bitcoin balance outputs to be included in the total wallet balance calculation
  * @param options.bitcoinTxSpeed - Target amount of block confirmations for the transaction to be included to the Bitcoin network
  * @param options.bitcoinMaxFeeRate - Maximum allowed fee rate in satoshi per byte for a Bitcoin transaction
@@ -195,6 +198,8 @@ export class Waas {
             vaultUrl: "?String",
             ethereumNetwork: "?String",
             ethereumTxSpeed: "?String",
+            ethereumGasPrice: "?String",
+            useGasTank: "?Boolean",
             bitcoinNetwork: "?String",
             bitcoinTxSpeed: "?String",
             bitcoinTxConfirmations: "?String",
@@ -235,6 +240,12 @@ export class Waas {
         }
         if (_options.ethereumTxSpeed) {
             api.headers["tangany-ethereum-tx-speed"] = _options.ethereumTxSpeed;
+        }
+        if (_options.ethereumGasPrice) {
+            api.headers["tangany-ethereum-gas-price"] = _options.ethereumGasPrice;
+        }
+        if (_options.useGasTank) {
+            api.headers["tangany-use-gas-tank"] = _options.useGasTank;
         }
         if (_options.bitcoinNetwork) {
             api.headers["tangany-bitcoin-network"] = _options.bitcoinNetwork;
@@ -350,6 +361,14 @@ export class Waas {
         const b = new Bitcoin(this, txHash);
 
         return b;
+    }
+
+    /**
+     * read api calls for asynchronous requests
+     * @param id - Unique identifier for an asynchronous request
+     */
+    public request(id: string): Request {
+        return new Request(this, id);
     }
 
     /**

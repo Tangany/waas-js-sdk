@@ -108,3 +108,32 @@ export interface IWaasError {
     activityId: string;
     message: string;
 }
+
+/**
+ * Represents the current state of an asynchronous request
+ */
+export interface IAsyncRequestStatus {
+    process: string,
+    status: {
+        stage: string,
+        [k: string]: string,
+    },
+    created: Date,
+    updated: Date,
+    output: null | { [k: string]: any }
+}
+
+/**
+ * Represents an RLP encoded transaction that is already signed
+ */
+export interface ITransmittableTransaction {
+    rawTransaction: string;
+}
+
+/**
+ * Represents the configuration of a Smart Contract method call
+ */
+export interface IContractMethod {
+    function: string,
+    inputs: string[],
+}
