@@ -3,7 +3,13 @@ import {BlockchainWallet} from "./blockchain-wallet"
 import {EthContractWallet} from "./eth-contract-wallet"
 import {Request} from "./request"
 import {ethereumRecipientType, Waas} from "./waas";
-import {IWalletBalance, ITransaction, IEthereumRecipient, ITransmittableTransaction} from "./interfaces";
+import {
+    IWalletBalance,
+    ITransaction,
+    IEthereumRecipient,
+    ITransmittableTransaction,
+    IAsyncEthereumTransactionOutput
+} from "./interfaces";
 import {EthErc20Wallet} from "./eth-erc20-wallet";
 import {Wallet} from "./wallet";
 
@@ -48,7 +54,7 @@ export class EthWallet extends BlockchainWallet {
      * @param recipient - {@link IEthereumRecipient}
      * @see [docs]{@link https://docs.tangany.com/?version=latest#29e9ed85-f4a1-42bc-88fa-8e1f96fb426f}
      */
-    public async sendAsync(recipient: IEthereumRecipient): Promise<Request> {
+    public async sendAsync(recipient: IEthereumRecipient): Promise<Request<IAsyncEthereumTransactionOutput>> {
         this.validateRecipient(recipient);
         const rawResponse = await this.waas.wrap<{ statusUri: string }>(() => this.waas.instance
             .post(`eth/wallet/${this.wallet}/send-async`, {
@@ -56,7 +62,7 @@ export class EthWallet extends BlockchainWallet {
             }),
         );
         const id = this.extractRequestId(rawResponse);
-        return new Request(this.waas, id);
+        return new Request<IAsyncEthereumTransactionOutput>(this.waas, id);
     }
 
     /**

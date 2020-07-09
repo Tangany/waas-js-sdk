@@ -8,7 +8,7 @@ import {IWaasMethod} from "./waas-method";
  * @param waas - {@link Waas} instance
  * @param id - Asynchronous request id
  */
-export class Request implements IWaasMethod {
+export class Request<T extends Record<string, any>> implements IWaasMethod {
 
     constructor(public waas: Waas, public readonly id: string) {
         // Make sure that the variable is set and has the correct type
@@ -19,7 +19,7 @@ export class Request implements IWaasMethod {
      * Retrieves the current status for a long-running asynchronous request
      * @see [docs]{@link https://docs.tangany.com/?version=latest#a6351116-3e2c-4f02-add8-d424c6212f60}
      */
-    public async get(): Promise<IAsyncRequestStatus> {
-        return this.waas.wrap<IAsyncRequestStatus>(() => this.waas.instance.get(`request/${this.id}`));
+    public async get(): Promise<IAsyncRequestStatus<T>> {
+        return this.waas.wrap<IAsyncRequestStatus<T>>(() => this.waas.instance.get(`request/${this.id}`));
     }
 }

@@ -367,8 +367,8 @@ export class Waas {
      * read api calls for asynchronous requests
      * @param id - Unique identifier for an asynchronous request
      */
-    public request(id: string): Request {
-        return new Request(this, id);
+    public request<T extends Record<string, any>>(id: string): Request<T> {
+        return new Request<T>(this, id);
     }
 
     /**

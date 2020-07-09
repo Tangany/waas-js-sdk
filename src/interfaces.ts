@@ -112,7 +112,7 @@ export interface IWaasError {
 /**
  * Represents the current state of an asynchronous request
  */
-export interface IAsyncRequestStatus {
+export interface IAsyncRequestStatus<T extends Record<string, any>> {
     process: string,
     status: {
         stage: string,
@@ -120,7 +120,17 @@ export interface IAsyncRequestStatus {
     },
     created: Date,
     updated: Date,
-    output: null | { [k: string]: any }
+    output: null | T
+}
+
+/**
+ * Represents the output of an asynchronous request for ethereum transactions
+ */
+export interface IAsyncEthereumTransactionOutput {
+    hash: string;
+    blockNr: number;
+    data: string;
+    status: string;
 }
 
 /**
