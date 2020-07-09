@@ -65,6 +65,7 @@ interface IWaaSOptions {
     ethereumTxSpeed?: EthereumTxSpeed;
     ethereumTxConfirmations?: BlockchainTxConfirmations;
     ethereumGasPrice?: string;
+    ethereumGas?: number;
     useGasTank?: boolean;
     bitcoinNetwork?: BitcoinNetwork;
     bitcoinTxConfirmations?: BlockchainTxConfirmations;
@@ -199,6 +200,7 @@ export class Waas {
             ethereumNetwork: "?String",
             ethereumTxSpeed: "?String",
             ethereumGasPrice: "?String",
+            ethereumGas: "?Number",
             useGasTank: "?Boolean",
             bitcoinNetwork: "?String",
             bitcoinTxSpeed: "?String",
@@ -243,6 +245,9 @@ export class Waas {
         }
         if (_options.ethereumGasPrice) {
             api.headers["tangany-ethereum-gas-price"] = _options.ethereumGasPrice;
+        }
+        if (_options.ethereumGas){
+            api.headers["tangany-ethereum-gas"] = _options.ethereumGas;
         }
         if (_options.useGasTank) {
             api.headers["tangany-use-gas-tank"] = _options.useGasTank;
