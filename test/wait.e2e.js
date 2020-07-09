@@ -17,7 +17,7 @@ describe("wait", function () {
 			ethereumNetwork: ETHEREUM_PUBLIC_NETWORK.ROPSTEN, // All tests execute on the ropsten testnet
 		};
 
-		it("should wait for a Ethereum tx", async function () {
+		it("should wait for a synchronous Ethereum tx", async function () {
 			this.timeout(60e3);
 
 			const api = new Waas(options);
@@ -32,7 +32,7 @@ describe("wait", function () {
 			await api.wallet(newWallet).delete();
 		});
 
-		it("should time out for a Ethereum tx", async function () {
+		it("should time out for a synchronous Ethereum tx", async function () {
 			this.timeout(20e3);
 
 			const api = new Waas(options);
@@ -86,4 +86,64 @@ describe("wait", function () {
 			await fastApi.wallet(newWallet).delete();
 		});
 	});
+
+	describe("Request", function () {
+
+		const options = {
+			ethereumNetwork: ETHEREUM_PUBLIC_NETWORK.ROPSTEN, // All tests execute on the ropsten testnet
+		};
+
+		it("should wait for an asynchronous request", async function () {
+			this.timeout(120e3);
+
+			const api = new Waas(options);
+
+			const { wallet: newWallet } = await api.wallet().create();
+			const { address: newWalletAddress } = await api.wallet(newWallet).eth().get();
+			// Use the asynchronous sending of Ethereum transactions as an example, because this returns a request object.
+			// One could also test it with any other method that returns this type.
+			const txReq = await api.wallet(wallet).eth().sendAsync({ to: newWalletAddress, amount: "0.0001" });
+
+			const success = await txReq.wait(60e3, 1e3);
+			console.log(success);
+
+			await api.wallet(newWallet).delete();
+		});
+
+		it("should wait for an asynchronous request with given id", async function () {
+
+			this.timeout(120e3);
+
+			const api = new Waas(options);
+			const { wallet: newWallet } = await api.wallet().create();
+			const { address: newWalletAddress } = await api.wallet(newWallet).eth().get();
+
+			// Perform an asynchronous Ethereum transaction to obtain a request ID.
+			// This could also be any other action that returns a request object.
+			const { id } = await api.wallet(wallet).eth().sendAsync({ to: newWalletAddress, amount: "0.0001" });
+
+			const success = await api.request(id).wait(60e3, 1e3);
+			console.log(success);
+
+			await api.wallet(newWallet).delete();
+		});
+
+		it("should time out for an asynchronous request", async function () {
+			this.timeout(20e3);
+
+			const api = new Waas(options);
+
+			const { wallet: newWallet } = await api.wallet().create();
+			const { address: newWalletAddress } = await api.wallet(newWallet).eth().get();
+			// Use the asynchronous sending of Ethereum transactions as an example, because this returns a request object.
+			// One could also test it with any other method that returns this type.
+			const txReq = await api.wallet(wallet).eth().sendAsync({ to: newWalletAddress, amount: "0.0001" });
+
+			await assert.rejects(async () => txReq.wait(1e3));
+
+			await api.wallet(newWallet).delete();
+		});
+
+	});
+
 });
