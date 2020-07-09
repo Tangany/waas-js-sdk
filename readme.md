@@ -113,6 +113,8 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet");
+    // estimate transaction fee
+    const {gas, gasPrice, fee} = await api.eth().estimateFee({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // send Ether
     const { hash } = await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // send Ether asynchronously (see examples for request interface to retrieve status details)
@@ -149,11 +151,14 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet").eth().contract(tokenAddress);
-    // send token asynchronously (see examples for request interface to retrieve status details)
-    const req = api.sendAsync({
+    const contractCall = {
         function: "transfer(address,uint256)",
         inputs: [someOtherWalletAddress, "2500000000000000"]
-    });
+    }
+    // estimate transaction fee
+    const {gas, gasPrice, fee} = await api.estimateFee(contractCall);
+    // send token asynchronously (see examples for request interface to retrieve status details)
+    const req = await api.sendAsync(contractCall);
 })();
 ````
 

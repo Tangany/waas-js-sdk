@@ -84,6 +84,15 @@ export interface IBitcoinTransactionEstimation {
 }
 
 /**
+ * Represents an Ethereum transaction estimation
+ */
+export interface IEthereumTransactionEstimation {
+    gas: string;
+    gasPrice: string;
+    fee: string;
+}
+
+/**
  * Represents a transaction recipient configuration
  * @param to - Recipient address
  * @param amount - Float currency amount formatted as a string

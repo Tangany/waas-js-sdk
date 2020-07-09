@@ -3,7 +3,13 @@ import {BlockchainWallet} from "./blockchain-wallet"
 import {EthContractWallet} from "./eth-contract-wallet"
 import {Request} from "./request"
 import {ethereumRecipientType, Waas} from "./waas";
-import {IWalletBalance, ITransaction, IEthereumRecipient, ITransmittableTransaction} from "./interfaces";
+import {
+    IEthereumRecipient,
+    IEthereumTransactionEstimation,
+    ITransaction,
+    ITransmittableTransaction,
+    IWalletBalance
+} from "./interfaces";
 import {EthErc20Wallet} from "./eth-erc20-wallet";
 import {Wallet} from "./wallet";
 
@@ -72,6 +78,18 @@ export class EthWallet extends BlockchainWallet {
                 ...recipient,
             }),
         );
+    }
+
+    /**
+     * Returns the fee estimation for a transaction with the given parameters.
+     * The fee estimation is based on the current ethereum network utilization and can fluctuate in random fashion.
+     * Thus the estimation cannot guarantee to match the actual transaction fee.
+     * @param recipient - {@link IEthereumRecipient}
+     */
+    public async estimateFee(recipient: IEthereumRecipient): Promise<IEthereumTransactionEstimation> {
+        this.validateRecipient(recipient);
+        return this.waas.wrap<IEthereumTransactionEstimation>(() => this.waas.instance
+            .post(`eth/wallet/${this.wallet}/estimate-fee`, recipient));
     }
 
     /**
