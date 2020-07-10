@@ -1,3 +1,4 @@
+import {EthereumContract} from "./eth-contract"
 import {wrapSearchRequest} from "./search-request-wrapper";
 import {IWaitForTxStatus, Waas} from "./waas";
 import {IEthereumTransactionStatus, ISearchTxQueryParams} from "./interfaces";
@@ -86,6 +87,14 @@ export class Ethereum implements IWaasMethod {
      */
     private async getTransactionDetails(txHash: string): Promise<IEthereumTransactionStatus> {
         return this.waas.wrap<IEthereumTransactionStatus>(() => this.waas.instance.get(`eth/transaction/${txHash}`));
+    }
+
+    /**
+     * Returns calls to interact with universal Ethereum smart contracts
+     * @param address - Smart contract address
+     */
+    public contract(address: string): EthereumContract {
+        return new EthereumContract(this.waas, address);
     }
 
 }

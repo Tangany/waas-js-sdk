@@ -178,8 +178,31 @@ export interface ISearchTxQueryParams {
     index?: string;
 }
 
+/**
+ * Query parameters describing filters to narrow down a search in all events of a contract.
+ * `hash` must contain lower case Ethereum transaction hash
+ * `blocknr` must be stringified numbers > "0"
+ * `event` must be a stringified event string like "approved"
+ * `index` must be >= "0" and `limit` must be within "1" and "100"
+ */
+export interface ISearchContractEventsQueryParams {
+    hash?: string;
+    blocknr?: string;
+    event?: string;
+    sort?: "event" | "eventdesc" | "blocknr" | "blocknrdesc" | "logindex" | "logindexdesc" | "timestamp" | "timestampdesc";
+    limit?: string;
+    index?: string;
+}
+
 export interface ISearchTxResponse extends ISearchResponse {
     list: ITxListItem[];
+}
+
+/**
+ * Same as {@link ISearchResponse} except an adjusted `list` property
+ */
+export interface ISearchContractEventsResponse extends ISearchResponse {
+    list: IContractEventListItem[];
 }
 
 /**
@@ -220,6 +243,18 @@ interface ITxListItem {
 
 interface ITxLinksItem extends ILinksItem {
     rel: "transaction";
+}
+
+/**
+ * Same as {@link ITxListItem} except  an `event` property instead of a `hash` property
+ */
+interface IContractEventListItem {
+    event: string;
+    links: IContractEventLinksItem[];
+}
+
+interface IContractEventLinksItem extends ILinksItem {
+    rel: "event";
 }
 
 /**

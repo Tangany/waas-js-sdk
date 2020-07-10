@@ -60,4 +60,16 @@ describe("Example workflow for reading Ethereum blockchain data", function () {
 		} while (currentResultPage !== null);
 	});
 
+	it("should read transaction events for a specific contract", async function () {
+		const ropstenApi = new Waas({ ethereumNetwork: EthereumPublicNetwork.ROPSTEN });
+		const events = await ropstenApi.eth()
+			.contract("0xa7a0faa59b29f94ccba78979b2b6980be3f98d7a")
+			.getEvents({ event: "CardsMinted", limit: 2 });
+		console.log(`${events.hits.total} results found. The first 2 are displayed below:`);
+		for (const elem of events.list) {
+			const details = await elem.get();
+			console.log(details);
+		}
+	});
+
 });

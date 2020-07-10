@@ -110,4 +110,13 @@ describe("Ethereum", function() {
             await assert.rejects(async () => e.wait(), /Some error/);
         });
     });
+
+    describe("contract", function() {
+        it("should return an EthereumContract instance", async function() {
+            const address = "0xC32AE45504Ee9482db99CfA21066A59E877Bc0e6";
+            const c = new Ethereum(this.waas).contract(address);
+            assert.strictEqual(c.address, address);
+        });
+    });
+
 });

@@ -174,6 +174,9 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const txDetails = next?.list[0].get();
     // Query transactions based on the current wallet context
     const walletTxs = await new Waas().wallet("my-wallet").eth().getTransactions({direction: "in", limit: 2});
+    // Read transaction events for a specific contract
+    const events = await api.contract(tokenAddress).getEvents({event: "Transfer", limit: 10});
+    const eventDetails = await events.list[0].get();
 })();
 ````
 

@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   * Options to set custom values for the amount of gas or nonce
   * Fee estimation for Ethereum (including the universal smart contract interface)
   * Explore Ethereum transactions with combinations of predefined filters
+  * Explore Ethereum smart contract events
 ### Changed
 
 ## [1.0.0-beta.9]
