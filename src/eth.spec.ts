@@ -3,7 +3,7 @@ import axios from "axios";
 import {MiningError, TimeoutError} from "./errors";
 import {isBitcoinMiningErrorData} from "./errors/mining-error";
 import {Ethereum} from "./eth";
-import {IEthereumTransactionStatus} from "./interfaces";
+import {IEthereumTransactionStatus, ISearchTxResponse} from "./interfaces";
 import {sandbox} from "./spec-helpers";
 import {Waas} from "./waas";
 
@@ -52,6 +52,25 @@ describe("Ethereum", function() {
             const spy = this.waas.instance.get = this.sandbox.spy();
             await new Ethereum(this.waas, nonHash).get();
             assert.strictEqual(spy.callCount, 1);
+        });
+    });
+
+    // The method only calls the general function for wrapping search queries and this is tested in detail separately anyway.
+    describe("getTransactions", function() {
+        it("should execute the api call", async function() {
+            const sampleResponse: ISearchTxResponse = {
+                hits: {total: 4},
+                list: [
+                    {
+                        hash: "0x531ac2cc55a58171697136a63f2ff63d2a6f44ea0e706dbc3889a8a0b9b6ef6f",
+                        links: [{type: "GET", href: "/eth/transaction/1", rel: "transaction"}]
+                    },
+                ],
+                links: {next: null, previous: null}
+            };
+            const stub = this.waas.instance.get = this.sandbox.stub().resolves(sampleResponse);
+            await new Ethereum(this.waas).getTransactions();
+            assert.ok(stub.calledOnce);
         });
     });
 

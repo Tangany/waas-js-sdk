@@ -162,6 +162,22 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 })();
 ````
 
+#### Ethereum interface for blockchain search queries
+````javascript
+(async () => {
+    const api = new Waas().eth();
+    // Receive the result object for the specified search request
+    const transactions = await api.getTransactions({blocknr: 10430231, sort: "valuedesc", limit: 15});
+    // Use pagination to query further results (if available)
+    const next = await transactions.next();
+    // Query the details of a transaction
+    const txDetails = next?.list[0].get();
+    // Query transactions based on the current wallet context
+    const walletTxs = await new Waas().wallet("my-wallet").eth().getTransactions({direction: "in", limit: 2});
+})();
+````
+
+
 #### General Bitcoin interface
 [*Bitcoin calls that are not wallet based*](https://docs.tangany.com/?version=latest#2fe57cbc-410e-4141-8161-fd335cfc05c8)
 ````javascript

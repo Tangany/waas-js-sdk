@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 * Supporting [WaaS 1.5](https://tangany.com/blog/release-notes-1-5/):
   * Options to set custom values for the amount of gas or nonce
   * Fee estimation for Ethereum (including the universal smart contract interface)
+  * Explore Ethereum transactions with combinations of predefined filters
 ### Changed
 
 ## [1.0.0-beta.9]

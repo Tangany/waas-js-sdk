@@ -1,16 +1,20 @@
 import * as t from "typeforce";
 import {BlockchainWallet} from "./blockchain-wallet"
+import {ISearchItemData} from "./eth";
 import {EthContractWallet} from "./eth-contract-wallet"
 import {Request} from "./request"
 import {ethereumRecipientType, Waas} from "./waas";
 import {
     IEthereumRecipient,
     IEthereumTransactionEstimation,
+    IEthereumTransactionStatus,
+    ISearchTxQueryParams,
     ITransaction,
     ITransmittableTransaction,
     IWalletBalance
 } from "./interfaces";
 import {EthErc20Wallet} from "./eth-erc20-wallet";
+import {wrapSearchRequest} from "./search-request-wrapper";
 import {Wallet} from "./wallet";
 
 /**
@@ -90,6 +94,16 @@ export class EthWallet extends BlockchainWallet {
         this.validateRecipient(recipient);
         return this.waas.wrap<IEthereumTransactionEstimation>(() => this.waas.instance
             .post(`eth/wallet/${this.wallet}/estimate-fee`, recipient));
+    }
+
+    /**
+     * Queries a list of transactions in the context of the current wallet. The exact query is specified with the parameters passed.
+     * @param queryParams
+     */
+    public async getTransactions(queryParams: ISearchTxQueryParams = {}) {
+        return wrapSearchRequest<IEthereumTransactionStatus, ISearchItemData>(
+            this.waas, `eth/wallet/${this.wallet}/transactions`,
+            queryParams);
     }
 
     /**

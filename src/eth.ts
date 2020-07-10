@@ -1,7 +1,12 @@
+import {wrapSearchRequest} from "./search-request-wrapper";
 import {IWaitForTxStatus, Waas} from "./waas";
-import {IEthereumTransactionStatus} from "./interfaces";
+import {IEthereumTransactionStatus, ISearchTxQueryParams} from "./interfaces";
 import * as t from "typeforce";
 import {IWaasMethod} from "./waas-method";
+
+export interface ISearchItemData {
+    hash: string
+}
 
 /**
  * Instantiates a new Ethereum interface
@@ -16,8 +21,7 @@ export class Ethereum implements IWaasMethod {
 
     get txHash() {
         t("String", this.transactionHash);
-
-        return this.transactionHash;
+        return this.transactionHash!;
     }
 
     /**
@@ -32,7 +36,16 @@ export class Ethereum implements IWaasMethod {
      * @see [docs]{@link https://docs.tangany.com/?version=latest#5b262285-c8a0-4e36-8a41-4a2b1f0cdb1b}
      */
     public async get(): Promise<IEthereumTransactionStatus> {
-        return this.waas.wrap<IEthereumTransactionStatus>(() => this.waas.instance.get(`eth/transaction/${this.txHash}`));
+        return this.getTransactionDetails(this.txHash);
+    }
+
+    /**
+     * Queries a list of transactions based on passed filter criteria.
+     * @param [queryParams]
+     */
+    public async getTransactions(queryParams: ISearchTxQueryParams = {}) {
+        // Use a custom return object to provide convenient methods instead of the URLs that the user would have to process himself.
+        return wrapSearchRequest<IEthereumTransactionStatus, ISearchItemData>(this.waas, "eth/transactions", queryParams);
     }
 
     /**
@@ -66,4 +79,13 @@ export class Ethereum implements IWaasMethod {
 
         return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IEthereumTransactionStatus>;
     }
+
+    /**
+     * Queries the details for a given transaction hash.
+     * @param txHash - Either the transaction hash of this object instance or any other
+     */
+    private async getTransactionDetails(txHash: string): Promise<IEthereumTransactionStatus> {
+        return this.waas.wrap<IEthereumTransactionStatus>(() => this.waas.instance.get(`eth/transaction/${txHash}`));
+    }
+
 }
