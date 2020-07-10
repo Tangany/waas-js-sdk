@@ -64,6 +64,16 @@ export interface IEthereumTransactionStatus {
     status: BlockchainTransactionStatuses;
     confirmations: number | null;
     data: string | null;
+    from: string | null;
+    to: string | null;
+    contractCreation: string | null;
+    gasPrice: string | null;
+    gas: number | null;
+    gasUsed: number | null;
+    nonce: number | null;
+    value: string | null;
+    timestamp: number | null;
+    transactionIndex: number | null;
 }
 
 /**
