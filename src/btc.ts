@@ -22,7 +22,7 @@ export class Bitcoin implements IWaasMethod {
 
     /**
      * Returns the status for a Bitcoin transaction
-     * @see [docs]{@link https://docs.tangany.com/?version=latest#e9f7074c-50ea-432c-8835-1d278ad68f1c}
+     * @see [docs]{@link https://docs.tangany.com/#e9f7074c-50ea-432c-8835-1d278ad68f1c}
      */
     public async get(): Promise<IBitcoinTransactionStatus> {
         return this.waas.wrap<IBitcoinTransactionStatus>(() => this.waas.instance.get(`btc/transaction/${this.txHash}`));

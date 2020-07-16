@@ -21,7 +21,7 @@ export class EthWallet extends BlockchainWallet {
 
     /**
      * Returns wallet metrics for the Ethereum blockchain like ether balance and the address
-     * @see [docs]{@link https://docs.tangany.com/?version=latest#0d926cca-e0bd-4045-864d-18845425adfe}
+     * @see [docs]{@link https://docs.tangany.com/#0d926cca-e0bd-4045-864d-18845425adfe}
      */
     public async get(): Promise<IWalletBalance> {
         return this.waas.wrap<IWalletBalance>(() => this.waas.instance
@@ -32,7 +32,7 @@ export class EthWallet extends BlockchainWallet {
     /**
      * Sends Ether to address from given wallet
      * @param recipient - {@link IEthereumRecipient}
-     * @see [docs]{@link https://docs.tangany.com/?version=latest#1d76974c-579a-47aa-9912-c7cfddf55889}
+     * @see [docs]{@link https://docs.tangany.com/#1d76974c-579a-47aa-9912-c7cfddf55889}
      */
     public async send(recipient: IEthereumRecipient): Promise<ITransaction> {
         this.validateRecipient(recipient);
@@ -46,7 +46,7 @@ export class EthWallet extends BlockchainWallet {
     /**
      * Sends Ether to address from given wallet *asynchronously*
      * @param recipient - {@link IEthereumRecipient}
-     * @see [docs]{@link https://docs.tangany.com/?version=latest#29e9ed85-f4a1-42bc-88fa-8e1f96fb426f}
+     * @see [docs]{@link https://docs.tangany.com/#29e9ed85-f4a1-42bc-88fa-8e1f96fb426f}
      */
     public async sendAsync(recipient: IEthereumRecipient): Promise<Request> {
         this.validateRecipient(recipient);
@@ -63,7 +63,7 @@ export class EthWallet extends BlockchainWallet {
      * Creates an RLP encoded transaction that is already signed and can be manually transmitted
      * to compatible blockchain networks at a later stage.
      * @param recipient - {@link IEthereumRecipient}
-     * @see [docs]{@link https://docs.tangany.com/?version=latest#925fd26a-daff-4321-9595-8509dd2ed6b3}
+     * @see [docs]{@link https://docs.tangany.com/#925fd26a-daff-4321-9595-8509dd2ed6b3}
      */
     public async sign(recipient: IEthereumRecipient): Promise<ITransmittableTransaction> {
         this.validateRecipient(recipient);
