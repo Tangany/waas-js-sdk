@@ -82,4 +82,12 @@ describe("Bitcoin", function() {
                 });
         });
     });
+
+    describe("getStatus", function() {
+        it("should execute the api call", async function() {
+            const spy = this.waas.instance.get = this.sandbox.spy();
+            await new Bitcoin(this.waas, nonHash).get();
+            assert.strictEqual(spy.callCount, 1);
+        });
+    });
 });

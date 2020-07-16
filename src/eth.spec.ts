@@ -119,6 +119,14 @@ describe("Ethereum", function() {
         });
     });
 
+    describe("getStatus", function() {
+        it("should execute the api call", async function() {
+            const spy = this.waas.instance.get = this.sandbox.spy();
+            await new Ethereum(this.waas, nonHash).get();
+            assert.strictEqual(spy.callCount, 1);
+        });
+    });
+
     describe("contract", function() {
         it("should return an EthereumContract instance", async function() {
             const address = "0xC32AE45504Ee9482db99CfA21066A59E877Bc0e6";

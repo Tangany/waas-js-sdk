@@ -233,6 +233,18 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 })();
 ````
 
+#### Node status
+Get status information about the [Bitcoin](https://docs.tangany.com/#15f3dbb7-84b6-4828-b866-52255f72b2bc)
+or [Ethereum](https://docs.tangany.com/#cb2713db-04dc-4003-94f7-b6eeb021a5ad) full node
+````javascript
+(async () => {
+    const api = new Waas();
+    const ethStatus = await api.eth().getStatus();
+    const btcStatus = await api.btc().getStatus();
+})();
+````
+
+
 ## Affinity Cookies
 WaaS employs its own load-balanced full-node backend to transmit transactions to the blockchains. Due to the nature of blockchain, full nodes sync their states only in the event of a new block. One implication of this behavior is that sending multiple transactions from the same wallet during a time frame of a single block may lead to an overlap of backend memory pool assignments which subsequent may result in transactions being cancelled and discarded from the blockchain.
 

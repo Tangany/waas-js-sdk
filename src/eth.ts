@@ -1,7 +1,7 @@
 import {EthereumContract} from "./eth-contract"
 import {wrapSearchRequest} from "./search-request-wrapper";
 import {IWaitForTxStatus, Waas} from "./waas";
-import {IEthereumTransactionStatus, ISearchTxEventResponse, ISearchTxQueryParams} from "./interfaces";
+import {IEthereumTransactionStatus, IEthStatus, ISearchTxEventResponse, ISearchTxQueryParams} from "./interfaces";
 import * as t from "typeforce";
 import {IWaasMethod} from "./waas-method";
 
@@ -88,6 +88,15 @@ export class Ethereum implements IWaasMethod {
             });
 
         return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IEthereumTransactionStatus>;
+    }
+
+    /**
+     * Get status and information about Ethereum full-node.
+     * The status faulty indicates that one or more info properties are missing.
+     * The status unavailable is returned if all info properties are missing.
+     */
+    public async getStatus(): Promise<IEthStatus>{
+        return this.waas.wrap<IEthStatus>(() => this.waas.instance.get(`eth/status`));
     }
 
     /**

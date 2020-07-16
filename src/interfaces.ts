@@ -1,6 +1,7 @@
 import {WalletSecurity, WalletVersion} from "./waas";
 
 export type BlockchainTransactionStatuses = "unknown" | "pending" | "confirmed" | "error";
+type NodeStatus = "live" | "unavailable" | "faulty";
 
 /**
  * Represents the response of a ERC20 token wallet balance
@@ -280,3 +281,32 @@ interface IEventInput {
 }
 
 /* ----------- END OF INTERFACES FOR SEARCH REQUESTS ----------- */
+
+export interface IEthStatus {
+    status: NodeStatus;
+    info: IEthStatusInfo;
+}
+
+interface IEthStatusInfo {
+    peerCount: number | null;
+    protocolVersion: string | null;
+    blockNumber: number | null;
+    chainId: number | null;
+    gasPrice: number | null;
+}
+
+export interface IBtcStatus {
+    status: NodeStatus;
+    info: IBtcNodeGetInfo;
+}
+
+interface IBtcNodeGetInfo {
+    version: number | null;
+    protocolversion: number | null;
+    blocks: number | null;
+    timeoffset: number | null;
+    connections: number | null;
+    difficulty: number | null;
+    testnet: boolean | null;
+    relayfee: number | null;
+}
