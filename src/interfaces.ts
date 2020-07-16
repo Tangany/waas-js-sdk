@@ -83,6 +83,7 @@ export interface IEthereumTransactionStatus {
 export interface IBitcoinTransactionStatus {
     status: BlockchainTransactionStatuses;
     confirmations: number | null;
+    blockHash: string | null;
     blockNr: number | null;
 }
 

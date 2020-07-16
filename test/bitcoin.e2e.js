@@ -56,9 +56,9 @@ describe("WaaS sample Bitcoin workflow", function () {
 
 	it("should fetch the tx details", async function () {
 		assert.ok(lastHash, "cannot run without previous tests");
-		const { confirmations, status, blockNr } = await noConfirmationsBtcApi.btc(lastHash).get();
-		console.log("inital tx status", { confirmations, status, blockNr });
-		assert.notStrictEqual(status, "unknown");
+		const details = await noConfirmationsBtcApi.btc(lastHash).get();
+		console.log("initial tx status:", JSON.stringify(details, null, 2));
+		assert.notStrictEqual(details.status, "unknown");
 	});
 
 	it("should create a signed transaction that can be manually transmitted", async function () {
