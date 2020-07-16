@@ -1,6 +1,5 @@
 import * as t from "typeforce";
 import {BtcWallet} from "./btc-wallet";
-import {ConflictError, GeneralError} from "./errors";
 import {EthWallet} from "./eth-wallet";
 import {ISoftDeletedWallet, IWallet, IWalletList} from "./interfaces";
 import {Waas} from "./waas";
@@ -51,22 +50,7 @@ export class Wallet implements IWaasMethod {
         t("?String", wallet);
         t("?Boolean", useHsm);
 
-        return this.waas
-            .wrap<IWallet>(() => this.waas.instance
-                .post("wallet", {
-                    wallet,
-                    useHsm,
-                })
-            )
-            .catch(e => {
-                if (e.status === 409) {
-                    throw new ConflictError(e.message);
-                }
-
-                throw new GeneralError(e.message, e.status);
-            })
-            ;
-
+        return this.waas.wrap<IWallet>(() => this.waas.instance.post("wallet", {wallet, useHsm,}));
     }
 
     /**
