@@ -177,6 +177,8 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     // Read transaction events for a specific contract
     const events = await api.contract(tokenAddress).getEvents({event: "Transfer", limit: 10});
     const eventDetails = await events.list[0].get();
+    // Read an individual event
+    const event = await new Waas().eth(txHash).getEvent(logIndex);
 })();
 ````
 

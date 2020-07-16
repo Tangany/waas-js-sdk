@@ -1,7 +1,7 @@
 import {EthereumContract} from "./eth-contract"
 import {wrapSearchRequest} from "./search-request-wrapper";
 import {IWaitForTxStatus, Waas} from "./waas";
-import {IEthereumTransactionStatus, ISearchTxQueryParams} from "./interfaces";
+import {IEthereumTransactionStatus, ISearchTxEventResponse, ISearchTxQueryParams} from "./interfaces";
 import * as t from "typeforce";
 import {IWaasMethod} from "./waas-method";
 
@@ -47,6 +47,15 @@ export class Ethereum implements IWaasMethod {
     public async getTransactions(queryParams: ISearchTxQueryParams = {}) {
         // Use a custom return object to provide convenient methods instead of the URLs that the user would have to process himself.
         return wrapSearchRequest<IEthereumTransactionStatus, ISearchItemData>(this.waas, "eth/transactions", queryParams);
+    }
+
+    /**
+     * Returns details of the event corresponding to the passed log index of the current transaction hash.
+     * @param index - Log index of the event that can be obtained by
+     */
+    public async getEvent(index: number): Promise<ISearchTxEventResponse> {
+        return this.waas.wrap<ISearchTxEventResponse>(
+            () => this.waas.instance.get(`/eth/transaction/${this.txHash}/event/${index}`));
     }
 
     /**

@@ -74,6 +74,14 @@ describe("Ethereum", function() {
         });
     });
 
+    describe("getEvent", function() {
+        it("should execute the api call", async function() {
+            const spy = this.waas.instance.get = this.sandbox.spy();
+            await new Ethereum(this.waas, nonHash).get();
+            assert.strictEqual(spy.callCount, 1);
+        });
+    });
+
     describe("wait", function() {
         it("should timeout for non-existent transaction", async function() {
             const e = new Ethereum(this.waas, nonHash);

@@ -72,4 +72,13 @@ describe("Example workflow for reading Ethereum blockchain data", function () {
 		}
 	});
 
+	it("should read a specific event for given transaction and index", async function () {
+		const ropstenApi = new Waas({ ethereumNetwork: EthereumPublicNetwork.ROPSTEN });
+		const txHash = "0x5b70ad23e5534bb989b32a547fef5218f7be3461d0155e9c679c3eba352bc20e";
+		const logIndex = 96;
+		const e = await ropstenApi.eth(txHash).getEvent(logIndex);
+		console.log(`Event details for log index ${logIndex} of ${txHash}:`);
+		console.log(e);
+	});
+
 });
