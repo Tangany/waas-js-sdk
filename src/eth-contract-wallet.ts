@@ -20,7 +20,7 @@ export class EthContractWallet extends BlockchainWallet {
     /**
      * Executes known methods of arbitrary Ethereum smart contracts
      * @param config - Smart Contract method configuration
-     * @see [docs]{@link https://docs.tangany.com/?version=latest#945c237f-5273-4e85-bf9d-1ba2b132df17}
+     * @see [docs]{@link https://docs.tangany.com/#945c237f-5273-4e85-bf9d-1ba2b132df17}
      */
     public async sendAsync(config: IContractMethod): Promise<Request> {
         const rawResponse = await this.waas.wrap<{ statusUri: string }>(() => this.waas.instance

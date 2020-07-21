@@ -17,7 +17,7 @@ export class Request implements IWaasMethod {
 
     /**
      * Retrieves the current status for a long-running asynchronous request
-     * @see [docs]{@link https://docs.tangany.com/?version=latest#a6351116-3e2c-4f02-add8-d424c6212f60}
+     * @see [docs]{@link https://docs.tangany.com/#a6351116-3e2c-4f02-add8-d424c6212f60}
      */
     public async get(): Promise<IAsyncRequestStatus> {
         return this.waas.wrap<IAsyncRequestStatus>(() => this.waas.instance.get(`request/${this.id}`));

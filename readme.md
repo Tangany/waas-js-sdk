@@ -79,7 +79,7 @@ bitcoinMaxFeeRate | Defines the maximum allowed fee rate in satoshi per byte for
 For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2e.js))
 
 #### Wallet interface
-[*Global wallet management*](https://docs.tangany.com/?version=latest#39e3a3fe-42fa-4188-b64a-12d8258ad98d)
+[*Global wallet management*](https://docs.tangany.com/#39e3a3fe-42fa-4188-b64a-12d8258ad98d)
 ````javascript
 (async () => {
     const api = new Waas();
@@ -95,7 +95,7 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````
 
 #### General Ethereum interface
-[*Ethereum calls that are not wallet based*](https://docs.tangany.com/?version=latest#7b314b47-012c-4baa-b928-dd32c7db1e41)
+[*Ethereum calls that are not wallet based*](https://docs.tangany.com/#7b314b47-012c-4baa-b928-dd32c7db1e41)
 ````javascript
 (async () => {
     const api = new Waas().eth(txHash);
@@ -107,7 +107,7 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````
 
 #### Ethereum interface for wallet
-[*Wallet based Ethereum calls*](https://docs.tangany.com/?version=latest#4a31e7ea-f62b-44db-81bd-b6802099955e)
+[*Wallet based Ethereum calls*](https://docs.tangany.com/#4a31e7ea-f62b-44db-81bd-b6802099955e)
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet");
@@ -123,7 +123,7 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````
 
 #### Ethereum ERC20 token interface for wallet
-[*Wallet based calls for Ethereum ERC20 token management*](https://docs.tangany.com/?version=latest#1cbcb11f-f2ca-4334-82b3-9729f4d5e7d8)
+[*Wallet based calls for Ethereum ERC20 token management*](https://docs.tangany.com/#1cbcb11f-f2ca-4334-82b3-9729f4d5e7d8)
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet").eth().erc20(tokenAddress);
@@ -143,7 +143,7 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````
 
 #### Universal Ethereum Smart Contract interface for wallet
-[*Wallet based calls for universal smart contract token management*](https://docs.tangany.com/?version=9bc7df56-b03b-4b25-9697-59aea9774174#945c237f-5273-4e85-bf9d-1ba2b132df17)
+[*Wallet based calls for universal smart contract token management*](https://docs.tangany.com/#945c237f-5273-4e85-bf9d-1ba2b132df17)
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet").eth().contract(tokenAddress);
@@ -156,7 +156,7 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````
 
 #### General Bitcoin interface
-[*Bitcoin calls that are not wallet based*](https://docs.tangany.com/?version=latest#2fe57cbc-410e-4141-8161-fd335cfc05c8)
+[*Bitcoin calls that are not wallet based*](https://docs.tangany.com/#2fe57cbc-410e-4141-8161-fd335cfc05c8)
 ````javascript
 (async () => {
     const api = new Waas().btc(hash);
@@ -168,7 +168,7 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````
 
 #### Bitcoin interface for wallet
-[*Wallet based Bitcoin calls*](https://docs.tangany.com/?version=latest#11dafda1-03e7-4911-b18f-091e4e2dd94e)
+[*Wallet based Bitcoin calls*](https://docs.tangany.com/#11dafda1-03e7-4911-b18f-091e4e2dd94e)
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet");
@@ -186,7 +186,7 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````
 
 #### Request interface
-[*Calls to obtain the status of asynchronous requests*](https://docs.tangany.com/?version=9bc7df56-b03b-4b25-9697-59aea9774174#a6351116-3e2c-4f02-add8-d424c6212f60)
+[*Calls to obtain the status of asynchronous requests*](https://docs.tangany.com/#a6351116-3e2c-4f02-add8-d424c6212f60)
 ````javascript
 (async () => {
     const api = new Waas();
