@@ -313,15 +313,16 @@ export class Waas {
                     message,
                 });
 
+                const {message: waasMessage, activityId} = response.data;
                 switch (e.response.status) {
                     case 401:
-                        throw new AuthenticationError(response.data.message);
+                        throw new AuthenticationError(waasMessage, activityId);
                     case 409:
-                        throw new ConflictError(response.data.message);
+                        throw new ConflictError(waasMessage, activityId);
                     case 404:
-                        throw new NotFoundError(response.data.message);
+                        throw new NotFoundError(waasMessage);
                     default:
-                        throw new GeneralError(response.data.message, response.status);
+                        throw new GeneralError(waasMessage, response.status, activityId);
                 }
 
             });
