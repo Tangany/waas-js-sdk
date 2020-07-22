@@ -31,6 +31,9 @@ export async function poll<T>(fn: () => Promise<T>, validationFn: (result: T) =>
                     return resolve(response);
                 }
             } catch (e) {
+                // clear all timers before rejecting
+                clearTimeout(globalTimeout);
+                clearInterval(intervalTimer);
                 return reject(e);
             }
         }, pollingInterval);
