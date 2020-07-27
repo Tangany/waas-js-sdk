@@ -18,7 +18,7 @@ describe("wait", function () {
 		};
 
 		it("should wait for a synchronous Ethereum tx", async function () {
-			this.timeout(60e3);
+			this.timeout(180e3);
 
 			const api = new Waas(options);
 
@@ -26,14 +26,14 @@ describe("wait", function () {
 			const { address: newWalletAddress } = await api.wallet(newWallet).eth().get();
 			const { hash } = await api.wallet(wallet).eth().send({ to: newWalletAddress, amount: "0.000128" });
 
-			const response = await api.eth(hash).wait(50e3);
+			const response = await api.eth(hash).wait(120e3);
 			console.log(response);
 
 			await api.wallet(newWallet).delete();
 		});
 
 		it("should time out for a synchronous Ethereum tx", async function () {
-			this.timeout(20e3);
+			this.timeout(60e3);
 
 			const api = new Waas(options);
 
@@ -72,7 +72,7 @@ describe("wait", function () {
 		});
 
 		it("should time out for a Bitcoin tx", async function () {
-			this.timeout(20e3);
+			this.timeout(60e3);
 
 			const fastApi = new Waas(options);
 			const safeApi = new Waas({ ...options, bitcoinTxConfirmations: BITCOIN_TX_CONFIRMATIONS.SECURE });
@@ -92,9 +92,9 @@ describe("wait", function () {
 		const options = {
 			ethereumNetwork: ETHEREUM_PUBLIC_NETWORK.ROPSTEN, // All tests execute on the ropsten testnet
 		};
+		this.timeout(160e3);
 
 		it("should wait for an asynchronous request", async function () {
-			this.timeout(120e3);
 
 			const api = new Waas(options);
 
@@ -104,15 +104,13 @@ describe("wait", function () {
 			// One could also test it with any other method that returns this type.
 			const txReq = await api.wallet(wallet).eth().sendAsync({ to: newWalletAddress, amount: "0.0001" });
 
-			const success = await txReq.wait(60e3, 1e3);
+			const success = await txReq.wait(120e3, 1e3);
 			console.log(success);
 
 			await api.wallet(newWallet).delete();
 		});
 
 		it("should wait for an asynchronous request with given id", async function () {
-
-			this.timeout(120e3);
 
 			const api = new Waas(options);
 			const { wallet: newWallet } = await api.wallet().create();
@@ -122,14 +120,14 @@ describe("wait", function () {
 			// This could also be any other action that returns a request object.
 			const { id } = await api.wallet(wallet).eth().sendAsync({ to: newWalletAddress, amount: "0.0001" });
 
-			const success = await api.request(id).wait(60e3, 1e3);
+			const success = await api.request(id).wait(120e3, 1e3);
 			console.log(success);
 
 			await api.wallet(newWallet).delete();
 		});
 
 		it("should time out for an asynchronous request", async function () {
-			this.timeout(20e3);
+			this.timeout(60e3);
 
 			const api = new Waas(options);
 
