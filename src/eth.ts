@@ -1,4 +1,4 @@
-import {IWaitForTxStatus, Waas} from "./waas";
+import {Waas} from "./waas";
 import {IEthereumTransactionStatus} from "./interfaces";
 import * as t from "typeforce";
 import {IWaasMethod} from "./waas-method";
@@ -45,24 +45,6 @@ export class Ethereum implements IWaasMethod {
 
         const call = async () => this
             .get()
-            .then((res: IEthereumTransactionStatus) => {
-
-                let status: IWaitForTxStatus["status"];
-
-                // tslint:disable-next-line:prefer-conditional-expression
-                if (typeof res.blockNr === "number") {
-                    status = "confirmed";
-                } else if (res.isError) {
-                    status = "error";
-                } else {
-                    status = "pending";
-                }
-
-                return {
-                    status,
-                    response: res,
-                };
-            });
 
         return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IEthereumTransactionStatus>;
     }

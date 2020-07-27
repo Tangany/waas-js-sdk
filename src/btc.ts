@@ -42,13 +42,7 @@ export class Bitcoin implements IWaasMethod {
      * @param [ms] - milliseconds delay between api polling attempts
      */
     public async wait(timeout = 20e3, ms = 8e2): Promise<IBitcoinTransactionStatus> {
-        const call = () => this.get().then((s: IBitcoinTransactionStatus) => {
-
-            return {
-                status: s.status,
-                response: s,
-            };
-        });
+        const call = () => this.get()
 
         return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IBitcoinTransactionStatus>;
     }
