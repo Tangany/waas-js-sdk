@@ -1,5 +1,7 @@
 import * as assert from "assert";
 import axios from "axios";
+import {TimeoutError} from "./errors"
+import {IAsyncEthereumTransactionOutput, IAsyncRequestStatus} from "./interfaces"
 import {Request} from "./request";
 import {sandbox} from "./spec-helpers";
 import {Waas} from "./waas";
@@ -29,5 +31,53 @@ describe("Request", function() {
             await new Request(this.waas, sampleRequestId).get();
             assert.strictEqual(spy.callCount, 1);
         });
+    });
+
+    // The underlying method for polling is also tested separately anyway.
+    describe("wait", function() {
+
+        it("should resolve for a completed request", async function() {
+            const r = new Request(this.waas, sampleRequestId);
+            const sampleReq: IAsyncRequestStatus<IAsyncEthereumTransactionOutput> = {
+                process: "Completed",
+                status: {
+                    stage: "transaction confirmed",
+                },
+                output: {
+                    hash: "0x9f4eb3fe6da8377f5316b2c2103583e88730d273a318459098867fd8ad417d43",
+                    blockNr: 7675874,
+                    data: "0xf00ba7",
+                    status: "confirmed"
+                },
+                created: new Date(),
+                updated: new Date(),
+            }
+            this.sandbox.stub(Request.prototype, "get").resolves(sampleReq);
+            const completed = await r.wait(100, 3);
+            assert.deepStrictEqual(completed, sampleReq);
+        });
+
+        it("should timeout for a non-completing asynchronous request", async function() {
+            const r = new Request(this.waas, sampleRequestId);
+            const sampleReq: IAsyncRequestStatus<IAsyncEthereumTransactionOutput> = {
+                process: "Running",
+                status: {
+                    stage: "awaiting transaction confirmation",
+                    hash: "0x9f4eb3fe6da8377f5316b2c2103583e88730d273a318459098867fd8ad417d43"
+                },
+                output: null,
+                created: new Date(),
+                updated: new Date(),
+            }
+            this.sandbox.stub(Request.prototype, "get").resolves(sampleReq);
+            await assert.rejects(async () => r.wait(10), TimeoutError);
+        });
+
+        it("should should reject if the request terminates with error", async function() {
+            const r = new Request(this.waas, sampleRequestId);
+            this.sandbox.stub(Request.prototype, "get").rejects(new Error("Request could not be completed"));
+            await assert.rejects(async () => r.wait(100, 3), /Request could not be completed/);
+        });
+
     });
 });
