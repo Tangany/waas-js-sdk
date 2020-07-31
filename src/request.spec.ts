@@ -1,5 +1,6 @@
 import * as assert from "assert";
 import axios from "axios";
+import {SinonFakeTimers} from "sinon"
 import {TimeoutError} from "./errors"
 import {IAsyncEthereumTransactionOutput, IAsyncRequestStatus} from "./interfaces"
 import {Request} from "./request";
@@ -70,7 +71,12 @@ describe("Request", function() {
                 updated: new Date(),
             }
             this.sandbox.stub(Request.prototype, "get").resolves(sampleReq);
-            await assert.rejects(async () => r.wait(10), TimeoutError);
+            const timer: SinonFakeTimers = this.sandbox.useFakeTimers({toFake: ["setTimeout"]}); // fake the timer
+
+            await Promise.all([
+                assert.rejects(async () => r.wait(10e3), TimeoutError),
+                timer.tick(10e3)
+            ])
         });
 
         it("should should reject if the request terminates with error", async function() {
