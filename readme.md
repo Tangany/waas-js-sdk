@@ -166,17 +166,23 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````javascript
 (async () => {
     const api = new Waas().eth();
-    // Receive the result object for the specified search request
-    const transactions = await api.getTransactions({blocknr: 10430231, sort: "valuedesc", limit: 15});
+    // Receive the AsyncIterable object for the specified search request
+    const iterable = api.getTransactions({blocknr: 10430231, sort: "valuedesc", limit: 15});
+    // Invoke the iterator to manually query paged results
+    const iterator = iterable[Symbol.asyncIterator]();
     // Use pagination to query further results (if available)
-    const next = await transactions.next();
+    const {value, done} = await iterator.next();
     // Query the details of a transaction
-    const txDetails = next?.list[0].get();
+    const txDetails = value.list[0].get();
+    // Iterate over all iterable results using for await of
+    for await (const iterableValue of iterable){
+    	console.log(await iterableValue.list[0].get());
+    }
     // Query transactions based on the current wallet context
-    const walletTxs = await new Waas().wallet("my-wallet").eth().getTransactions({direction: "in", limit: 2});
+    const walletTxsIterable = new Waas().wallet("my-wallet").eth().getTransactions({direction: "in", limit: 2});
     // Read transaction events for a specific contract
-    const events = await api.contract(tokenAddress).getEvents({event: "Transfer", limit: 10});
-    const eventDetails = await events.list[0].get();
+    const eventsList = (await api.contract(tokenAddress).getEvents({event: "Transfer", limit: 10})[Symbol.asyncIterator]().next()).value;
+    const eventDetails = await eventsList[0].get();
     // Read an individual event
     const event = await new Waas().eth(txHash).getEvent(logIndex);
 })();
