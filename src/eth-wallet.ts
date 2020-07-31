@@ -8,7 +8,7 @@ import {
     IEthereumRecipient,
     IEthereumTransactionEstimation,
     IEthereumTransactionStatus,
-    ISearchTxQueryParams,
+    IWalletSearchTxQueryParams,
     ITransaction,
     ITransmittableTransaction,
     IWalletBalance
@@ -100,7 +100,7 @@ export class EthWallet extends BlockchainWallet {
      * Queries a list of transactions in the context of the current wallet. The exact query is specified with the parameters passed.
      * @param queryParams
      */
-    public async getTransactions(queryParams: ISearchTxQueryParams = {}) {
+    public async getTransactions(queryParams: IWalletSearchTxQueryParams = {}) {
         return wrapSearchRequest<IEthereumTransactionStatus, ISearchItemData>(
             this.waas, `eth/wallet/${this.wallet}/transactions`,
             queryParams);

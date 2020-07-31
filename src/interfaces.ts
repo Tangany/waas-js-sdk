@@ -180,6 +180,10 @@ export interface ISearchTxQueryParams {
     index?: string;
 }
 
+export interface IWalletSearchTxQueryParams extends ISearchTxQueryParams {
+    direction?: "in" | "out";
+}
+
 /**
  * Query parameters describing filters to narrow down a search in all events of a contract.
  * `hash` must contain lower case Ethereum transaction hash
