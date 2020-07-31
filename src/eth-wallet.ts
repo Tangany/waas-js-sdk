@@ -1,16 +1,22 @@
 import * as t from "typeforce";
 import {BlockchainWallet} from "./blockchain-wallet"
+import {IEthereumTxSearchItemData} from "./eth";
 import {EthContractWallet} from "./eth-contract-wallet"
 import {Request} from "./request"
 import {ethereumRecipientType, Waas} from "./waas";
 import {
-    IWalletBalance,
-    ITransaction,
     IEthereumRecipient,
+    IEthereumTransactionEstimation,
+    IEthereumTransactionStatus,
+    IWalletSearchTxQueryParams,
+    ITransaction,
     ITransmittableTransaction,
+    IWalletBalance,
     IAsyncEthereumTransactionOutput
 } from "./interfaces";
+
 import {EthErc20Wallet} from "./eth-erc20-wallet";
+import {wrapSearchRequestIterable} from "./search-request-wrapper";
 import {Wallet} from "./wallet";
 
 /**
@@ -78,6 +84,42 @@ export class EthWallet extends BlockchainWallet {
                 ...recipient,
             }),
         );
+    }
+
+    /**
+     * Returns the fee estimation for a transaction with the given parameters
+     * The fee estimation is based on the current ethereum network utilization and can fluctuate in random fashion.
+     * Thus the estimation cannot guarantee to match the actual transaction fee.
+     * @param recipient - {@link IEthereumRecipient}
+     */
+    public async estimateFee(recipient: IEthereumRecipient): Promise<IEthereumTransactionEstimation> {
+        this.validateRecipient(recipient);
+        return this.waas.wrap<IEthereumTransactionEstimation>(() => this.waas.instance
+            .post(`eth/wallet/${this.wallet}/estimate-fee`, recipient));
+    }
+
+    /**
+     * Returns an async iterable object that is able to query lists of transactions based on passed filter criteria
+     * @example
+     * const iterable = api.eth().getTransactions(query); // can be used to iterate forward in a for await of loop
+     * const iterator = iterable[Symbol.asyncIterator](); // can be used to iterate forward and backward via manual calls
+     *
+     * // iterate manually
+     * const firstPageList = await iterator.next(); // fetch the inital page
+     * const firstTxData = await firstPageList.value.list[0].get(); // fetching transaction details from the results list
+     * const secondPageList = await iterator.next(); // fetch the next page
+     * const firstPageListAgain = await iterator.previous(); // fetch the first page again
+     *
+     * // automatically iterate forward through the rest of the results
+     * for await (const value of iterable) {
+     *    console.log(value.list.hits.total);
+     *    console.log(await value.list[0].get()); // get details for a list result
+     * }
+     */
+    public getTransactions(queryParams: IWalletSearchTxQueryParams = {}) {
+        return wrapSearchRequestIterable<IEthereumTransactionStatus, IEthereumTxSearchItemData>(
+            this.waas, `eth/wallet/${this.wallet}/transactions`,
+            queryParams);
     }
 
     /**

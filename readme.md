@@ -69,6 +69,8 @@ ethereumNetwork | Public Ethereum network to operate in (`mainnet`, `ropsten`) o
 ethereumTxConfirmations |  Amount of block confirmations required to consider an Ethereum transaction as valid. The levels correspond with following target block confirmations amounts (# of confirmations): `none`: 0, `default`: 1, `secure`: 12  | `default` |
 ethereumTxSpeed |  Additional gas fee that is added to the base gas fee for the given Ethereum network to speed up the mining process of the transaction. The usage of `none` value may result in the transaction never gets mined and is only intended to use for custom Ethereum networks that employ zero gas price policies. The speed levels correspond with following Ethereum fees (in gwei): `none`: 0, `slow`: 2, `default`: 5, `fast`: 15 | `default` |
 ethereumGasPrice | Enforces custom base transaction fee in wei. This prevents the dynamic gas price calculation by the network and nullifies `ethereumTxSpeed`. Example: `7000000000` | `auto` |
+ethereumGas | Enforces custom amount of transaction gas. Example: `21000` | `auto` |
+ethereumNonce | Enforces custom transaction nonce. Example: `123` | `auto` |
 useGasTank | Allows to pre-fund the transaction fee for the desired wallet transaction. Supported values: `false`, `true` | `false`
 bitcoinNetwork | Public Bitcoin network name. Supported networks: `bitcoin`, `testnet` | `bitcoin` |
 bitcoinTxConfirmations | Minimum amount of block confirmations required for Bitcoin balance outputs ("utxo", "coins") to be included in the total wallet balance calculation. The exclusion of unconfirmed outputs prevents the posthumous invalidation of own wallet transaction by the parent utxo sending party. The levels correspond with following target block confirmations amounts (# of confirmations): `none`: 0, `default`: 1, `secure`: 6 | `default` |
@@ -111,6 +113,8 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet");
+    // estimate transaction fee
+    const {gas, gasPrice, fee} = await api.eth().estimateFee({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // send Ether
     const { hash } = await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // send Ether asynchronously (see examples for request interface to retrieve status details)
@@ -147,13 +151,37 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````javascript
 (async () => {
     const api = new Waas().wallet("my-wallet").eth().contract(tokenAddress);
-    // send token asynchronously (see examples for request interface to retrieve status details)
-    const req = api.sendAsync({
+    const contractCall = {
         function: "transfer(address,uint256)",
         inputs: [someOtherWalletAddress, "2500000000000000"]
-    });
+    }
+    // estimate transaction fee
+    const {gas, gasPrice, fee} = await api.estimateFee(contractCall);
+    // send token asynchronously (see examples for request interface to retrieve status details)
+    const req = await api.sendAsync(contractCall);
 })();
 ````
+
+#### Ethereum interface for blockchain search queries
+````javascript
+(async () => {
+    const api = new Waas().eth();
+    // Receive the result object for the specified search request
+    const transactions = await api.getTransactions({blocknr: 10430231, sort: "valuedesc", limit: 15});
+    // Use pagination to query further results (if available)
+    const next = await transactions.next();
+    // Query the details of a transaction
+    const txDetails = next?.list[0].get();
+    // Query transactions based on the current wallet context
+    const walletTxs = await new Waas().wallet("my-wallet").eth().getTransactions({direction: "in", limit: 2});
+    // Read transaction events for a specific contract
+    const events = await api.contract(tokenAddress).getEvents({event: "Transfer", limit: 10});
+    const eventDetails = await events.list[0].get();
+    // Read an individual event
+    const event = await new Waas().eth(txHash).getEvent(logIndex);
+})();
+````
+
 
 #### General Bitcoin interface
 [*Bitcoin calls that are not wallet based*](https://docs.tangany.com/#2fe57cbc-410e-4141-8161-fd335cfc05c8)
@@ -204,6 +232,18 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const anotherStatus = await api.request("a2e19473b9ec44cf97f71c9d4615e364").get();
 })();
 ````
+
+#### Node status
+Get status information about the [Bitcoin](https://docs.tangany.com/#15f3dbb7-84b6-4828-b866-52255f72b2bc)
+or [Ethereum](https://docs.tangany.com/#cb2713db-04dc-4003-94f7-b6eeb021a5ad) full node
+````javascript
+(async () => {
+    const api = new Waas();
+    const ethStatus = await api.eth().getStatus();
+    const btcStatus = await api.btc().getStatus();
+})();
+````
+
 
 ## Affinity Cookies
 WaaS employs its own load-balanced full-node backend to transmit transactions to the blockchains. Due to the nature of blockchain, full nodes sync their states only in the event of a new block. One implication of this behavior is that sending multiple transactions from the same wallet during a time frame of a single block may lead to an overlap of backend memory pool assignments which subsequent may result in transactions being cancelled and discarded from the blockchain.

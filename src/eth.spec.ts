@@ -1,9 +1,10 @@
 import * as assert from "assert";
 import axios from "axios";
+import {SinonFakeTimers} from "sinon"
 import {MiningError, TimeoutError} from "./errors";
 import {isBitcoinMiningErrorData} from "./errors/mining-error";
 import {Ethereum} from "./eth";
-import {IEthereumTransactionStatus} from "./interfaces";
+import {IBlockchainTransactionStatus, IEthereumTransactionStatus, ISearchTxResponse} from "./interfaces";
 import {sandbox} from "./spec-helpers";
 import {Waas} from "./waas";
 
@@ -40,7 +41,7 @@ describe("Ethereum", function() {
     });
 
     describe("get", function() {
-        it("should throw for missing transaction hash", function(){
+        it("should throw for missing transaction hash", function() {
             const eth = new Ethereum(this.waas);
             // The method should call the getter (with type check) instead of the instance variable, which may be undefined
             const spy = this.sandbox.spy(eth, "txHash", ["get"]).get;
@@ -48,6 +49,33 @@ describe("Ethereum", function() {
             assert.ok(spy.calledOnce);
         });
 
+        it("should execute the api call", async function() {
+            const spy = this.waas.instance.get = this.sandbox.spy();
+            await new Ethereum(this.waas, nonHash).get();
+            assert.strictEqual(spy.callCount, 1);
+        });
+    });
+
+    // The method only calls the general function for wrapping search queries and this is tested in detail separately anyway.
+    describe("getTransactions", function() {
+        it("should execute the api call", async function() {
+            const sampleResponse: ISearchTxResponse = {
+                hits: {total: 4},
+                list: [
+                    {
+                        hash: "0x531ac2cc55a58171697136a63f2ff63d2a6f44ea0e706dbc3889a8a0b9b6ef6f",
+                        links: [{type: "GET", href: "/eth/transaction/1", rel: "transaction"}]
+                    },
+                ],
+                links: {next: null, previous: null}
+            };
+            const stub = this.waas.instance.get = this.sandbox.stub().resolves(sampleResponse);
+            await new Ethereum(this.waas).getTransactions()[Symbol.asyncIterator]().next();
+            assert.ok(stub.calledOnce);
+        });
+    });
+
+    describe("getEvent", function() {
         it("should execute the api call", async function() {
             const spy = this.waas.instance.get = this.sandbox.spy();
             await new Ethereum(this.waas, nonHash).get();
@@ -65,30 +93,66 @@ describe("Ethereum", function() {
         });
         it("should resolve for a successful transaction", async function() {
             const e = new Ethereum(this.waas, nonHash);
-            this.sandbox.stub(Ethereum.prototype, "get").resolves({isError: false, blockNr: 777});
+            const stub = this.sandbox.stub()
+            this.waas.instance.get = stub;
+            const timer: SinonFakeTimers = this.sandbox.useFakeTimers({toFake: ["setInterval"]}); // fake the timer
+            const status: IBlockchainTransactionStatus = {isError: false, blockNr: 777, status: "confirmed"} as any
+            stub.resolves(status);
 
-            await assert.doesNotReject(async () => e.wait());
+            await Promise.all([
+                assert.doesNotReject(async () => e.wait()),
+                timer.tick(400),
+            ]);
         });
         it("should reject for a unsuccessful transaction", async function() {
             const e = new Ethereum(this.waas, nonHash);
-            this.sandbox.stub(Ethereum.prototype, "get").resolves({isError: true, blockNr: undefined});
-            await e.wait()
-                .then(() => assert.fail("should have failed"))
-                .catch((r: MiningError) => {
-                    assert.ok(r instanceof MiningError);
-                    if (isBitcoinMiningErrorData(r.txData)) {
-                        throw new Error("invalid error type");
-                    }
-                    const txData = (r.txData) as IEthereumTransactionStatus;
-                    assert.strictEqual(txData.isError, true);
-                    assert.strictEqual(txData.blockNr, undefined);
-                });
+            this.sandbox.stub(Ethereum.prototype, "get").resolves({isError: true, blockNr: undefined, status: "error"});
+            const timer: SinonFakeTimers = this.sandbox.useFakeTimers({toFake: ["setInterval"]}); // fake the timer
+
+            await Promise.all([
+                e
+                    .wait()
+                    .then(() => assert.fail("should have failed"))
+                    .catch((r: MiningError) => {
+                        assert.ok(r instanceof MiningError);
+                        if (isBitcoinMiningErrorData(r.txData)) {
+                            throw new Error("invalid error type");
+                        }
+                        const txData = (r.txData) as IEthereumTransactionStatus;
+                        assert.strictEqual(txData.isError, true);
+                        assert.strictEqual(txData.blockNr, undefined);
+                    }),
+                timer.tick(400),
+            ])
         });
         it("should throw while the 'get' call", async function() {
             const e = new Ethereum(this.waas, nonHash);
             // tslint:disable-next-line:no-null-keyword
             this.sandbox.stub(Ethereum.prototype, "get").throws(() => new Error("Some error"));
-            await assert.rejects(async () => e.wait(), /Some error/);
+
+            const timer: SinonFakeTimers = this.sandbox.useFakeTimers({toFake: ["setInterval"]}); // fake the timer
+
+            await Promise.all([
+                assert.rejects(async () => e.wait(), /Some error/),
+                timer.tick(400),
+            ])
         });
     });
+
+    describe("getStatus", function() {
+        it("should execute the api call", async function() {
+            const spy = this.waas.instance.get = this.sandbox.spy();
+            await new Ethereum(this.waas, nonHash).get();
+            assert.strictEqual(spy.callCount, 1);
+        });
+    });
+
+    describe("contract", function() {
+        it("should return an EthereumContract instance", async function() {
+            const address = "0xC32AE45504Ee9482db99CfA21066A59E877Bc0e6";
+            const c = new Ethereum(this.waas).contract(address);
+            assert.strictEqual(c.address, address);
+        });
+    });
+
 });

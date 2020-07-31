@@ -1,5 +1,5 @@
 import * as t from "typeforce";
-import {IBitcoinTransactionStatus} from "./interfaces";
+import {IBitcoinTransactionStatus, IBtcStatus} from "./interfaces";
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
 
@@ -29,7 +29,7 @@ export class Bitcoin implements IWaasMethod {
     }
 
     /**
-     * Establish a sticky session with a Ethereum full node by fetching and setting affinity cookies for the current Waas instance
+     * Establish a sticky session with a Bitcoin full node by fetching and setting affinity cookies for the current Waas instance
      */
     public async fetchAffinityCookie(): Promise<void> {
         await this.waas.wrap(() => this.waas.instance.head("btc/transaction/0000000000000000000000000000000000000000000000000000000000000000"));
@@ -45,5 +45,13 @@ export class Bitcoin implements IWaasMethod {
         const call = () => this.get()
 
         return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IBitcoinTransactionStatus>;
+    }
+
+    /**
+     * Get status and information about Bitcoin full-node.
+     * The status unavailable is returned if info properties could not be received.
+     */
+    public async getStatus(): Promise<IBtcStatus>{
+        return this.waas.wrap<IBtcStatus>(() => this.waas.instance.get(`btc/status`));
     }
 }

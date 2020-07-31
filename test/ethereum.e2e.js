@@ -99,6 +99,12 @@ describe("WaaS sample Ethereum workflow", function () {
 		console.log(`new token balance: ${balance}`);
 	});
 
+	it("should estimate the transaction fee for a transaction", async function () {
+		assert.ok(createdWalletAddress, "cannot run without previous tests");
+		const estimation = await api.wallet(tokenWallet).eth().estimateFee({ to: createdWalletAddress, amount: etherAmount });
+		console.log(`fee estimation: ${JSON.stringify(estimation, null, 2)}`);
+	})
+
 	it("should send a small amount of ether to the new wallet to fund the token transactions", async function () {
 		assert.ok(createdWalletAddress, "cannot run without previous tests");
 		const { hash } = await api.wallet(tokenWallet).eth().send({ to: createdWalletAddress, amount: etherAmount });
@@ -157,6 +163,14 @@ describe("WaaS sample Ethereum workflow", function () {
 			inputs: [createdWalletAddress, "2500000000000000"]
 		});
 		console.log(`asynchronous transaction request '${request.id}' started. Waiting for the process to finish...`);
+	});
+
+	it("should estimate the transaction fee for a smart contract interaction", async function () {
+		const estimation = await api.wallet(tokenWallet).eth().contract(tokenAddress).estimateFee({
+			function: "transfer(address,uint256)",
+			inputs: [createdWalletAddress, "2500000000000000"]
+		});
+		console.log(`fee estimation: ${JSON.stringify(estimation, null, 2)}`);
 	});
 
 	it("should create a signed transaction that can be manually transmitted", async function () {

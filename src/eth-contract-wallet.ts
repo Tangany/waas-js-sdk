@@ -1,6 +1,6 @@
 import * as t from "typeforce";
 import {BlockchainWallet} from "./blockchain-wallet";
-import {IAsyncEthereumTransactionOutput, IContractMethod} from "./interfaces";
+import {IAsyncEthereumTransactionOutput, IContractMethod, IEthereumTransactionEstimation} from "./interfaces";
 import {Request} from "./request";
 import {Waas} from "./waas";
 import {Wallet} from "./wallet"
@@ -30,6 +30,17 @@ export class EthContractWallet extends BlockchainWallet {
         );
         const id = this.extractRequestId(rawResponse);
         return new Request<IAsyncEthereumTransactionOutput>(this.waas, id);
+    }
+
+    /**
+     * Returns the fee estimation for a smart contract execution with the given parameters.
+     * The fee estimation is based on the current ethereum network utilization and can fluctuate in random fashion.
+     * Thus the estimation cannot guarantee to match the actual transaction fee.
+     * @param config - Smart contract method configuration
+     */
+    public async estimateFee(config: IContractMethod): Promise<IEthereumTransactionEstimation> {
+        return this.waas.wrap<IEthereumTransactionEstimation>(() => this.waas.instance
+            .post(`eth/contract/${this.address}/${this.wallet}/estimate-fee`, config));
     }
 
 }
