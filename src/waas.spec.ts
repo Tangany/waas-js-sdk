@@ -105,6 +105,23 @@ describe("Waas", function() {
                 await assert.doesNotReject(async () => axiosInstance.get("annie"));
             });
 
+            it("should copy the activity id from the response into the thrown error", async function() {
+                const activityId = "6aac41bc-582a-49b5-819a-3e40d86b0818";
+                // Of course a true WaaS error returns more properties.
+                // However, we focus on the activityId to keep the test as minimal as possible.
+                moxios.stubRequest(/.*/, {
+                    status: 400,
+                    response: {activityId},
+                });
+                const {axios: axiosInstance} = new Waas(auth);
+
+                await assert.rejects(async () => axiosInstance.get(""), e => {
+                    assert.ok(e instanceof GeneralError);
+                    assert.strictEqual(e.activityId, activityId);
+                    return true;
+                });
+            });
+
             it("should throw a NotFoundError error for 404 server response", async function() {
                 moxios.stubRequest(/.*/, {
                     status: 404,

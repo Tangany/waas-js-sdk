@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   * Explore Ethereum transactions with combinations of predefined filters
   * Explore Ethereum smart contract events
   * Get status information about the Ethereum or Bitcoin full node
+* Added `wait` method for asynchronous requests
 ### Changed
 
 ## [1.0.0-beta.9]

@@ -15,10 +15,10 @@ describe("WaaS sample Ethereum workflow", function () {
 	this.timeout(timeout);
 	this.slow(timeout / 3);
 
-	const tokenAddress = process.env.E2E_TOKEN; // mintable ERC20 token address
-	const tokenWallet = process.env.E2E_WALLET; // Wallet with some testnet balance that owns the mintable ERC20 token
+	const tokenWallet = process.env.E2E_WALLET; // Wallet with some Ropsten Ether balance that owns the ERC20 token
+	const tokenAddress = process.env.E2E_TOKEN; // mintable & burnable ERC20 token address deployed by the tokenWallet to Ropsten
 	const tokenAmount = "0.0032"; // Token amount used for transactions
-	const etherAmount = "0.001"; // Ether amount used for transactions
+	const etherAmount = "0.002"; // Ether amount used for transactions
 	let tokenWalletAddress; // Token wallet address
 	let createdWallet; // Random created wallet name
 	let createdWalletAddress; // Created wallet address

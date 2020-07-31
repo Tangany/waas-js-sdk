@@ -1,6 +1,6 @@
 import {EthereumContract} from "./eth-contract"
 import {wrapSearchRequestIterable} from "./search-request-wrapper";
-import {IWaitForTxStatus, Waas} from "./waas";
+import {Waas} from "./waas";
 import {IEthereumTransactionStatus, IEthStatus, ISearchTxEventResponse, ISearchTxQueryParams} from "./interfaces";
 import * as t from "typeforce";
 import {IWaasMethod} from "./waas-method";
@@ -34,7 +34,7 @@ export class Ethereum implements IWaasMethod {
 
     /**
      * Returns the status for an Ethereum transaction. The transaction is not mined until a blockNr is assigned.
-     * @see [docs]{@link https://docs.tangany.com/?version=latest#5b262285-c8a0-4e36-8a41-4a2b1f0cdb1b}
+     * @see [docs]{@link https://docs.tangany.com/#5b262285-c8a0-4e36-8a41-4a2b1f0cdb1b}
      */
     public async get(): Promise<IEthereumTransactionStatus> {
         return this.getTransactionDetails(this.txHash);
@@ -75,24 +75,6 @@ export class Ethereum implements IWaasMethod {
 
         const call = async () => this
             .get()
-            .then((res: IEthereumTransactionStatus) => {
-
-                let status: IWaitForTxStatus["status"];
-
-                // tslint:disable-next-line:prefer-conditional-expression
-                if (typeof res.blockNr === "number") {
-                    status = "confirmed";
-                } else if (res.isError) {
-                    status = "error";
-                } else {
-                    status = "pending";
-                }
-
-                return {
-                    status,
-                    response: res,
-                };
-            });
 
         return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IEthereumTransactionStatus>;
     }
