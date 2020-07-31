@@ -1,17 +1,29 @@
-import {ISearchResponse} from "./interfaces";
+import {ISearchQueryParams, ISearchResponse} from "./interfaces";
 import {Waas} from "./waas";
 
 /**
- * Represents a blockchain search request where the original URL references to resources are replaced by TypeScript methods.
+ * Represents a AsyncIterable object for a blockchain search request where the original URL references to resources are replaced by TypeScript methods.
  * The generic type TDetail describes the structure of a request for an individual resource (for example, a transaction).
  * The generic type TData defines which object properties an element in the result list contains apart from method accesses such as get(),
  * for example, "hash" for transactions.
+ * @param TDetail - Data type that describes the query result of a single resource (for example, a specific transaction)
+ * @param TData - Describes which properties each search result item contains in addition to methods like get() (for example, "hash" for transactions)
  */
-export interface ISearchResult<TDetail, TData> {
+export interface ISearchResultIterable<TDetail, TData> extends AsyncIterable<ISearchResultValue<TDetail, TData>> {
+    [Symbol.asyncIterator]: () => ISearchResultIterator<TDetail, TData>
+}
+
+/**
+ * Async Iterator that is able to iterate next and previous results
+ */
+export interface ISearchResultIterator<TDetail, TData> extends AsyncIterator<ISearchResultValue<TDetail, TData>> {
+    next: () => Promise<IteratorResult<ISearchResultValue<TDetail, TData>, ISearchResultValue<TDetail, TData>>>;
+    previous: () => Promise<IteratorResult<ISearchResultValue<TDetail, TData>, ISearchResultValue<TDetail, TData>>>;
+}
+
+export interface ISearchResultValue<TDetail, TData> {
     hits: ISearchResponse["hits"];
     list: (ResourceMethods<TDetail> & TData)[];
-    previous: () => Promise<ISearchResult<TDetail, TData>> | null;
-    next: () => Promise<ISearchResult<TDetail, TData>> | null;
 }
 
 /**
@@ -23,33 +35,34 @@ interface ResourceMethods<T> {
 }
 
 /**
- * Executes a WaaS-Call based on the passed URL and parameters, which reads information from the
+ * Returns an AsyncIterable which executes a WaaS-Call based on the passed URL and parameters, which reads information from the
  * blockchain (such as transactions or events). These endpoints return URLs for further navigation, which this method
  * converts into convenient method calls. In order to support recursion, either only a URL with preset query parameters or
  * a base URL and an object with parameters can be passed.
  * @param waas - Current WaaS instance
- * @param url - URL to access the search endpoint (can already contain all query parameters)
+ * @param url - URL to access the search endpoint. Mustn't contain any URL query parameters
  * @param [params] - Optional query parameters that are added to the HTTP call
  * @template TDetail - Data type that describes the query result of a single resource (for example, a specific transaction)
  * @template TData - Describes which properties each search result item contains in addition to methods like get() (for example, "hash" for transactions)
  */
-export async function wrapSearchRequest<TDetail, TData>(
+export function wrapSearchRequestIterable<TDetail, TData>(
     waas: Waas,
     url: string,
-    params: object = {}
-): Promise<ISearchResult<TDetail, TData>> {
+    params: ISearchQueryParams = {}
+): ISearchResultIterable<TDetail, TData> {
 
-    const response = await waas.wrap<ISearchResponse>(() => waas.instance.get(url, {params}));
-    const {hits, links: {previous, next}} = response;
+    let previous: string | null;
+    let next: string | null = url;
+    let queryParams = params;
 
-    // Use the pagination URL to call the function recursively (without parameters, since these are already set in the URL)
-    const paginate = (paginationUrl: string | null) => paginationUrl ?
-        wrapSearchRequest<TDetail, TData>(waas, paginationUrl)
-        : null;
+    if (/[?&=]/.test(url)) {
+        throw new Error("The search endpoint URL mustn't contain any URL query parameters")
+    }
 
-    // Unfortunately, the return type of the mapped object must be any (as far as I know) in this case,
-    // otherwise there will be problems with the type generics.
-    const list = response.list.map<any>(item => {
+    /**
+     * enrich search request list with fetch methods
+     */
+    const getResponseList = (response: ISearchResponse) => response.list.map<any>(item => {
         const {links, ...rest} = item;
         // This line is of course very much adapted to the current interface (only the GET method) in order
         // not to make the logic here even more complicated. For WaaS changes this must be extended.
@@ -63,10 +76,50 @@ export async function wrapSearchRequest<TDetail, TData>(
         }
     });
 
+    /**
+     * fetch data for given url and return it in a iterator like response
+     */
+    const iteratePage = async (_url: string | null, cb: (_response: ISearchResponse) => void): Promise<IteratorResult<ISearchResultValue<TDetail, TData>>> => {
+        if (!_url) {
+            return {
+                value: null,
+                done: true
+            }
+        }
+
+        const response: ISearchResponse = await waas.wrap<ISearchResponse>(() => waas.instance.get(_url, {params: queryParams}));
+        const list = getResponseList(response);
+        const hits = response.hits;
+
+        // preserve state for next iterations
+        cb(response)
+
+        // reset request params for the next iteration since the next link already contains all required query params
+        queryParams = {};
+
+        return {
+            value: {
+                hits,
+                list,
+            },
+            done: false,
+        }
+    }
+
+    // iterator object
+    const asyncIterator: ISearchResultIterator<TDetail, TData> = {
+        next: async () => iteratePage(next, response => {
+            previous = response.links?.previous;
+            next = response.links?.next;
+        })
+        , previous: async () => iteratePage(previous, response => {
+            previous = response.links?.previous;
+            next = response.links?.next;
+        })
+    }
+
+
     return {
-        hits,
-        list,
-        previous: () => paginate(previous),
-        next: () => paginate(next),
+        [Symbol.asyncIterator]: () => asyncIterator // AsyncIterable
     };
 }

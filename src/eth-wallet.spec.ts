@@ -111,7 +111,8 @@ describe("EthWallet", function() {
             const stub = this.waas.instance.get = this.sandbox.stub().resolves(sampleResponse);
             const wallet = new Wallet(this.waas, sampleWallet);
 
-            await new EthWallet(this.waas, wallet).getTransactions();
+            const iterable = new EthWallet(this.waas, wallet).getTransactions();
+            await iterable[Symbol.asyncIterator]().next();
             assert.ok(stub.calledOnce);
         });
     });

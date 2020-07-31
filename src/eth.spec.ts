@@ -69,7 +69,7 @@ describe("Ethereum", function() {
                 links: {next: null, previous: null}
             };
             const stub = this.waas.instance.get = this.sandbox.stub().resolves(sampleResponse);
-            await new Ethereum(this.waas).getTransactions();
+            await new Ethereum(this.waas).getTransactions()[Symbol.asyncIterator]().next();
             assert.ok(stub.calledOnce);
         });
     });

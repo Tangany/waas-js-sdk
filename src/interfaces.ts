@@ -160,6 +160,7 @@ export interface IContractMethod {
 }
 
 /* ----------- INTERFACES FOR SEARCH REQUESTS ----------- */
+export type ISearchQueryParams = ISearchTxQueryParams | ISearchContractEventsQueryParams;
 
 /**
  * Query parameters describing filters to narrow down a search in all transactions of a chain.
@@ -169,7 +170,6 @@ export interface IContractMethod {
  * `index` must be >= "0" and `limit` must be within "1" and "100"
  */
 export interface ISearchTxQueryParams {
-    direction?: "in" | "out";
     from?: string;
     to?: string;
     blocknr?: string;

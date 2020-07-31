@@ -37,7 +37,8 @@ describe("EthereumContract", function() {
                 links: {next: null, previous: null}
             };
             const stub = this.waas.instance.get = this.sandbox.stub().resolves(sampleResponse);
-            await new EthereumContract(this.waas, tokenAddress).getEvents();
+            const iterable =  new EthereumContract(this.waas, tokenAddress).getEvents();
+            await iterable[Symbol.asyncIterator]().next();
             assert.ok(stub.calledOnce);
         });
 

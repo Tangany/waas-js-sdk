@@ -1,11 +1,11 @@
 import {EthereumContract} from "./eth-contract"
-import {wrapSearchRequest} from "./search-request-wrapper";
+import {wrapSearchRequestIterable} from "./search-request-wrapper";
 import {IWaitForTxStatus, Waas} from "./waas";
 import {IEthereumTransactionStatus, IEthStatus, ISearchTxEventResponse, ISearchTxQueryParams} from "./interfaces";
 import * as t from "typeforce";
 import {IWaasMethod} from "./waas-method";
 
-export interface ISearchItemData {
+export interface IEthereumTxSearchItemData {
     hash: string
 }
 
@@ -41,12 +41,19 @@ export class Ethereum implements IWaasMethod {
     }
 
     /**
-     * Queries a list of transactions based on passed filter criteria.
-     * @param [queryParams]
+     * Returns an async iterable object that is able to query lists of transactions based on passed filter criteria
+     * @example
+     * const iterable = new Waas().eth().getTransactions(qs);
+     * // fetch a single page
+     * const iterator = iterable[Symbol.asyncIterator]()
+     * const txPage = (await iterator.next).value
+     * // fetch all pages
+     * for await (value of iterable) {
+     *     console.log(await value.list[0].get); // fetch transaction details
+     * }
      */
-    public async getTransactions(queryParams: ISearchTxQueryParams = {}) {
-        // Use a custom return object to provide convenient methods instead of the URLs that the user would have to process himself.
-        return wrapSearchRequest<IEthereumTransactionStatus, ISearchItemData>(this.waas, "eth/transactions", queryParams);
+    public getTransactions(queryParams: ISearchTxQueryParams = {}) {
+        return wrapSearchRequestIterable<IEthereumTransactionStatus, IEthereumTxSearchItemData>(this.waas, "eth/transactions", queryParams);
     }
 
     /**
