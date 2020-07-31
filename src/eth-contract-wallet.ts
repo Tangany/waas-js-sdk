@@ -40,7 +40,7 @@ export class EthContractWallet extends BlockchainWallet {
      */
     public async estimateFee(config: IContractMethod): Promise<IEthereumTransactionEstimation> {
         return this.waas.wrap<IEthereumTransactionEstimation>(() => this.waas.instance
-            .post(`eth/contract/${this.address}/estimate-fee`, config));
+            .post(`eth/contract/${this.address}/${this.wallet}/estimate-fee`, config));
     }
 
 }
