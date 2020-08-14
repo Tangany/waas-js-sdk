@@ -206,8 +206,8 @@ export interface ISearchContractEventsQueryParams {
     blocknr?: string;
     event?: string;
     sort?: "event" | "eventdesc" | "blocknr" | "blocknrdesc" | "logindex" | "logindexdesc" | "timestamp" | "timestampdesc";
-    limit?: string;
-    index?: string;
+    limit?: number;
+    index?: number;
 }
 
 export interface ISearchTxResponse extends ISearchResponse {
