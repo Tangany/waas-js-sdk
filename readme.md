@@ -262,6 +262,26 @@ Although each `Waas` instance does automatically store its individual affinity c
 
 Check out the example implementation in [test/limiter.e2e.js](test/limiter.e2e.js) where a high amount of non-overlapping Ethereum transactions are transmitted simultaneously via pre-established sticky session.
 
+## Custom axios settings
+
+The SDK exposes a single [axios](https://github.com/axios/axios) instance to perform all WaaS requests.
+For example, this instance can be used to tunnel all SDK requests through a user-defined proxy:
+
+```
+const waas = new Waas();
+const axios = waas.axios;
+axios.defaults.proxy = {
+    host: Proxy.host,
+    port: Proxy.port,
+    auth: {
+        username: Proxy.username,
+        password: Proxy.password
+    }
+};
+```
+
+Such user-defined settings are not required for standard operations.
+
 ## Changelog
 All notable changes to this project are documented in the [changelog](./CHANGELOG.MD)
 
