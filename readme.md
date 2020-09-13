@@ -232,6 +232,9 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const { rawTransaction } = await api.btc().sign({to: someAddress, amount: "0.021"});
     // get BTC balance and wallet address
     const { balance,address,currency } = await api.btc().get();
+    // sweep wallet
+    const req = await api.btc().sweepAsync({to: someAddress});
+    const { process, status, output } = await req.get();
 })();
 ````
 

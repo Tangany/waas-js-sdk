@@ -1,6 +1,14 @@
 import {BlockchainWallet} from "./blockchain-wallet"
 import {recipientType, Waas} from "./waas";
-import {IBitcoinTransactionEstimation, ITransmittableTransaction, IRecipient, ITransaction, IWalletBalance} from "./interfaces";
+import {
+    IAsyncEndpointResponse,
+    IBitcoinTransactionEstimation,
+    ITransmittableTransaction,
+    IRecipient,
+    ITransaction,
+    IWalletBalance, IBitcoinSweepResult
+} from "./interfaces";
+import {Request} from "./request"
 import {Wallet} from "./wallet";
 import * as t from "typeforce";
 
@@ -10,8 +18,12 @@ import * as t from "typeforce";
  * @param walletInstance - instance of Wallet class
  */
 export class BtcWallet extends BlockchainWallet {
+
+    private readonly baseUrl: string;
+
     constructor(waas: Waas, walletInstance: Wallet) {
         super(waas, walletInstance);
+        this.baseUrl = `btc/wallet/${this.wallet}`;
     }
 
     /**
@@ -19,7 +31,7 @@ export class BtcWallet extends BlockchainWallet {
      * @see [docs]{@link https://docs.tangany.com/#ccedf387-e9f9-4118-985c-d434e762b6fe}
      */
     public async get(): Promise<IWalletBalance> {
-        return this.waas.wrap<IWalletBalance>(() => this.waas.instance.get(`btc/wallet/${this.wallet}`));
+        return this.waas.wrap<IWalletBalance>(() => this.waas.instance.get(this.baseUrl));
     }
 
     /**
@@ -28,7 +40,7 @@ export class BtcWallet extends BlockchainWallet {
      * @see [docs]{@link https://docs.tangany.com/#62b0f6e4-641b-4230-8cf2-1cb8b2181812}
      */
     public async send(recipients: IRecipient[] | IRecipient): Promise<ITransaction> {
-        return this.waas.wrap<ITransaction>(() => this.waas.instance.post(`btc/wallet/${this.wallet}/send`, this.getRecipientsData(recipients)));
+        return this.waas.wrap<ITransaction>(() => this.waas.instance.post(`${this.baseUrl}/send`, this.getRecipientsData(recipients)));
     }
 
     /**
@@ -39,7 +51,7 @@ export class BtcWallet extends BlockchainWallet {
      */
     public async sign(recipients: IRecipient[] | IRecipient): Promise<ITransmittableTransaction> {
         return this.waas.wrap<ITransmittableTransaction>(() => this.waas.instance
-            .post(`btc/wallet/${this.wallet}/sign`, this.getRecipientsData(recipients)));
+            .post(`${this.baseUrl}/sign`, this.getRecipientsData(recipients)));
     }
 
     /**
@@ -49,8 +61,23 @@ export class BtcWallet extends BlockchainWallet {
      */
     public async estimateFee(recipientsObject: IRecipient[] | IRecipient): Promise<IBitcoinTransactionEstimation> {
         return this.waas.wrap<IBitcoinTransactionEstimation>(() => this.waas.instance
-            .post(`btc/wallet/${this.wallet}/estimate-fee`, this.getRecipientsData(recipientsObject)))
+            .post(`${this.baseUrl}/estimate-fee`, this.getRecipientsData(recipientsObject)))
             ;
+    }
+
+    /**
+     * Transfers all available funds minus the transaction fees to the specified wallet or address.
+     * One of the two properties from the parameter object must be set.
+     * If both are set, the specified address needs to belong to the wallet.
+     * @param to - Definition of the target using a Bitcoin address
+     * @param wallet - Definition of the target using a wallet name of the current key vault
+     */
+    public async sweepAsync({to, wallet}: { to?: string, wallet?: string }): Promise<Request<IBitcoinSweepResult>> {
+        const rawResponse = await this.waas.wrap<IAsyncEndpointResponse>(() => this.waas.instance
+            .post(`${this.baseUrl}/sweep-async`, {to, wallet}),
+        );
+        const id = this.extractRequestId(rawResponse);
+        return new Request<IBitcoinSweepResult>(this.waas, id);
     }
 
     /**

@@ -88,6 +88,13 @@ export interface IBitcoinTransactionStatus {
 }
 
 /**
+ * Represents the transaction status after a sweep operation
+ */
+export interface IBitcoinSweepResult extends Pick<IBitcoinTransactionStatus, "status" | "blockNr">{
+    hash: string | null;
+}
+
+/**
  * Represents a Bitcoin transaction estimation
  */
 export interface IBitcoinTransactionEstimation {
