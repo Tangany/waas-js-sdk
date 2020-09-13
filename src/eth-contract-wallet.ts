@@ -1,7 +1,7 @@
 import * as t from "typeforce";
 import {BlockchainWallet} from "./blockchain-wallet";
 import {
-    ContractCallResult,
+    ContractCallResult, IAsyncEndpointResponse,
     IAsyncEthereumTransactionOutput,
     IContractCall,
     IContractTransaction,
@@ -33,7 +33,7 @@ export class EthContractWallet extends BlockchainWallet {
      * @see [docs]{@link https://docs.tangany.com/#945c237f-5273-4e85-bf9d-1ba2b132df17}
      */
     public async sendAsync(config: IContractTransaction): Promise<Request<IAsyncEthereumTransactionOutput>> {
-        const rawResponse = await this.waas.wrap<{ statusUri: string }>(() => this.waas.instance
+        const rawResponse = await this.waas.wrap<IAsyncEndpointResponse>(() => this.waas.instance
             .post(`${this.baseUrl}/send-async`, {
                 ...config,
             }),

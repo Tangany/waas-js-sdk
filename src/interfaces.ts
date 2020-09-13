@@ -131,6 +131,13 @@ export interface IWaasError {
 }
 
 /**
+ * Represents the response of an asynchronous endpoints that returns a link to its status.
+ */
+export interface IAsyncEndpointResponse {
+    statusUri: string
+}
+
+/**
  * Represents the current state of an asynchronous request
  */
 export interface IAsyncRequestStatus<T extends Record<string, any>> {

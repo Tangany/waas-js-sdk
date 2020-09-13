@@ -12,7 +12,7 @@ import {
     ITransaction,
     ITransmittableTransaction,
     IWalletBalance,
-    IAsyncEthereumTransactionOutput
+    IAsyncEthereumTransactionOutput, IAsyncEndpointResponse
 } from "./interfaces";
 
 import {EthErc20Wallet} from "./eth-erc20-wallet";
@@ -62,7 +62,7 @@ export class EthWallet extends BlockchainWallet {
      */
     public async sendAsync(recipient: IEthereumRecipient): Promise<Request<IAsyncEthereumTransactionOutput>> {
         this.validateRecipient(recipient);
-        const rawResponse = await this.waas.wrap<{ statusUri: string }>(() => this.waas.instance
+        const rawResponse = await this.waas.wrap<IAsyncEndpointResponse>(() => this.waas.instance
             .post(`eth/wallet/${this.wallet}/send-async`, {
                 ...recipient,
             }),
