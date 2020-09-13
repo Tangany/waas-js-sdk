@@ -159,6 +159,22 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const {gas, gasPrice, fee} = await api.estimateFee(contractCall);
     // send token asynchronously (see examples for request interface to retrieve status details)
     const req = await api.sendAsync(contractCall);
+    // execute readonly contract function on behalf the given wallet
+    const balance = await api.call("balanceOf");
+})();
+````
+
+#### Universal Ethereum Smart Contract interface
+````javascript
+(async () => {
+    const api = new Waas().eth().contract(tokenAddress);
+    const supply = await api.call("totalSupply");
+    const symbol = await api.call("symbol", ["string"]);
+    const balance = await api.call({
+        function: "balanceOf(address)",
+        inputs: [walletAddress],
+        outputs: ["uint256"]
+    });
 })();
 ````
 

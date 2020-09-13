@@ -173,6 +173,41 @@ describe("WaaS sample Ethereum workflow", function () {
 		console.log(`fee estimation: ${JSON.stringify(estimation, null, 2)}`);
 	});
 
+	it("should call a readonly smart contract function", async function(){
+		assert.ok(tokenWalletAddress, "cannot run without previous tests");
+		const contractResponse = await api.eth().contract(tokenAddress).call({
+			function: "balanceOf(address)",
+			inputs: [tokenWalletAddress],
+			outputs: ["uint256"]
+		});
+		console.log(`Contract call result: ${JSON.stringify(contractResponse)}`);
+	})
+
+	it("should call a readonly smart contract without arguments", async function () {
+		const symbol = await api.eth().contract(tokenAddress).call("symbol", ["string"]);
+		console.log(`Symbol of contract ${tokenAddress}: ${symbol[0].value}`);
+		// Omit the second argument, because the default value ["uint256"] is suitable for totalSupply()
+		const supply = await api.eth().contract(tokenAddress).call("totalSupply");
+		console.log(`Total supply of ${symbol[0].value}: ${supply[0].value}`);
+	});
+
+	it("should call a readonly smart contract function on behalf of a wallet", async function () {
+		assert.ok(tokenWalletAddress, "cannot run without previous tests");
+		assert.ok(createdWalletAddress, "cannot run without previous tests");
+
+		// balanceOf expects an address as first argument, which is set automatically in this overload
+		const balance = await api.wallet(tokenWallet).eth().contract(tokenAddress).call("balanceOf");
+		console.log(`balanceOf(${tokenWalletAddress}): ${balance[0].value}`);
+
+		// Since the allowance function expects several parameters, we use the overload with the configuration object
+		const allowance = await api.wallet(tokenWallet).eth().contract(tokenAddress).call({
+			function: "allowance(address,address)",
+			inputs: [tokenWalletAddress, createdWalletAddress],
+			outputs: ["uint256"],
+		});
+		console.log(`Result for allowance(${tokenWalletAddress}, ${createdWalletAddress}): ${JSON.stringify(allowance)}`);
+	});
+
 	it("should create a signed transaction that can be manually transmitted", async function () {
 		const { rawTransaction } = await api.wallet(tokenWallet).eth().sign({
 			to: createdWalletAddress,

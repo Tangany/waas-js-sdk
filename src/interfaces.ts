@@ -162,12 +162,37 @@ export interface ITransmittableTransaction {
 }
 
 /**
- * Represents the configuration of a Smart Contract method call
+ * Represents the basic configuration to execute a smart contract function.
+ * Besides the Solidity types, `wallet` can also be used as function parameter type to specify a wallet name as input.
+ * This name is then translated to an address.
  */
-export interface IContractMethod {
-    function: string,
-    inputs: string[],
+interface IContractFunction {
+    function: string;
+    inputs: (boolean | number | string)[];
 }
+
+/**
+ * Configuration to execute a smart contract function triggered by sending a transaction.
+ */
+export interface IContractTransaction extends IContractFunction {
+    amount?: string
+}
+
+/**
+ * Configuration for a smart contract function method call (this means readonly).
+ */
+export interface IContractCall extends IContractFunction {
+    outputs: string[];
+}
+
+export interface IContractCallResponse {
+    list: {
+        type: string;
+        value: string;
+    }[];
+}
+
+export type ContractCallResult = IContractCallResponse["list"]
 
 /* ----------- INTERFACES FOR SEARCH REQUESTS ----------- */
 export type ISearchQueryParams = ISearchTxQueryParams | ISearchContractEventsQueryParams;
