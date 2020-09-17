@@ -1,5 +1,10 @@
 import {WalletSecurity, WalletVersion} from "./waas";
 
+/**
+ * General purpose utility type to specify only some properties of T as optional (in contrast to Partial<T>)
+ */
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
+
 export type BlockchainTransactionStatuses = "unknown" | "pending" | "confirmed" | "error";
 type NodeStatus = "live" | "unavailable" | "faulty";
 
@@ -131,12 +136,10 @@ export interface IRecipient {
  * If both are set, the specified address needs to belong to the wallet.
  * @param to - Recipient ethereum address
  * @param [wallet] - Name of a wallet in the current key vault
- * @param amount - Float Ether amount formatted as a string
+ * @param [amount] - Float Ether amount formatted as a string (if no value is defined, the API uses the default value "0")
  * @param [data] - Ethereum transaction data payload
  */
-export interface IEthereumRecipient extends IRecipient {
-    data?: string;
-}
+export type IEthereumRecipient = Optional<IRecipient, "amount"> & {data?: string;};
 
 export interface IWaasError {
     statusCode: number;

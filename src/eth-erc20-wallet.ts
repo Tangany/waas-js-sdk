@@ -111,6 +111,7 @@ export class EthErc20Wallet extends BlockchainWallet {
     private readonly getRecipientsData = (method: METHOD) =>
         ({to, wallet, amount, from}: { to?: string, wallet?: string, amount: string, from?: string }) => {
 
+        // In contrast to the non-ERC20 endpoints, the amount parameter is not optional here, but required
         switch (method) {
             case METHOD.MINT:
                 if (!amount) {

@@ -87,7 +87,7 @@ export const recipientType = t.compile({
 export const ethereumRecipientType = t.compile({
     to: "?String",
     wallet: "?String",
-    amount: "String",
+    amount: "?String",
     data: "?String",
 });
 

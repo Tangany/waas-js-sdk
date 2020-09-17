@@ -135,17 +135,20 @@ describe("EthWallet", function() {
 
         it("should throw for missing arguments", function() {
             assert.throws(
-                () => this.ethWallet.__test_validateRecipient({to: sampleAddress}),
-                /Missing 'amount' argument/);
+                () => this.ethWallet.__test_validateRecipient({}),
+                /At least one of the properties .* must be set/);
             assert.throws(
                 () => this.ethWallet.__test_validateRecipient({to: NaN, amount: "NaN"}),
-                /Missing 'to' argument/);
+                /At least one of the properties .* must be set/);
         });
 
         it("should throw for invalid types", function() {
             assert.throws(
+                () => this.ethWallet.__test_validateRecipient({wallet: 12345}),
+                /Expected property "wallet" of type \?String, got Number 12345/);
+            assert.throws(
                 () => this.ethWallet.__test_validateRecipient({to: true, amount: true}),
-                /Expected property "to" of type String, got Boolean true/);
+                /Expected property "to" of type \?String, got Boolean true/);
             assert.throws(
                 () => this.ethWallet.__test_validateRecipient({
                     to: sampleAddress,
@@ -165,6 +168,10 @@ describe("EthWallet", function() {
             assert.doesNotThrow(() => this.ethWallet.__test_validateRecipient({
                 wallet: sampleWallet,
                 amount: sampleAmount
+            }));
+            // Omit "amount"
+            assert.doesNotThrow(() => this.ethWallet.__test_validateRecipient({
+                wallet: sampleWallet,
             }));
         });
     });

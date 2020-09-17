@@ -151,9 +151,6 @@ export class EthWallet extends BlockchainWallet {
         if (!(recipient.to || recipient.wallet)) {
             throw new Error("At least one of the properties 'to' or 'wallet' must be set");
         }
-        if (!recipient.amount) {
-            throw new Error("Missing 'amount' argument");
-        }
         t(ethereumRecipientType, recipient, true);
     }
 }

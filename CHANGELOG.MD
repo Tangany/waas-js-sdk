@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
     * Call arbitrary readonly smart contract methods
     * Sweep Bitcoin wallet
     * Wallet substitution
+    * Optional amount argument in all sending Ethereum methods
 ### Changed
 * Universal smart contract methods `sendAsync` and `estimateFee` allow JavaScript values in `inputs` instead of exclusively string encapsulated values
 
