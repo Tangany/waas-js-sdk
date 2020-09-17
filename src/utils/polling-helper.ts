@@ -1,4 +1,4 @@
-import {TimeoutError} from "./errors";
+import {TimeoutError} from "../errors";
 
 /**
  * Executes the passed function until the defined result occurs or the timeout is exceeded.

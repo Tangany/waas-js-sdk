@@ -5,7 +5,7 @@ import {
     ISearchContractEventsQueryParams,
     ISearchTxEventResponse
 } from "./interfaces";
-import {wrapSearchRequestIterable} from "./search-request-wrapper";
+import {wrapSearchRequestIterable} from "./utils/search-request-wrapper";
 import {callContractFunction} from "./utils/eth-contract-call"
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";

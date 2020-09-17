@@ -2,7 +2,7 @@ import * as assert from "assert";
 import axios from "axios"
 import {EthContractWallet} from "./eth-contract-wallet";
 import {IContractTransaction, IEthereumTransactionEstimation} from "./interfaces"
-import {sandbox} from "./spec-helpers";
+import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";
 import {Wallet} from "./wallet";
 

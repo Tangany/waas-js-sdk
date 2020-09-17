@@ -2,7 +2,7 @@ import axios from "axios";
 import {BtcWallet} from "./btc-wallet";
 import * as assert from "assert";
 import {IAsyncEndpointResponse} from "./interfaces"
-import {sandbox} from "./spec-helpers";
+import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";
 import {Wallet} from "./wallet";
 

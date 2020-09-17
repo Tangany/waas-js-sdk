@@ -3,7 +3,7 @@ import * as assert from "assert";
 import {ConflictError, GeneralError} from "./errors";
 import {Waas} from "./waas";
 import {Wallet} from "./wallet";
-import {sandbox} from "./spec-helpers";
+import {sandbox} from "./utils/spec-helpers";
 import axios from "axios";
 
 sandbox();

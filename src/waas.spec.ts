@@ -3,7 +3,7 @@ import {Bitcoin} from "./btc";
 import {AuthenticationError, ConflictError, GeneralError, NotFoundError} from "./errors";
 import {Ethereum} from "./eth";
 import {Request} from "./request"
-import {sandbox} from "./spec-helpers";
+import {sandbox} from "./utils/spec-helpers";
 import {
     BitcoinNetwork,
     BlockchainTxConfirmations,

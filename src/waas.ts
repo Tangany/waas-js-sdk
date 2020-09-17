@@ -10,10 +10,10 @@ import {
     IBlockchainTransactionStatus,
     IWaasError
 } from "./interfaces";
-import {limiter} from "./limiter";
+import {limiter} from "./utils/limiter";
 import {Request} from "./request"
 import {Wallet} from "./wallet";
-import {poll} from "./polling-helper";
+import {poll} from "./utils/polling-helper";
 
 const debug = Debug("waas-js-sdk:main");
 

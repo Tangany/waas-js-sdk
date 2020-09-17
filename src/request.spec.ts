@@ -4,7 +4,7 @@ import {SinonFakeTimers} from "sinon"
 import {TimeoutError} from "./errors"
 import {IAsyncEthereumTransactionOutput, IAsyncRequestStatus} from "./interfaces"
 import {Request} from "./request";
-import {sandbox} from "./spec-helpers";
+import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";
 
 describe("Request", function() {

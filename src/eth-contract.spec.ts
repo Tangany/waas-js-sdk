@@ -2,7 +2,7 @@ import * as assert from "assert";
 import axios from "axios";
 import {EthereumContract} from "./eth-contract";
 import {ISearchContractEventsResponse} from "./interfaces";
-import {sandbox} from "./spec-helpers";
+import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";
 
 sandbox();

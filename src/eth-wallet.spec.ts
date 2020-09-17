@@ -2,7 +2,7 @@ import axios from "axios";
 import {EthContractWallet} from "./eth-contract-wallet"
 import {EthErc20Wallet} from "./eth-erc20-wallet";
 import {ISearchTxResponse} from "./interfaces"
-import {sandbox} from "./spec-helpers";
+import {sandbox} from "./utils/spec-helpers";
 import * as assert from "assert";
 import {Waas} from "./waas";
 import {EthWallet} from "./eth-wallet";

@@ -5,7 +5,7 @@ import {MiningError, TimeoutError} from "./errors";
 import {isBitcoinMiningErrorData} from "./errors/mining-error";
 import {Ethereum} from "./eth";
 import {IBlockchainTransactionStatus, IEthereumTransactionStatus, ISearchTxResponse} from "./interfaces";
-import {sandbox} from "./spec-helpers";
+import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";
 
 sandbox();

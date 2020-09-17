@@ -16,7 +16,7 @@ import {
 } from "./interfaces";
 
 import {EthErc20Wallet} from "./eth-erc20-wallet";
-import {wrapSearchRequestIterable} from "./search-request-wrapper";
+import {wrapSearchRequestIterable} from "./utils/search-request-wrapper";
 import {Wallet} from "./wallet";
 
 /**
