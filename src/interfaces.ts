@@ -112,18 +112,25 @@ export interface IEthereumTransactionEstimation {
 }
 
 /**
- * Represents a transaction recipient configuration
- * @param to - Recipient address
+ * Represents a transaction recipient configuration.
+ * One of the properties `to` or `wallet` must be set.
+ * If both are set, the specified address needs to belong to the wallet.
+ * @param [to] - Recipient address
+ * @param [wallet] - Name of a wallet in the current key vault
  * @param amount - Float currency amount formatted as a string
  */
 export interface IRecipient {
-    to: string;
+    to?: string;
+    wallet?: string;
     amount: string;
 }
 
 /**
- * Represents a transaction recipient configuration
+ * Represents an Ethereum transaction recipient configuration.
+ * One of the properties `to` or `wallet` must be set.
+ * If both are set, the specified address needs to belong to the wallet.
  * @param to - Recipient ethereum address
+ * @param [wallet] - Name of a wallet in the current key vault
  * @param amount - Float Ether amount formatted as a string
  * @param [data] - Ethereum transaction data payload
  */

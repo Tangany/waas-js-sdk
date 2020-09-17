@@ -127,35 +127,45 @@ describe("EthWallet", function() {
     });
 
     describe("validateRecipient", function(){
-        it("should throw for missing arguments", function() {
+
+        beforeEach(function(){
             const wallet = new Wallet(this.waas, sampleWallet);
-            const ethWallet = new EthWallet(this.waas, wallet);
+            this.ethWallet = new EthWallet(this.waas, wallet);
+        });
+
+        it("should throw for missing arguments", function() {
             assert.throws(
-                () => ethWallet.__test_validateRecipient({to: sampleAddress}),
+                () => this.ethWallet.__test_validateRecipient({to: sampleAddress}),
                 /Missing 'amount' argument/);
             assert.throws(
-                () => ethWallet.__test_validateRecipient({to: NaN, amount: "NaN"}),
+                () => this.ethWallet.__test_validateRecipient({to: NaN, amount: "NaN"}),
                 /Missing 'to' argument/);
         });
 
         it("should throw for invalid types", function() {
-            const wallet = new Wallet(this.waas, sampleWallet);
-            const ethWallet = new EthWallet(this.waas, wallet);
             assert.throws(
-                () => ethWallet.__test_validateRecipient({to: true, amount: true}),
+                () => this.ethWallet.__test_validateRecipient({to: true, amount: true}),
                 /Expected property "to" of type String, got Boolean true/);
             assert.throws(
-                () => ethWallet.__test_validateRecipient({
+                () => this.ethWallet.__test_validateRecipient({
                     to: sampleAddress,
                     amount: sampleAmount,
                     data: true}),
                 /Expected property "data" of type \?String, got Boolean true/);
             assert.throws(
-                () => ethWallet.__test_validateRecipient({
+                () => this.ethWallet.__test_validateRecipient({
                     to: sampleAddress,
                     amount: sampleAmount,
                     from: "abc",}),
                 /Unexpected property "from"/);
+        });
+
+        it("should not throw if optional arguments are omitted", function() {
+            // Omit "to"
+            assert.doesNotThrow(() => this.ethWallet.__test_validateRecipient({
+                wallet: sampleWallet,
+                amount: sampleAmount
+            }));
         });
     });
 

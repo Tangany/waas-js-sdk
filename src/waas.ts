@@ -79,12 +79,14 @@ interface IWaaSOptions {
 }
 
 export const recipientType = t.compile({
-    to: "String",
+    to: "?String",
+    wallet: "?String",
     amount: "String",
 });
 
 export const ethereumRecipientType = t.compile({
-    to: "String",
+    to: "?String",
+    wallet: "?String",
     amount: "String",
     data: "?String",
 });

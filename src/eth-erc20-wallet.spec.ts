@@ -79,15 +79,20 @@ describe("EthErc20Wallet", function() {
             const r = new EthErc20Wallet(this.waas, this.walletInstance, sampleToken);
             assert.doesNotThrow(() => r.__test_getRecipientsData()({to: sampleAddress, amount: "6"}));
             assert.doesNotThrow(() => r.__test_getRecipientsData("transfer")({to: sampleAddress, amount: "6"}));
+            assert.doesNotThrow(() => r.__test_getRecipientsData("transfer")({wallet: "my-wallet", amount: "6"}));
             assert.doesNotThrow(() => r.__test_getRecipientsData("approve")({to: sampleAddress, amount: "6"}));
+            assert.doesNotThrow(() => r.__test_getRecipientsData("approve")({wallet: "my-wallet", amount: "6"}));
             assert.doesNotThrow(() => r.__test_getRecipientsData("transferFrom")({from: sampleAddress, amount: "6"}));
+            assert.doesNotThrow(() => r.__test_getRecipientsData("transferFrom")({wallet: "my-wallet", amount: "6"}));
             assert.doesNotThrow(() => r.__test_getRecipientsData("burn")({amount: "6"}));
             assert.doesNotThrow(() => r.__test_getRecipientsData("mint")({amount: "6"}));
+            assert.doesNotThrow(() => r.__test_getRecipientsData("mint")({wallet: "my-wallet", amount: "6"}));
         });
-        it("should throw fo invalid recipients data for given method", function() {
+        it("should throw for invalid recipients data for given method", function() {
             const r = new EthErc20Wallet(this.waas, this.walletInstance, sampleToken);
             assert.throws(() => r.__test_getRecipientsData()({to: sampleAddress, amount: 6 as any}));
             assert.throws(() => r.__test_getRecipientsData()({to: sampleAddress} as any));
+            assert.throws(() => r.__test_getRecipientsData()({wallet: 123, amount: "6"} as any), /Expected property "wallet" of type/);
             assert.throws(() => r.__test_getRecipientsData("transfer")({from: sampleAddress, amount: "6"}));
             assert.throws(() => r.__test_getRecipientsData("transfer")({
                 from: sampleAddress,
@@ -100,6 +105,10 @@ describe("EthErc20Wallet", function() {
                 from: sampleAddress,
                 amount: "6",
             }));
+            assert.throws(
+                () => r.__test_getRecipientsData("approve")({amount: "6"}),
+                /At least one of the properties .* must be set/
+            );
             assert.throws(() => r.__test_getRecipientsData("transferFrom")({to: sampleAddress, amount: "6"}));
             assert.throws(() => r.__test_getRecipientsData("transferFrom")({
                 from: sampleAddress,
@@ -111,6 +120,10 @@ describe("EthErc20Wallet", function() {
                 to: sampleAddress,
                 amount: "11",
             } as any));
+            assert.throws(
+                () => r.__test_getRecipientsData("transferFrom")({amount: "6"}),
+                /At least one of the properties .* must be set/
+            );
             assert.throws(() => r.__test_getRecipientsData("burn")({amount: 6 as any}));
             assert.throws(() => r.__test_getRecipientsData("burn")({amount: "6", from: "123"} as any));
             assert.throws(() => r.__test_getRecipientsData("burn")({from: "123"} as any));

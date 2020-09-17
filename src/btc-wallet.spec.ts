@@ -82,8 +82,9 @@ describe("BtcWallet", function() {
         });
         it("should throw for invalid type", function() {
             const b = new BtcWallet(this.stub, new Wallet(this.stub, "some-wallet"));
-            assert.throws(() => b.__test_getRecipientsData({to}), /Missing/);
-            assert.throws(() => b.__test_getRecipientsData([recipient, {amount}]), /Missing/);
+            assert.throws(() => b.__test_getRecipientsData({amount: "6"}), /At least one of the properties .* must be set/);
+            assert.throws(() => b.__test_getRecipientsData({wallet: "my-wallet"}), /Missing 'amount'/);
+            assert.throws(() => b.__test_getRecipientsData([recipient, {amount}]), /At least one of the properties .* must be set/);
         });
     });
 });

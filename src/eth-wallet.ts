@@ -148,8 +148,8 @@ export class EthWallet extends BlockchainWallet {
      * @param recipient - Recipient to be validated ({@link IEthereumRecipient})
      */
     private validateRecipient(recipient: IEthereumRecipient,): void {
-        if (!recipient.to) {
-            throw new Error("Missing 'to' argument");
+        if (!(recipient.to || recipient.wallet)) {
+            throw new Error("At least one of the properties 'to' or 'wallet' must be set");
         }
         if (!recipient.amount) {
             throw new Error("Missing 'amount' argument");

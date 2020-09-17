@@ -93,14 +93,15 @@ export class BtcWallet extends BlockchainWallet {
         let data: any = {};
 
         const checkType = (recipient: IRecipient) => {
-            if (!recipient.to) {
-                throw new Error("Missing 'to' argument");
+            const {to, wallet, amount} = recipient;
+            if (!(to || wallet)) {
+                throw new Error("At least one of the properties 'to' or 'wallet' must be set");
             }
-            if (!recipient.amount) {
+            if (!amount) {
                 throw new Error("Missing 'amount' argument");
             }
 
-            t(recipientType, {to: recipient.to, amount: recipient.amount}, true);
+            t(recipientType, {to, wallet, amount}, true);
 
             return recipient;
         };
