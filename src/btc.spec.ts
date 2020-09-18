@@ -3,7 +3,7 @@ import {SinonFakeTimers} from "sinon"
 import {Bitcoin} from "./btc";
 import {MiningError, TimeoutError} from "./errors";
 import {isBitcoinMiningErrorData} from "./errors/mining-error";
-import {sandbox} from "./spec-helpers";
+import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";
 import axios from "axios";
 

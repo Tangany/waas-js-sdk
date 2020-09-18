@@ -1,5 +1,5 @@
-import {ISearchQueryParams, ISearchResponse} from "./interfaces";
-import {Waas} from "./waas";
+import {ISearchQueryParams, ISearchResponse} from "../interfaces";
+import {Waas} from "../waas";
 
 /**
  * Represents a AsyncIterable object for a blockchain search request where the original URL references to resources are replaced by TypeScript methods.

@@ -1,6 +1,6 @@
 import * as t from "typeforce";
 import {IAsyncRequestStatus} from "./interfaces";
-import {poll} from "./polling-helper";
+import {poll} from "./utils/polling-helper";
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
 

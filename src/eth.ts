@@ -1,5 +1,5 @@
 import {EthereumContract} from "./eth-contract"
-import {wrapSearchRequestIterable} from "./search-request-wrapper";
+import {wrapSearchRequestIterable} from "./utils/search-request-wrapper";
 import {Waas} from "./waas";
 import {IEthereumTransactionStatus, IEthStatus, ISearchTxEventResponse, ISearchTxQueryParams} from "./interfaces";
 import * as t from "typeforce";

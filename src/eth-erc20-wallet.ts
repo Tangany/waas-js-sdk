@@ -108,8 +108,10 @@ export class EthErc20Wallet extends BlockchainWallet {
     /**
      * returns valid recipient object configuration for given ERC20 method
      */
-    private readonly getRecipientsData = (method: METHOD) => ({to, amount, from}: { to?: string, amount: string, from?: string }) => {
+    private readonly getRecipientsData = (method: METHOD) =>
+        ({to, wallet, amount, from}: { to?: string, wallet?: string, amount: string, from?: string }) => {
 
+        // In contrast to the non-ERC20 endpoints, the amount parameter is not optional here, but required
         switch (method) {
             case METHOD.MINT:
                 if (!amount) {
@@ -118,9 +120,9 @@ export class EthErc20Wallet extends BlockchainWallet {
                 if (from) {
                     throw new Error("Invalid 'from' argument");
                 }
-                t({to: "?String", amount: "String"}, {to, amount}, true);
+                t(recipientType, {to, wallet, amount}, true);
 
-                return {to, amount};
+                return {to, wallet, amount};
             case METHOD.BURN:
                 if (!amount) {
                     throw new Error("Missing 'amount' argument");
@@ -135,8 +137,8 @@ export class EthErc20Wallet extends BlockchainWallet {
 
                 return {amount};
             case METHOD.TRANSFER_FROM:
-                if (!from) {
-                    throw new Error("Missing 'from' argument");
+                if (!(from || wallet)) {
+                    throw new Error("At least one of the properties 'from' or 'wallet' must be set");
                 }
                 if (to) {
                     throw new Error("Invalid 'to' argument");
@@ -144,14 +146,14 @@ export class EthErc20Wallet extends BlockchainWallet {
                 if (!amount) {
                     throw new Error("Missing 'amount' argument");
                 }
-                t({from: "String", amount: "String"}, {from, amount}, true);
+                t({from: "?String", wallet: "?String", amount: "String"}, {from, wallet, amount}, true);
 
                 return {from, amount};
             case METHOD.APPROVE:
             case METHOD.TRANSFER:
             default:
-                if (!to) {
-                    throw new Error("Missing 'to' argument");
+                if (!(to || wallet)) {
+                    throw new Error("At least one of the properties 'to' or 'wallet' must be set");
                 }
                 if (from) {
                     throw new Error("Invalid 'from' argument");
@@ -159,9 +161,9 @@ export class EthErc20Wallet extends BlockchainWallet {
                 if (!amount) {
                     throw new Error("Missing 'amount' argument");
                 }
-                t(recipientType, {to, amount}, true);
+                t(recipientType, {to, wallet, amount}, true);
 
-                return {to, amount};
+                return {to, wallet, amount};
         }
     }
 }

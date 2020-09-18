@@ -10,10 +10,10 @@ import {
     IBlockchainTransactionStatus,
     IWaasError
 } from "./interfaces";
-import {limiter} from "./limiter";
+import {limiter} from "./utils/limiter";
 import {Request} from "./request"
 import {Wallet} from "./wallet";
-import {poll} from "./polling-helper";
+import {poll} from "./utils/polling-helper";
 
 const debug = Debug("waas-js-sdk:main");
 
@@ -79,13 +79,15 @@ interface IWaaSOptions {
 }
 
 export const recipientType = t.compile({
-    to: "String",
+    to: "?String",
+    wallet: "?String",
     amount: "String",
 });
 
 export const ethereumRecipientType = t.compile({
-    to: "String",
-    amount: "String",
+    to: "?String",
+    wallet: "?String",
+    amount: "?String",
     data: "?String",
 });
 

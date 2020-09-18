@@ -12,11 +12,11 @@ import {
     ITransaction,
     ITransmittableTransaction,
     IWalletBalance,
-    IAsyncEthereumTransactionOutput
+    IAsyncEthereumTransactionOutput, IAsyncEndpointResponse
 } from "./interfaces";
 
 import {EthErc20Wallet} from "./eth-erc20-wallet";
-import {wrapSearchRequestIterable} from "./search-request-wrapper";
+import {wrapSearchRequestIterable} from "./utils/search-request-wrapper";
 import {Wallet} from "./wallet";
 
 /**
@@ -62,7 +62,7 @@ export class EthWallet extends BlockchainWallet {
      */
     public async sendAsync(recipient: IEthereumRecipient): Promise<Request<IAsyncEthereumTransactionOutput>> {
         this.validateRecipient(recipient);
-        const rawResponse = await this.waas.wrap<{ statusUri: string }>(() => this.waas.instance
+        const rawResponse = await this.waas.wrap<IAsyncEndpointResponse>(() => this.waas.instance
             .post(`eth/wallet/${this.wallet}/send-async`, {
                 ...recipient,
             }),
@@ -148,11 +148,8 @@ export class EthWallet extends BlockchainWallet {
      * @param recipient - Recipient to be validated ({@link IEthereumRecipient})
      */
     private validateRecipient(recipient: IEthereumRecipient,): void {
-        if (!recipient.to) {
-            throw new Error("Missing 'to' argument");
-        }
-        if (!recipient.amount) {
-            throw new Error("Missing 'amount' argument");
+        if (!(recipient.to || recipient.wallet)) {
+            throw new Error("At least one of the properties 'to' or 'wallet' must be set");
         }
         t(ethereumRecipientType, recipient, true);
     }

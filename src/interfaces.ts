@@ -1,5 +1,10 @@
 import {WalletSecurity, WalletVersion} from "./waas";
 
+/**
+ * General purpose utility type to specify only some properties of T as optional (in contrast to Partial<T>)
+ */
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
+
 export type BlockchainTransactionStatuses = "unknown" | "pending" | "confirmed" | "error";
 type NodeStatus = "live" | "unavailable" | "faulty";
 
@@ -88,6 +93,13 @@ export interface IBitcoinTransactionStatus {
 }
 
 /**
+ * Represents the transaction status after a sweep operation
+ */
+export interface IBitcoinSweepResult extends Pick<IBitcoinTransactionStatus, "status" | "blockNr">{
+    hash: string | null;
+}
+
+/**
  * Represents a Bitcoin transaction estimation
  */
 export interface IBitcoinTransactionEstimation {
@@ -105,29 +117,41 @@ export interface IEthereumTransactionEstimation {
 }
 
 /**
- * Represents a transaction recipient configuration
- * @param to - Recipient address
+ * Represents a transaction recipient configuration.
+ * One of the properties `to` or `wallet` must be set.
+ * If both are set, the specified address needs to belong to the wallet.
+ * @param [to] - Recipient address
+ * @param [wallet] - Name of a wallet in the current key vault
  * @param amount - Float currency amount formatted as a string
  */
 export interface IRecipient {
-    to: string;
+    to?: string;
+    wallet?: string;
     amount: string;
 }
 
 /**
- * Represents a transaction recipient configuration
+ * Represents an Ethereum transaction recipient configuration.
+ * One of the properties `to` or `wallet` must be set.
+ * If both are set, the specified address needs to belong to the wallet.
  * @param to - Recipient ethereum address
- * @param amount - Float Ether amount formatted as a string
+ * @param [wallet] - Name of a wallet in the current key vault
+ * @param [amount] - Float Ether amount formatted as a string (if no value is defined, the API uses the default value "0")
  * @param [data] - Ethereum transaction data payload
  */
-export interface IEthereumRecipient extends IRecipient {
-    data?: string;
-}
+export type IEthereumRecipient = Optional<IRecipient, "amount"> & {data?: string;};
 
 export interface IWaasError {
     statusCode: number;
     activityId: string;
     message: string;
+}
+
+/**
+ * Represents the response of an asynchronous endpoints that returns a link to its status.
+ */
+export interface IAsyncEndpointResponse {
+    statusUri: string
 }
 
 /**
@@ -162,12 +186,37 @@ export interface ITransmittableTransaction {
 }
 
 /**
- * Represents the configuration of a Smart Contract method call
+ * Represents the basic configuration to execute a smart contract function.
+ * Besides the Solidity types, `wallet` can also be used as function parameter type to specify a wallet name as input.
+ * This name is then translated to an address.
  */
-export interface IContractMethod {
-    function: string,
-    inputs: string[],
+interface IContractFunction {
+    function: string;
+    inputs: (boolean | number | string)[];
 }
+
+/**
+ * Configuration to execute a smart contract function triggered by sending a transaction.
+ */
+export interface IContractTransaction extends IContractFunction {
+    amount?: string
+}
+
+/**
+ * Configuration for a smart contract function method call (this means readonly).
+ */
+export interface IContractCall extends IContractFunction {
+    outputs: string[];
+}
+
+export interface IContractCallResponse {
+    list: {
+        type: string;
+        value: string;
+    }[];
+}
+
+export type ContractCallResult = IContractCallResponse["list"]
 
 /* ----------- INTERFACES FOR SEARCH REQUESTS ----------- */
 export type ISearchQueryParams = ISearchTxQueryParams | ISearchContractEventsQueryParams;

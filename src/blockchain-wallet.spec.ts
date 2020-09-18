@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import {BlockchainWallet} from "./blockchain-wallet";
-import {sandbox} from "./spec-helpers";
+import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";
 import {Wallet} from "./wallet";
 

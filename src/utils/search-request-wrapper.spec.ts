@@ -1,9 +1,9 @@
 import * as assert from "assert";
 import axios from "axios";
-import {ISearchResponse, ISearchTxResponse} from "./interfaces";
+import {ISearchResponse, ISearchTxResponse} from "../interfaces";
 import {wrapSearchRequestIterable} from "./search-request-wrapper";
 import {sandbox} from "./spec-helpers";
-import {Waas} from "./waas";
+import {Waas} from "../waas";
 
 describe("SearchRequestWrapper", function() {
 
