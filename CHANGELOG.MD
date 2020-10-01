@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 ### Fixed
 ### Added
+### Changed
+
+## [1.1.0]
+### Fixed
+### Added
 * Supporting [WaaS 1.6](https://github.com/Tangany/Wallet-as-a-Service/blob/master/CHANGELOG.md#161---2020-08-12):
     * Call arbitrary readonly smart contract methods
     * Sweep Bitcoin wallet
