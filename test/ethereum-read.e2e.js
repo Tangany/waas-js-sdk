@@ -13,30 +13,33 @@ describe("Example workflow for reading Ethereum blockchain data", function () {
 
 	this.timeout(75e3);
 	const wallet = process.env.E2E_WALLET;
-	const api = new Waas({ ethereumNetwork: EthereumPublicNetwork.MAINNET });
+	const api = new Waas({ ethereumNetwork: EthereumPublicNetwork.ROPSTEN });
 
 	it("should iterate over all search results for given wallet", async function () {
 		const query = {
-			blocknr: "8000000",
-			sort: "nonceDesc",
-			limit: "40",
+			sort: "noncedesc",
+			to: "0xc32ae45504ee9482db99cfa21066a59e877bc0e6",
+			iserror: true
 		};
-		const iterable = api.eth().getTransactions(query); // can be used to iterate forward in a for await of loop
+		const iterable = api.wallet(wallet).eth().getTransactions(query); // can be used to iterate forward in a for await of loop
 		const iterator = iterable[Symbol.asyncIterator](); // can be used to iterate forward and backward manually
 
 		// iterate manually
 		const firstPageList = await iterator.next();
 		console.log(`Fetched the first page with ${firstPageList.value.list.length} results of total ${firstPageList.value.hits.total}. Fetching the details for the first result`);
+		assert.ok(firstPageList.value.list.length);
 		const firstTxData = await firstPageList.value.list[0].get();
 		console.log(firstTxData);
 
 		const secondPageList = await iterator.next();
 		console.log(`Fetched the second page with ${secondPageList.value.list.length} results of total ${secondPageList.value.hits.total}. Fetching the details for the first result`);
+		assert.ok(secondPageList.value.list.length);
 		const secondTxData = await secondPageList.value.list[0].get();
 		console.log(secondTxData);
 
 		const firstPageListAgain = await iterator.previous();
 		console.log(`Fetched the first page again with ${firstPageListAgain.value.list.length} results of total ${firstPageListAgain.value.hits.total}. Fetching the details for the first result`);
+		assert.ok(firstPageListAgain.value.list.length);
 		const firstTxAgainData = await firstPageListAgain.value.list[0].get();
 		console.log(firstTxAgainData);
 
