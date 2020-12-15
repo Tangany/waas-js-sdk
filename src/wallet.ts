@@ -1,7 +1,14 @@
 import * as t from "typeforce";
 import {BtcWallet} from "./btc-wallet";
 import {EthWallet} from "./eth-wallet";
-import {ISignatureResponse, ISoftDeletedWallet, IWallet, IWalletList, SignatureEncoding} from "./interfaces";
+import {
+    ISignatureResponse,
+    ISignatureVerificationResponse,
+    ISoftDeletedWallet,
+    IWallet,
+    IWalletList,
+    SignatureEncoding
+} from "./interfaces";
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
 
@@ -95,6 +102,21 @@ export class Wallet implements IWaasMethod {
 
         return signature;
     }
+
+    public async verifySignature(payload: string, signature: string, encoding?: SignatureEncoding): Promise<boolean> {
+        const body = {
+            payload,
+            signature,
+            ...encoding && {encoding}
+        };
+
+        const {isValid} = await this.waas.wrap<ISignatureVerificationResponse>(() => this.waas.instance
+            .post(`wallet/${this.wallet}/verify`, body),
+        );
+
+        return isValid;
+    }
+
 
     /**
      * Returns wallet calls for the Ethereum blockchain

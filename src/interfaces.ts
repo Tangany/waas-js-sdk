@@ -73,6 +73,10 @@ export interface ISignatureResponse {
     encoding: SignatureEncoding;
 }
 
+export interface ISignatureVerificationResponse {
+    isValid: boolean;
+}
+
 export type IBlockchainTransactionStatus = IEthereumTransactionStatus | IBitcoinTransactionStatus;
 
 /**

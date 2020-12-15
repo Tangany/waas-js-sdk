@@ -49,7 +49,7 @@ describe("WaaS sample wallet workflow", function () {
 		});
 	});
 
-	it("should sign arbitrary payload", async function(){
+	it("should sign and verify arbitrary payload", async function(){
 		assert.ok(createdWallet, "cannot run without previous tests");
 
 		const walletApi = api.wallet(createdWallet);
@@ -57,9 +57,13 @@ describe("WaaS sample wallet workflow", function () {
 
 		const signatureDer = await walletApi.sign(payload);
 		assert.ok(signatureDer);
+		const isValidDer = await walletApi.verifySignature(payload, signatureDer);
+		assert.ok(isValidDer);
 
 		const signatureP1363 = await walletApi.sign(payload, "ieee-p1363");
 		assert.ok(signatureP1363);
+		const isValidP1363 = await walletApi.verifySignature(payload, signatureP1363, "ieee-p1363");
+		assert.ok(isValidP1363);
 	});
 
 	it("should replace the created wallet with a new version", async function(){

@@ -107,6 +107,12 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const signatureDer = await api.sign(payload);
     // create signature with IEEE-P1363 encoding
     const signatureP1363 = await api.sign(payload, "ieee-p1363");
+    // verify signatures
+    const isValidDer = await waas.verifySignature(payload, signatureDer);
+    const isValidP1363 = await waas.verifySignature(payload, signatureP1363, "ieee-p1363");
+    // DER signatures can also be verified externally using tools such as OpenSSL.
+    // For this, the public key is necessary, which may have to be converted depending on the tool.
+    const {public: {secp256k1}} = await api.get();
 })();
 ````
 
