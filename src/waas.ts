@@ -67,7 +67,7 @@ interface IWaaSOptions {
     vaultUrl?: string; // can be omitted for non-custodian calls (e.g. check transaction status)
     ethereumNetwork?: EthereumPublicNetwork | string;
     ethereumTxSpeed?: EthereumTxSpeed;
-    ethereumTxConfirmations?: BlockchainTxConfirmations;
+    ethereumTxConfirmations?: BlockchainTxConfirmations | number;
     ethereumGasPrice?: string;
     ethereumGas?: number;
     ethereumNonce?: number;
@@ -174,6 +174,7 @@ export class Waas {
             vaultUrl: "?String",
             ethereumNetwork: "?String",
             ethereumTxSpeed: "?String",
+            ethereumTxConfirmations: t.anyOf("?String", "?Number"),
             ethereumGasPrice: "?String",
             ethereumGas: "?Number",
             ethereumNonce: "?Number",

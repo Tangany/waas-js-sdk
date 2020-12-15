@@ -4,6 +4,8 @@ declare namespace typeforce {
         (type: any, value: any, strict?: boolean, surrogate?: any): void;
 
         compile(type: object): object;
+
+        anyOf(...types: string[]): object;
     }
 }
 declare const typeforce: typeforce.ITypeforce;
