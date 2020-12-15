@@ -210,7 +210,12 @@ export interface ITransmittableTransaction {
  */
 interface IContractFunction {
     function: string;
-    inputs: (boolean | number | string)[];
+
+    /**
+     * The associated endpoints allow an array of arguments, which may each contain arbitrary JSON-compatible values.
+     * In order not to lose this flexibility, the type `unknown` is used.
+     */
+    inputs?: unknown[];
 }
 
 /**
