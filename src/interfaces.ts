@@ -257,7 +257,7 @@ export interface ISearchTxQueryParams {
     blocknr?: string;
     nonce?: string;
     iserror?: string;
-    sort?: "value" | "valuedesc" | "blocknr" | "blocknrdesc" | "nonce" | "noncedesc" | "to" | "todesc" | "from" | "fromdesc" | "timestamp" | "timestampdesc";
+    sort?: "value" | "valuedesc" | "blocknr" | "blocknrdesc" | "nonce" | "noncedesc" | "to" | "todesc" | "from" | "fromdesc" | "timestamp" | "timestampdesc" | "transactionindex" | "transactionindexdesc";
     limit?: string;
     index?: string;
 }
