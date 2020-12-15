@@ -32,12 +32,20 @@ export interface IWallet {
     updated: string;
     created: string;
     version: string | WalletVersion.LATEST;
+    public: {
+        secp256k1: string
+    };
+    tags: string[];
 }
 
 /**
  * Represents a wallet list operation response
  */
 export interface IWalletList {
+    hits: {
+        total: number;
+        hsm: number
+    };
     list: IWallet[];
     skiptoken: string;
 }
