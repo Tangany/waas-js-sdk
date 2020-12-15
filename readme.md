@@ -98,6 +98,18 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 })();
 ````
 
+#### Payload signing interface
+````javascript
+(async () => {
+    const api = new Waas().wallet("my-wallet");
+    const payload = "arbitrary payload";
+    // create signature with default encoding (DER)
+    const signatureDer = await api.sign(payload);
+    // create signature with IEEE-P1363 encoding
+    const signatureP1363 = await api.sign(payload, "ieee-p1363");
+})();
+````
+
 #### General Ethereum interface
 [*Ethereum calls that are not wallet based*](https://docs.tangany.com/#7b314b47-012c-4baa-b928-dd32c7db1e41)
 ````javascript

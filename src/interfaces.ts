@@ -5,6 +5,7 @@ import {WalletSecurity, WalletVersion} from "./waas";
  */
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 
+export type SignatureEncoding = "der" | "ieee-p1363";
 export type BlockchainTransactionStatuses = "unknown" | "pending" | "confirmed" | "error";
 type NodeStatus = "live" | "unavailable" | "faulty";
 
@@ -65,6 +66,11 @@ export interface IWalletBalance {
     address: string;
     balance: string;
     currency: string;
+}
+
+export interface ISignatureResponse {
+    signature: string;
+    encoding: SignatureEncoding;
 }
 
 export type IBlockchainTransactionStatus = IEthereumTransactionStatus | IBitcoinTransactionStatus;

@@ -1,7 +1,7 @@
 import * as t from "typeforce";
 import {BtcWallet} from "./btc-wallet";
 import {EthWallet} from "./eth-wallet";
-import {ISoftDeletedWallet, IWallet, IWalletList} from "./interfaces";
+import {ISignatureResponse, ISoftDeletedWallet, IWallet, IWalletList, SignatureEncoding} from "./interfaces";
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
 
@@ -81,6 +81,19 @@ export class Wallet implements IWaasMethod {
         return this.waas.wrap<IWallet>(() => this.waas.instance
             .get(`wallet/${this.wallet}`),
         );
+    }
+
+    public async sign(payload: string, encoding?: SignatureEncoding): Promise<string> {
+        const body = {
+            payload,
+            ...encoding && {encoding}
+        };
+
+        const {signature} = await this.waas.wrap<ISignatureResponse>(() => this.waas.instance
+            .post(`wallet/${this.wallet}/sign`, body),
+        );
+
+        return signature;
     }
 
     /**
