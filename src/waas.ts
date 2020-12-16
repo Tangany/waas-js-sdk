@@ -5,11 +5,7 @@ import * as t from "typeforce";
 import {Bitcoin} from "./btc";
 import {AuthenticationError, ConflictError, GeneralError, MiningError, NotFoundError} from "./errors";
 import {Ethereum} from "./eth";
-import {
-    BlockchainTransactionStatuses,
-    IBlockchainTransactionStatus,
-    IWaasError
-} from "./interfaces";
+import {BlockchainTransactionStatuses, IBlockchainTransactionStatus, IWaasError, WaasErrorResponse} from "./interfaces";
 import {limiter} from "./utils/limiter";
 import {Request} from "./request"
 import {Wallet} from "./wallet";
@@ -285,12 +281,12 @@ export class Waas {
 
                 return data;
             },
-            async (e: AxiosError<IWaasError>) => {
-                if (!e.response) {
+            async (e: AxiosError<WaasErrorResponse>) => {
+                const {response, message} = e;
+
+                if (!response) {
                     throw e;
                 }
-
-                const {response, message} = e;
 
                 debug("interceptors.response.error", {
                     response: response.data,
@@ -298,8 +294,13 @@ export class Waas {
                     message,
                 });
 
-                const {message: waasMessage, activityId} = response.data;
-                switch (e.response.status) {
+                // In responses of endpoints with asynchronous execution, the error details are (usually) in a nested object.
+                // Otherwise, use the properties at the top level of the response body.
+                const noErrorDetails: IWaasError = {message: "An error has occurred for which no error details could be retrieved", statusCode: 0, activityId: ""};
+                const waasError: IWaasError = (typeof response.data === "object" && "output" in response.data ? response.data.output : response.data) || noErrorDetails;
+                const {activityId, message: waasMessage} = waasError;
+
+                switch (response.status) {
                     case 401:
                         throw new AuthenticationError(waasMessage, activityId);
                     case 409:

@@ -168,6 +168,8 @@ export interface IRecipient {
  */
 export type IEthereumRecipient = Optional<IRecipient, "amount"> & {data?: string;};
 
+export type WaasErrorResponse = IWaasError | IAsyncRequestStatus<IWaasError>;
+
 export interface IWaasError {
     statusCode: number;
     activityId: string;
