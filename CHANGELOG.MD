@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 ### Added
 * Add wallet replace functionality (#52)
+* Support [WaaS 1.7](https://github.com/Tangany/Wallet-as-a-Service/blob/master/CHANGELOG.md#170---2020-12-22) (#49)
+    * Return total wallets statistic and wallet public key
+    * Add payload signing and verification
+    * Support integer values besides levels in transaction confirmation options
+    * Make smart contract inputs more flexible and optional
+    * Add smart contract event search based on their arguments
+    * Extend transaction search options
+    * Add asynchronous Bitcoin transactions
 ### Changed
 
 ## [1.1.0]
