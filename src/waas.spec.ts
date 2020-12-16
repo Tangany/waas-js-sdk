@@ -74,7 +74,7 @@ describe("Waas", function() {
         assert.throws(() => new Waas({...auth, ethereumTxSpeed: eval} as any));
         assert.throws(() => new Waas({...auth, bitcoinNetwork: 1} as any));
         assert.throws(() => new Waas({...auth, bitcoinTxSpeed: Symbol} as any));
-        assert.throws(() => new Waas({...auth, bitcoinTxConfirmations: -2} as any));
+        assert.throws(() => new Waas({...auth, bitcoinTxConfirmations: true} as any));
         assert.throws(() => new Waas({...auth, bitcoinMaxFeeRate: "yak"} as any));
     });
 

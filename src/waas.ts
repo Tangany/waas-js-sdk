@@ -69,7 +69,7 @@ interface IWaaSOptions {
     ethereumNonce?: number;
     useGasTank?: boolean;
     bitcoinNetwork?: BitcoinNetwork;
-    bitcoinTxConfirmations?: BlockchainTxConfirmations;
+    bitcoinTxConfirmations?: BlockchainTxConfirmations | number;
     bitcoinTxSpeed?: BitcoinTxSpeed;
     bitcoinMaxFeeRate?: number;
 }
@@ -177,7 +177,7 @@ export class Waas {
             useGasTank: "?Boolean",
             bitcoinNetwork: "?String",
             bitcoinTxSpeed: "?String",
-            bitcoinTxConfirmations: "?String",
+            bitcoinTxConfirmations: t.anyOf("?String", "?Number"),
             bitcoinMaxFeeRate: "?Number",
             version: "?Number",
         }, _options, true);
