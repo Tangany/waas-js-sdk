@@ -1,4 +1,4 @@
-import {ISearchQueryParams, ISearchResponse} from "../interfaces";
+import {IEventArgumentFilter, ISearchQueryParams, ISearchResponse} from "../interfaces";
 import {Waas} from "../waas";
 
 /**
@@ -87,7 +87,18 @@ export function wrapSearchRequestIterable<TDetail, TData>(
             }
         }
 
-        const response: ISearchResponse = await waas.wrap<ISearchResponse>(() => waas.instance.get(_url, {params: queryParams}));
+        // Build a custom query string for event argument filters due to its custom format
+        if ("argumentFilters" in queryParams && queryParams.argumentFilters !== undefined) {
+            _url += composeEventArgumentQuery(queryParams.argumentFilters);
+            delete queryParams.argumentFilters; // Remove this property as it is SDK-specific and cannot be processed by the endpoint
+        }
+
+        // If the URL already contains parts of a URL query like ".../resource?foo=true"
+        // and additional query parameters are defined in the options like {params: {bar: 42, active: "yes"}},
+        // axios will merge them correctly, thus recognizing that the query already starts with ?: .../resource?foo=true&bar=42&active="yes"
+        const response: ISearchResponse = await waas.wrap<ISearchResponse>(
+            () => waas.instance.get(_url!, {params: queryParams}));
+
         const list = getResponseList(response);
         const hits = response.hits;
 
@@ -122,4 +133,29 @@ export function wrapSearchRequestIterable<TDetail, TData>(
     return {
         [Symbol.asyncIterator]: () => asyncIterator // AsyncIterable
     };
+}
+
+export function composeEventArgumentQuery(argFilters: IEventArgumentFilter[]): string {
+    return argFilters.reduce<string>((accumulatedQuery, filter) => {
+        const {position, type, value} = filter;
+
+        if (!(position || type || value)) {
+            throw new Error("An argument filter object must define at least one criterion");
+        }
+
+        // If it is the first URL query parameter, use "?", otherwise use "&" to join multiple filters
+        let s = `${accumulatedQuery === "" ? "?" : "&"}inputs`;
+
+        // Ensure that the brackets are created to produce the form "inputs[]" even if no position is specified
+        s += `[${position !== undefined ? JSON.stringify(position) : ""}]`;
+
+        if (type) {
+            s += `.${type}`;
+        }
+        if (value) {
+            s += `=${JSON.stringify(value)}`;
+        }
+
+        return accumulatedQuery + s;
+    }, "");
 }

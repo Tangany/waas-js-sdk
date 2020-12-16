@@ -219,6 +219,11 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     // Read transaction events for a specific contract
     const eventsList = (await api.contract(tokenAddress).getEvents({event: "Transfer", limit: 10})[Symbol.asyncIterator]().next()).value;
     const eventDetails = await eventsList[0].get();
+    // Query transaction events based on their arguments
+    const filteredEventsIterator = await api.contract(tokenAddress).getEvents({
+        event: "Transfer",
+        argumentFilters: [{position: "to", value: "0x1ec2a77ec126369ad7c7e6fdb03e3d52b79b013d"}]
+    });
     // Read an individual event
     const event = await new Waas().eth(txHash).getEvent(logIndex);
 })();
