@@ -253,6 +253,8 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const { hash } = await api.btc().send({to: someAddress, amount: "0.021"});
     // send BTC to multiple recipients
     await api.btc().send([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
+    // send BTC using an asynchronous request
+    const sendReq = await api.btc().sendAsync([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
     // create a signed transaction that can be manually transmitted
     const { rawTransaction } = await api.btc().sign({to: someAddress, amount: "0.021"});
     // get BTC balance and wallet address

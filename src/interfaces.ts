@@ -118,6 +118,15 @@ export interface IBitcoinSweepResult extends Pick<IBitcoinTransactionStatus, "st
 }
 
 /**
+ * Represents the output of an asynchronous request for Bitcoin transactions
+ */
+export interface IAsyncBitcoinTransactionOutput {
+    hash: string;
+    blockNr: number | null;
+    status: string;
+}
+
+/**
  * Represents a Bitcoin transaction estimation
  */
 export interface IBitcoinTransactionEstimation {
