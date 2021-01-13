@@ -54,6 +54,16 @@ export class Wallet implements IWaasMethod {
     }
 
     /**
+     * Creates a new version of the current wallet. It generates new keys and therefore disables "write" operations of the previous wallet version to the blockchain.
+     * @param [useHsm] - Use a hardware secure module to store the wallet private key
+     * @see [docs]{@link https://docs.tangany.com/#73451025-c889-4d94-b424-fbe2a3f9999f}
+     */
+    public async replace(useHsm?: boolean): Promise<IWallet> {
+        t("?Boolean", useHsm);
+        return this.waas.wrap<IWallet>(() => this.waas.instance.put(`wallet/${this.wallet}`, {useHsm}));
+    }
+
+    /**
      * Soft-deletes a wallet so not writing operations cannot be executed for the associated blockchain account. Wallet recovery endpoints are not yet implemented into the API. Contact the support team to recover soft-deleted wallets during the retention period.
      * @see [docs]{@link https://docs.tangany.com/#e0b207c8-5cdc-4dce-af6d-a6a655a1cf20}
      */

@@ -91,6 +91,8 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const { wallet, security } = await api.wallet().create("some-other-wallet", false);
     //  fetch a wallet
     const { created } = await api.wallet(wallet).get();
+    // replace a wallet
+    const { version } = await api.wallet(wallet).replace();
     //  delete a wallet
     const { scheduledPurgeDate, recoveryId } = await api.wallet(wallet).delete();
 })();
