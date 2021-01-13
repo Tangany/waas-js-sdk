@@ -49,6 +49,17 @@ describe("WaaS sample wallet workflow", function () {
 		});
 	});
 
+	it("should replace the created wallet with a new version", async function(){
+		assert.ok(createdWallet, "cannot run without previous tests");
+		const wallet = api.wallet(createdWallet);
+		const previousWallet = await wallet.get();
+		const replacedWallet = await wallet.replace();
+
+		assert.notStrictEqual(replacedWallet.version, previousWallet.version);
+		assert.strictEqual(replacedWallet.wallet, previousWallet.wallet);
+		assert.notStrictEqual(replacedWallet.updated, previousWallet.updated);
+	});
+
 	it("should delete the created wallet", async function () {
 		this.timeout(30e3);
 

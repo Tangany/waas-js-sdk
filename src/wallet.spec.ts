@@ -108,6 +108,21 @@ describe("Wallet", function() {
         });
     });
 
+    describe("replace", function() {
+        it("should not throw for undefined optional parameters", async function() {
+            const stub = this.waas.instance.put = this.sandbox.stub().resolves();
+            const w = new Wallet(this.waas, dummyWalletName);
+            await assert.doesNotReject(async () => w.replace());
+            assert.strictEqual(stub.callCount, 1);
+        });
+
+        it("should execute the api call", async function() {
+            const stub = this.waas.instance.put = this.sandbox.spy();
+            await new Wallet(this.waas, dummyWalletName).replace();
+            assert.strictEqual(stub.callCount, 1);
+        });
+    });
+
     describe("delete", function() {
         it("should execute the api call", async function() {
             const stub = this.waas.instance.delete = this.sandbox.spy();
