@@ -90,6 +90,13 @@ export class Wallet implements IWaasMethod {
         );
     }
 
+    /**
+     * Signs the SHA2-256 hash of the given payload string using the ES256K algorithm.
+     * If a format is specified, the signature is encoded with it, otherwise DER is used by default.
+     * The result is then returned as base64 text.
+     * @param payload - Payload string to be signed
+     * @param [encoding] - Signature encoding to be used (`der` or `ieee-p1363`), where `der` is the default
+     */
     public async sign(payload: string, encoding?: SignatureEncoding): Promise<string> {
         const body = {
             payload,
@@ -103,6 +110,13 @@ export class Wallet implements IWaasMethod {
         return signature;
     }
 
+    /**
+     * Verifies the SHA2-256 hash of the passed payload string against the given signature.
+     * By default, the signature is expected in DER format, but the encoding used can also be passed explicitly.
+     * @param payload - Payload to be compared against the passed signature
+     * @param signature - Signature to be verified
+     * @param [encoding] - Encoding used for the passed signature (`der` by default)
+     */
     public async verifySignature(payload: string, signature: string, encoding?: SignatureEncoding): Promise<boolean> {
         const body = {
             payload,
