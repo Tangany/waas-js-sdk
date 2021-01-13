@@ -135,6 +135,11 @@ export function wrapSearchRequestIterable<TDetail, TData>(
     };
 }
 
+/**
+ * Assembles a URL query string to filter events based on their arguments.
+ * This way, a JavaScript-side configuration with objects is built into a URL string compatible with WaaS.
+ * @param argFilters - Configured event argument filters
+ */
 export function composeEventArgumentQuery(argFilters: IEventArgumentFilter[]): string {
     return argFilters.reduce<string>((accumulatedQuery, filter) => {
         const {position, type, value} = filter;
