@@ -40,6 +40,17 @@ describe("BtcWallet", function() {
         });
     });
 
+    describe("sendAsync", function() {
+        it("should execute the call", async function() {
+            const sampleRequestId = "71c4f385a4124239b6c968e47ea95f73";
+            const sampleResponse: IAsyncEndpointResponse = {statusUri: `request/${sampleRequestId}`};
+            const postStub = this.waas.instance.post = this.sandbox.stub().resolves(sampleResponse);
+            const req = await new BtcWallet(this.waas, new Wallet(this.waas, sampleWallet)).sendAsync(recipient);
+            assert.ok(postStub.calledOnce);
+            assert.strictEqual(req.id, sampleRequestId);
+        });
+    });
+
     describe("sign", function() {
         it("should execute the api call", async function() {
             const spy = this.waas.instance.post = this.sandbox.spy();

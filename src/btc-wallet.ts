@@ -1,12 +1,14 @@
 import {BlockchainWallet} from "./blockchain-wallet"
 import {recipientType, Waas} from "./waas";
 import {
+    IAsyncBitcoinTransactionOutput,
     IAsyncEndpointResponse,
     IBitcoinTransactionEstimation,
     ITransmittableTransaction,
     IRecipient,
     ITransaction,
-    IWalletBalance, IBitcoinSweepResult
+    IWalletBalance,
+    IBitcoinSweepResult
 } from "./interfaces";
 import {Request} from "./request"
 import {Wallet} from "./wallet";
@@ -41,6 +43,18 @@ export class BtcWallet extends BlockchainWallet {
      */
     public async send(recipients: IRecipient[] | IRecipient): Promise<ITransaction> {
         return this.waas.wrap<ITransaction>(() => this.waas.instance.post(`${this.baseUrl}/send`, this.getRecipientsData(recipients)));
+    }
+
+    /**
+     * Send BTC from the current wallet to the given recipients in an *asynchronous* manner.
+     * @param recipients - Recipient configuration
+     */
+    public async sendAsync(recipients: IRecipient[] | IRecipient): Promise<Request<IAsyncBitcoinTransactionOutput>> {
+        const rawResponse = await this.waas.wrap<IAsyncEndpointResponse>(() => this.waas.instance
+            .post(`${this.baseUrl}/send-async`, this.getRecipientsData(recipients)),
+        );
+        const id = this.extractRequestId(rawResponse);
+        return new Request<IAsyncBitcoinTransactionOutput>(this.waas, id);
     }
 
     /**

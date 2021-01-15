@@ -88,6 +88,15 @@ describe("WaaS sample Bitcoin workflow", function () {
 		assert.notStrictEqual(status, "unknown");
 	});
 
+	it("should send some BTC using an asynchronous request", async function () {
+		const req = await noConfirmationsBtcApi.wallet(wallet).btc().sendAsync(recipients);
+		// To take advantage of the asynchronous behavior, normally one would not wait for completion. For testing purposes, however, we do.
+		console.log(`Wait for the completion of request ${req.id} ...`);
+		await req.wait(35e3);
+		const { output } = await req.get();
+		console.log(output);
+	});
+
 	it("should transfer all funds from the created wallet back to the main wallet", async function () {
 		const req = await noConfirmationsBtcApi.wallet(createdWallet).btc().sweepAsync({wallet: wallet});
 		await req.wait(35e3);

@@ -1,7 +1,14 @@
 import * as t from "typeforce";
 import {BtcWallet} from "./btc-wallet";
 import {EthWallet} from "./eth-wallet";
-import {ISoftDeletedWallet, IWallet, IWalletList} from "./interfaces";
+import {
+    ISignatureResponse,
+    ISignatureVerificationResponse,
+    ISoftDeletedWallet,
+    IWallet,
+    IWalletList,
+    SignatureEncoding
+} from "./interfaces";
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
 
@@ -82,6 +89,48 @@ export class Wallet implements IWaasMethod {
             .get(`wallet/${this.wallet}`),
         );
     }
+
+    /**
+     * Signs the SHA2-256 hash of the given payload string using the ES256K algorithm.
+     * If a format is specified, the signature is encoded with it, otherwise DER is used by default.
+     * The result is then returned as base64 text.
+     * @param payload - Payload string to be signed
+     * @param [encoding] - Signature encoding to be used (`der` or `ieee-p1363`), where `der` is the default
+     */
+    public async sign(payload: string, encoding?: SignatureEncoding): Promise<string> {
+        const body = {
+            payload,
+            ...encoding && {encoding}
+        };
+
+        const {signature} = await this.waas.wrap<ISignatureResponse>(() => this.waas.instance
+            .post(`wallet/${this.wallet}/sign`, body),
+        );
+
+        return signature;
+    }
+
+    /**
+     * Verifies the SHA2-256 hash of the passed payload string against the given signature.
+     * By default, the signature is expected in DER format, but the encoding used can also be passed explicitly.
+     * @param payload - Payload to be compared against the passed signature
+     * @param signature - Signature to be verified
+     * @param [encoding] - Encoding used for the passed signature (`der` by default)
+     */
+    public async verifySignature(payload: string, signature: string, encoding?: SignatureEncoding): Promise<boolean> {
+        const body = {
+            payload,
+            signature,
+            ...encoding && {encoding}
+        };
+
+        const {isValid} = await this.waas.wrap<ISignatureVerificationResponse>(() => this.waas.instance
+            .post(`wallet/${this.wallet}/verify`, body),
+        );
+
+        return isValid;
+    }
+
 
     /**
      * Returns wallet calls for the Ethereum blockchain

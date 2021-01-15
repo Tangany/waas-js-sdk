@@ -24,6 +24,10 @@ describe("WaaS sample Ethereum workflow", function () {
 	let createdWalletAddress; // Created wallet address
 	let txHash; // Tx hashes
 
+	// Tangany-based smart contract ("Caller") used for testing here:
+	// https://github.com/Tangany/truffle-blueprint/blob/master/contracts/Caller.sol
+	const callerContract = "0x6dfC099FD9D1214e37e33Ecb3124dE451b751EbF";
+
 	const api = new Waas({
 		ethereumNetwork: EthereumPublicNetwork.ROPSTEN, // All tests execute on the ropsten testnet
 	}, undefined, true);
@@ -206,6 +210,34 @@ describe("WaaS sample Ethereum workflow", function () {
 			outputs: ["uint256"],
 		});
 		console.log(`Result for allowance(${tokenWalletAddress}, ${createdWalletAddress}): ${JSON.stringify(allowance)}`);
+	});
+
+	it("should call a smart contract function with nested array argument", async function () {
+		const resultArr = await api.eth().contract(callerContract).call({
+			"function": "callFlattenAddressArray(address[][2])",
+			"inputs": [
+				[
+					[
+						"0x0120000000000000000000000000000000000000",
+						"0x0340000000000000000000000000000000000000"
+					],
+					[
+						"0x1330000000000000000000000000000000000000",
+						"0x1440000000000000000000000000000000000000",
+						"0x1550000000000000000000000000000000000000"
+					]
+				]
+			],
+			outputs: ["address[]"]
+		});
+		const expected = [
+			"0x0120000000000000000000000000000000000000",
+			"0x0340000000000000000000000000000000000000",
+			"0x1330000000000000000000000000000000000000",
+			"0x1440000000000000000000000000000000000000",
+			"0x1550000000000000000000000000000000000000"
+		];
+		assert.deepStrictEqual(resultArr[0].value, expected);
 	});
 
 	it("should create a signed transaction that can be manually transmitted", async function () {

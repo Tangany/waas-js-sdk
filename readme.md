@@ -66,14 +66,14 @@ clientSecret | Service to service authentication client secret | process.env.TAN
 subscription | Product subscription key | process.env.TANGANY_SUBSCRIPTION |
 vaultUrl | Tangany vault URL required for all wallet-based calls. Example: `https://my-vault.some.cloud.tld` | process.env.TANGANY_VAULT_URL |
 ethereumNetwork | Public Ethereum network to operate in (`mainnet`, `ropsten`) or private Ethereum network Custom RPC URL for a private Ethereum network to operate in (example: `http://somenetwork.example.org:8540`) | `mainnet` |
-ethereumTxConfirmations |  Amount of block confirmations required to consider an Ethereum transaction as valid. The levels correspond with following target block confirmations amounts (# of confirmations): `none`: 0, `default`: 1, `secure`: 12  | `default` |
+ethereumTxConfirmations |  Amount of block confirmations required to consider an Ethereum transaction as valid. Either a numeric value or one of the following levels can be set, each corresponding to a number of target block confirmations: `none`: 0, `default`: 1, `secure`: 12  | `default` |
 ethereumTxSpeed |  Additional gas fee that is added to the base gas fee for the given Ethereum network to speed up the mining process of the transaction. The usage of `none` value may result in the transaction never gets mined and is only intended to use for custom Ethereum networks that employ zero gas price policies. The speed levels correspond with following Ethereum fees (in gwei): `none`: 0, `slow`: 2, `default`: 5, `fast`: 15 | `default` |
 ethereumGasPrice | Enforces custom base transaction fee in wei. This prevents the dynamic gas price calculation by the network and nullifies `ethereumTxSpeed`. Example: `7000000000` | `auto` |
 ethereumGas | Enforces custom amount of transaction gas. Example: `21000` | `auto` |
 ethereumNonce | Enforces custom transaction nonce. Example: `123` | `auto` |
 useGasTank | Allows to pre-fund the transaction fee for the desired wallet transaction. Supported values: `false`, `true` | `false`
 bitcoinNetwork | Public Bitcoin network name. Supported networks: `bitcoin`, `testnet` | `bitcoin` |
-bitcoinTxConfirmations | Minimum amount of block confirmations required for Bitcoin balance outputs ("utxo", "coins") to be included in the total wallet balance calculation. The exclusion of unconfirmed outputs prevents the posthumous invalidation of own wallet transaction by the parent utxo sending party. The levels correspond with following target block confirmations amounts (# of confirmations): `none`: 0, `default`: 1, `secure`: 6 | `default` |
+bitcoinTxConfirmations | Minimum amount of block confirmations required for Bitcoin balance outputs ("utxo", "coins") to be included in the total wallet balance calculation. The exclusion of unconfirmed outputs prevents the posthumous invalidation of own wallet transaction by the parent utxo sending party. Either a numeric value or one of the following levels can be set, each corresponding to a number of target block confirmations: `none`: 0, `default`: 1, `secure`: 6 | `default` |
 bitcoinTxSpeed | Defines the target amount of blocks for the transaction to be included to the Bitcoin network. Faster inclusion requires a higher transaction fee. The fee is calculated in real time based on the network state and can be limited by the `header-bitcoin-max-fee-rate` option. The effective transaction delay can be calculated by multiplying the target confirmation blocks with the Bitcoin block time of 10 minutes (e.g. `slow` yields an block inclusion time of approx. 4h). The speed levels correspond with following block times (target blocks): `slow`: 24, `default`: 6, `fast`: 2 | `default` |
 bitcoinMaxFeeRate | Defines the maximum allowed fee rate in satoshi per byte for a Bitcoin transaction. Prevents from spending absurdly high transaction fees during block fee peaks | 500 |
 
@@ -95,6 +95,24 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const { version } = await api.wallet(wallet).replace();
     //  delete a wallet
     const { scheduledPurgeDate, recoveryId } = await api.wallet(wallet).delete();
+})();
+````
+
+#### Payload signing interface
+````javascript
+(async () => {
+    const api = new Waas().wallet("my-wallet");
+    const payload = "arbitrary payload";
+    // create signature with default encoding (DER)
+    const signatureDer = await api.sign(payload);
+    // create signature with IEEE-P1363 encoding
+    const signatureP1363 = await api.sign(payload, "ieee-p1363");
+    // verify signatures
+    const isValidDer = await waas.verifySignature(payload, signatureDer);
+    const isValidP1363 = await waas.verifySignature(payload, signatureP1363, "ieee-p1363");
+    // DER signatures can also be verified externally using tools such as OpenSSL.
+    // For this, the public key is necessary, which may have to be converted depending on the tool.
+    const {public: {secp256k1}} = await api.get();
 })();
 ````
 
@@ -201,6 +219,11 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     // Read transaction events for a specific contract
     const eventsList = (await api.contract(tokenAddress).getEvents({event: "Transfer", limit: 10})[Symbol.asyncIterator]().next()).value;
     const eventDetails = await eventsList[0].get();
+    // Query transaction events based on their arguments
+    const filteredEventsIterator = await api.contract(tokenAddress).getEvents({
+        event: "Transfer",
+        argumentFilters: [{position: "to", value: "0x1ec2a77ec126369ad7c7e6fdb03e3d52b79b013d"}]
+    });
     // Read an individual event
     const event = await new Waas().eth(txHash).getEvent(logIndex);
 })();
@@ -230,6 +253,8 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const { hash } = await api.btc().send({to: someAddress, amount: "0.021"});
     // send BTC to multiple recipients
     await api.btc().send([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
+    // send BTC using an asynchronous request
+    const sendReq = await api.btc().sendAsync([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
     // create a signed transaction that can be manually transmitted
     const { rawTransaction } = await api.btc().sign({to: someAddress, amount: "0.021"});
     // get BTC balance and wallet address

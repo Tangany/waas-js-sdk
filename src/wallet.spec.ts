@@ -1,6 +1,7 @@
 import * as moxios from "moxios";
 import * as assert from "assert";
 import {ConflictError, GeneralError} from "./errors";
+import {ISignatureResponse, SignatureEncoding} from "./interfaces"
 import {Waas} from "./waas";
 import {Wallet} from "./wallet";
 import {sandbox} from "./utils/spec-helpers";
@@ -136,6 +137,29 @@ describe("Wallet", function() {
             const stub = this.waas.instance.get = this.sandbox.spy();
             await new Wallet(this.waas, dummyWalletName).get();
             assert.strictEqual(stub.callCount, 1);
+        });
+    });
+
+    describe("sign", function() {
+        it("should execute the api call", async function() {
+            const res: ISignatureResponse = {
+                signature: "MEUCIQCxow7KVLW3SbQpMLhlLc6xBIxOHCatXCIutc8Ya7DfVAIgPuGCus2TMO7i9C1nVRKwumTe888UCK2lDR97NGRjftU=",
+                encoding: "der"
+            }
+            const stub = this.waas.instance.post = this.sandbox.stub().resolves(res);
+            await new Wallet(this.waas, dummyWalletName).sign("Hello World");
+            assert.strictEqual(stub.callCount, 1);
+
+        });
+        it("should consider the optional parameter", async function() {
+            const res: ISignatureResponse = {
+                signature: "DOdiFuYAYrKnYrFg/HP2vDbaOvCz+pNLk8+iE2Zx38o1FKfKpeuwNWpN3BL4lDqajV16Kq+LKqmGImVVt5IILQ==",
+                encoding: "ieee-p1363"
+            }
+            const stub = this.waas.instance.post = this.sandbox.stub().resolves(res);
+            const encoding: SignatureEncoding = "ieee-p1363";
+            await new Wallet(this.waas, dummyWalletName).sign("Hello World", encoding);
+            assert.strictEqual(stub.getCall(0).args[1].encoding, encoding);
         });
     });
 

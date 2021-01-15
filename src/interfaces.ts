@@ -5,6 +5,7 @@ import {WalletSecurity, WalletVersion} from "./waas";
  */
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>;
 
+export type SignatureEncoding = "der" | "ieee-p1363";
 export type BlockchainTransactionStatuses = "unknown" | "pending" | "confirmed" | "error";
 type NodeStatus = "live" | "unavailable" | "faulty";
 
@@ -32,12 +33,20 @@ export interface IWallet {
     updated: string;
     created: string;
     version: string | WalletVersion.LATEST;
+    public: {
+        secp256k1: string
+    };
+    tags: string[];
 }
 
 /**
  * Represents a wallet list operation response
  */
 export interface IWalletList {
+    hits: {
+        total: number;
+        hsm: number
+    };
     list: IWallet[];
     skiptoken: string;
 }
@@ -57,6 +66,15 @@ export interface IWalletBalance {
     address: string;
     balance: string;
     currency: string;
+}
+
+export interface ISignatureResponse {
+    signature: string;
+    encoding: SignatureEncoding;
+}
+
+export interface ISignatureVerificationResponse {
+    isValid: boolean;
 }
 
 export type IBlockchainTransactionStatus = IEthereumTransactionStatus | IBitcoinTransactionStatus;
@@ -100,6 +118,15 @@ export interface IBitcoinSweepResult extends Pick<IBitcoinTransactionStatus, "st
 }
 
 /**
+ * Represents the output of an asynchronous request for Bitcoin transactions
+ */
+export interface IAsyncBitcoinTransactionOutput {
+    hash: string;
+    blockNr: number | null;
+    status: string;
+}
+
+/**
  * Represents a Bitcoin transaction estimation
  */
 export interface IBitcoinTransactionEstimation {
@@ -140,6 +167,8 @@ export interface IRecipient {
  * @param [data] - Ethereum transaction data payload
  */
 export type IEthereumRecipient = Optional<IRecipient, "amount"> & {data?: string;};
+
+export type WaasErrorResponse = IWaasError | IAsyncRequestStatus<IWaasError>;
 
 export interface IWaasError {
     statusCode: number;
@@ -192,7 +221,12 @@ export interface ITransmittableTransaction {
  */
 interface IContractFunction {
     function: string;
-    inputs: (boolean | number | string)[];
+
+    /**
+     * The associated endpoints allow an array of arguments, which may each contain arbitrary JSON-compatible values.
+     * In order not to lose this flexibility, the type `unknown` is used.
+     */
+    inputs?: unknown[];
 }
 
 /**
@@ -234,7 +268,7 @@ export interface ISearchTxQueryParams {
     blocknr?: string;
     nonce?: string;
     iserror?: string;
-    sort?: "value" | "valuedesc" | "blocknr" | "blocknrdesc" | "nonce" | "noncedesc" | "to" | "todesc" | "from" | "fromdesc" | "timestamp" | "timestampdesc";
+    sort?: "value" | "valuedesc" | "blocknr" | "blocknrdesc" | "nonce" | "noncedesc" | "to" | "todesc" | "from" | "fromdesc" | "timestamp" | "timestampdesc" | "transactionindex" | "transactionindexdesc";
     limit?: string;
     index?: string;
 }
@@ -257,6 +291,30 @@ export interface ISearchContractEventsQueryParams {
     sort?: "event" | "eventdesc" | "blocknr" | "blocknrdesc" | "logindex" | "logindexdesc" | "timestamp" | "timestampdesc";
     limit?: number;
     index?: number;
+    argumentFilters?: IEventArgumentFilter[];
+}
+
+/**
+ * Represents a single filter item to search smart contract events based on their arguments.
+ * All properties are optional because they can be combined depending on the use case.
+ */
+export interface IEventArgumentFilter {
+
+    /**
+     * This can be the positional number (e.g. 2) or the name of an event argument (e.g. "from")
+     */
+    position?: number | string;
+
+    /**
+     * Defines the Solidity type of the event argument. The API-side default is `address`.
+     */
+    type?: string;
+
+    /**
+     * Defines the argument value to filter by. The associated endpoints allow any JSON-compatible values.
+     * In order not to lose this flexibility, the type `unknown` is used for array values, which enables arbitrary nesting.
+     */
+    value?: string | boolean | number | unknown[];
 }
 
 export interface ISearchTxResponse extends ISearchResponse {

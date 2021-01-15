@@ -116,6 +116,25 @@ describe("Example workflow for reading Ethereum blockchain data", function () {
 		}
 	});
 
+	it("should filter contract events by their arguments", async function () {
+		const ropstenApi = new Waas({ ethereumNetwork: EthereumPublicNetwork.ROPSTEN });
+		const iterable = ropstenApi.eth()
+			.contract("0xC32AE45504Ee9482db99CfA21066A59E877Bc0e6")
+			.getEvents({
+				event: "Approval", argumentFilters: [
+					{ position: "owner", value: "0x76F0CE0Ee55bF1AAe0ADF85A2cd348b8Dd358376" },
+					{ position: "spender", value: "0x9C2E011c0CE0d75c2B62B9C5A0Ba0a7456593803" },
+				]
+			});
+		const iterator = await iterable[Symbol.asyncIterator]().next();
+		const events = iterator.value;
+		console.log(`${events.hits.total} results found. The first 2 are displayed below:`);
+		for (const elem of events.list.slice(0, 2)) {
+			const details = await elem.get();
+			console.log(details);
+		}
+	});
+
 	it("should read a specific event for given transaction and index", async function () {
 		const ropstenApi = new Waas({ ethereumNetwork: EthereumPublicNetwork.ROPSTEN });
 		const txHash = "0x5b70ad23e5534bb989b32a547fef5218f7be3461d0155e9c679c3eba352bc20e";
