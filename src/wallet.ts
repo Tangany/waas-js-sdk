@@ -1,108 +1,152 @@
-import {AxiosInstance, AxiosResponse} from "axios";
-import {ConflictError} from "./errors/conflict-error";
-import {WaasAxiosInstance} from "./waas-axios-instance";
-import {ISoftDeletedWallet, IWallet, IWalletList} from "./interfaces";
+import * as t from "typeforce";
+import {BtcWallet} from "./btc-wallet";
 import {EthWallet} from "./eth-wallet";
-import {EthErc20Token} from "./eth-erc20-token";
+import {
+    ISignatureResponse,
+    ISignatureVerificationResponse,
+    ISoftDeletedWallet,
+    IWallet,
+    IWalletList,
+    SignatureEncoding
+} from "./interfaces";
+import {Waas} from "./waas";
+import {IWaasMethod} from "./waas-method";
 
 /**
- * Class representing wallet endpoints
- * @param instance - api instance created by a new WaasApi instance
+ *  Instantiates a new wallet interface
+ * @param instance - axios instance created by {@link Waas}
+ * @param limiter - Bottleneck limiter instance
+ * @param  [wallet) - wallet name
  */
-export class Wallet extends WaasAxiosInstance {
+export class Wallet implements IWaasMethod {
+    constructor(public waas: Waas, private readonly name?: string) {
+        t("?String", name);
+    }
 
-    constructor(instance: AxiosInstance) {
-        super(instance);
+    public get wallet() {
+        t("String", this.name);
+
+        return this.name;
     }
 
     /**
      * Lists all wallets for current clientId.
-     * @param skiptoken - skiptoken value returned in the api response to fetch the next batch of wallets
-     * @see {@link https://tangany.docs.stoplight.io/api/wallet/list-wallets}
+     * @param [skiptoken] - "skiptoken" value returned in the api response to fetch the next batch of wallets
+     * @see [docs]{@link https://docs.tangany.com/#5f27c76b-48a1-45d1-9d8b-44d5afbb1ef3}
      */
-    public async listWallets(skiptoken?: string): Promise<AxiosResponse<IWalletList>> {
+    public async list(skiptoken?: string): Promise<IWalletList> {
+        t("?String", skiptoken);
+
         let url = "wallet";
         if (skiptoken) {
             url += `?skiptoken=${skiptoken}`;
         }
 
-        return this.instance
-            .get(url)
-            ;
+        return this.waas.wrap<IWalletList>(() => this.waas.instance
+            .get(url),
+        );
     }
 
     /**
      * Creates a new wallet
-     * @param wallet - wallet name that can be linked to a user. E.g. the userId
-     * @param useHsm - use hardware secure module to store the wallet private key
-     * @see {@link https://tangany.docs.stoplight.io/api/wallet/create-wallet}
+     * @param [wallet] - Wallet name that can be linked to a user identifier
+     * @param [useHsm] - Use a hardware secure module to store the wallet private key
+     * @see [docs]{@link https://docs.tangany.com/#88ca3b1c-fd97-4e92-bc42-89c5744f25d2}
      */
-    public async createWallet(wallet: string, useHsm = false): Promise<AxiosResponse<IWallet>> {
+    public async create(wallet?: string, useHsm?: boolean): Promise<IWallet> {
+        t("?String", wallet);
+        t("?Boolean", useHsm);
 
-        if (!wallet) {
-            throw new Error("missing wallet arg");
-        }
+        return this.waas.wrap<IWallet>(() => this.waas.instance.post("wallet", {wallet, useHsm,}));
+    }
 
-        return this.instance
-            .post("wallet", {
-                wallet,
-                useHsm,
-            })
-            .catch(e => {
-                if (e.response && e.response.status === 409) {
-                    throw new ConflictError("Cannot overwrite existing wallet");
-                }
-                throw e;
-            })
-            ;
+    /**
+     * Creates a new version of the current wallet. It generates new keys and therefore disables "write" operations of the previous wallet version to the blockchain.
+     * @param [useHsm] - Use a hardware secure module to store the wallet private key
+     * @see [docs]{@link https://docs.tangany.com/#73451025-c889-4d94-b424-fbe2a3f9999f}
+     */
+    public async replace(useHsm?: boolean): Promise<IWallet> {
+        t("?Boolean", useHsm);
+        return this.waas.wrap<IWallet>(() => this.waas.instance.put(`wallet/${this.wallet}`, {useHsm}));
     }
 
     /**
      * Soft-deletes a wallet so not writing operations cannot be executed for the associated blockchain account. Wallet recovery endpoints are not yet implemented into the API. Contact the support team to recover soft-deleted wallets during the retention period.
-     * @param wallet - wallet name
-     * @see {@link https://tangany.docs.stoplight.io/api/wallet/delete-wallet}
+     * @see [docs]{@link https://docs.tangany.com/#e0b207c8-5cdc-4dce-af6d-a6a655a1cf20}
      */
-    public async deleteWallet(wallet: string): Promise<AxiosResponse<ISoftDeletedWallet>> {
-        if (!wallet) {
-            throw new Error("missing wallet arg");
-        }
-
-        return this.instance
-            .delete(`wallet/${wallet}`)
-            .catch(this.catch404.bind(this))
-            ;
+    public async delete(): Promise<ISoftDeletedWallet> {
+        return this.waas.wrap<ISoftDeletedWallet>(() => this.waas.instance
+            .delete(`wallet/${this.wallet}`),
+        );
     }
 
     /**
      * Returns information for given wallet name
-     * @param wallet - wallet name
-     * @see {@link https://tangany.docs.stoplight.io/api/wallet/get-wallet}
+     * @see [docs]{@link https://docs.tangany.com/#f95ba7a2-5526-4eef-b0da-7d7a13be34d2}
      */
-    public async getWallet(wallet: string): Promise<AxiosResponse<IWallet>> {
-        if (!wallet) {
-            throw new Error("missing wallet arg");
-        }
-
-        return this.instance
-            .get(`wallet/${wallet}`)
-            .catch(this.catch404.bind(this))
-            ;
+    public async get(): Promise<IWallet> {
+        return this.waas.wrap<IWallet>(() => this.waas.instance
+            .get(`wallet/${this.wallet}`),
+        );
     }
+
+    /**
+     * Signs the SHA2-256 hash of the given payload string using the ES256K algorithm.
+     * If a format is specified, the signature is encoded with it, otherwise DER is used by default.
+     * The result is then returned as base64 text.
+     * @param payload - Payload string to be signed
+     * @param [encoding] - Signature encoding to be used (`der` or `ieee-p1363`), where `der` is the default
+     */
+    public async sign(payload: string, encoding?: SignatureEncoding): Promise<string> {
+        const body = {
+            payload,
+            ...encoding && {encoding}
+        };
+
+        const {signature} = await this.waas.wrap<ISignatureResponse>(() => this.waas.instance
+            .post(`wallet/${this.wallet}/sign`, body),
+        );
+
+        return signature;
+    }
+
+    /**
+     * Verifies the SHA2-256 hash of the passed payload string against the given signature.
+     * By default, the signature is expected in DER format, but the encoding used can also be passed explicitly.
+     * @param payload - Payload to be compared against the passed signature
+     * @param signature - Signature to be verified
+     * @param [encoding] - Encoding used for the passed signature (`der` by default)
+     */
+    public async verifySignature(payload: string, signature: string, encoding?: SignatureEncoding): Promise<boolean> {
+        const body = {
+            payload,
+            signature,
+            ...encoding && {encoding}
+        };
+
+        const {isValid} = await this.waas.wrap<ISignatureVerificationResponse>(() => this.waas.instance
+            .post(`wallet/${this.wallet}/verify`, body),
+        );
+
+        return isValid;
+    }
+
 
     /**
      * Returns wallet calls for the Ethereum blockchain
-     * @param walletName - wallet name
      */
-    public eth(walletName: string): EthWallet {
-        return new EthWallet(this.instance, walletName);
+    public eth(): EthWallet {
+        const ew = new EthWallet(this.waas, this);
+
+        return ew;
     }
 
     /**
-     * Returns wallet calls for the Ethereum ERC20 token
-     * @param walletName - wallet name
-     * @param tokenAddress - ethereum erc20 token address for given ethereum network
+     * Returns wallet calls for the Bitcoin blockchain
      */
-    public ethErc20(walletName: string, tokenAddress: string): EthErc20Token {
-        return new EthErc20Token(this.instance, walletName, tokenAddress);
+    public btc(): BtcWallet {
+        const btc = new BtcWallet(this.waas, this);
+
+        return btc;
     }
 }

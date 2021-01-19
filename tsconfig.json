@@ -1,12 +1,16 @@
 {
-  "files": [
-    "src/index.ts"
-  ],
   "compilerOptions": {
     "lib": [
       "es2015",
       "dom"
     ],
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "node_modules/*",
+        "src/types/*"
+      ]
+    },
     "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -21,5 +25,8 @@
     "outDir": "dist",
     "sourceMap": true,
     "downlevelIteration": true
-  }
+  },
+  "exclude": [
+    "**/*.spec.ts"
+  ]
 }

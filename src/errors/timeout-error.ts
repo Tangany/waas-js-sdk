@@ -1,9 +1,9 @@
-export class TimeoutError extends Error {
-    public readonly status = 408;
+import {HttpError} from "./http-error";
 
+export class TimeoutError extends HttpError {
     constructor(msg = "Request Timeout") {
-        super();
-        Object.setPrototypeOf(this, TimeoutError.prototype); // https://stackoverflow.com/questions/41102060/typescript-extending-error-class
-        this.message = msg;
+        super(msg, 408);
+        this.name = this.constructor.name;
+        Object.setPrototypeOf(this, TimeoutError.prototype);
     }
 }

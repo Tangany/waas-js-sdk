@@ -1,9 +1,9 @@
-export class NotFoundError extends Error {
-    public readonly status = 404;
+import {HttpError} from "./http-error";
 
-    constructor(msg = "Resource not found for current user") {
-        super();
-        Object.setPrototypeOf(this, NotFoundError.prototype); // https://stackoverflow.com/questions/41102060/typescript-extending-error-class
-        this.message = msg;
+export class NotFoundError extends HttpError {
+    constructor(msg = "Requested resource not found") {
+        super(msg, 404);
+        this.name = this.constructor.name;
+        Object.setPrototypeOf(this, NotFoundError.prototype);
     }
 }

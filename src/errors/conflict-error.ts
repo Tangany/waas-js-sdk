@@ -1,9 +1,10 @@
-export class ConflictError extends Error {
-    public readonly status = 409;
+import {HttpError} from "./http-error";
 
-    constructor(msg = "Cannot reset resource") {
-        super();
-        Object.setPrototypeOf(this, ConflictError.prototype); // https://stackoverflow.com/questions/41102060/typescript-extending-error-class
-        this.message = msg;
+export class ConflictError extends HttpError {
+    constructor(msg = "Cannot reset resource", activityId: string) {
+        super(msg, 409, activityId);
+        Error.captureStackTrace(this, this.constructor);
+        this.name = this.constructor.name;
+        Object.setPrototypeOf(this, ConflictError.prototype);
     }
 }

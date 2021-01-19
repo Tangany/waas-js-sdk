@@ -1,75 +1,158 @@
-import {mockSandbox, queueOpenApiResponse} from "./test-helpers";
-import axios from "axios";
 import * as assert from "assert";
+import axios from "axios";
+import {SinonFakeTimers} from "sinon"
+import {MiningError, TimeoutError} from "./errors";
+import {isBitcoinMiningErrorData} from "./errors/mining-error";
 import {Ethereum} from "./eth";
-import {WaasApi} from "./waas-api";
-import {TimeoutError} from "./errors/timeout-error";
+import {IBlockchainTransactionStatus, IEthereumTransactionStatus, ISearchTxResponse} from "./interfaces";
+import {sandbox} from "./utils/spec-helpers";
+import {Waas} from "./waas";
 
-describe("Ethereum", function () {
-    mockSandbox();
+sandbox();
 
-    const CLIENT_ID = "1",
-        CLIENT_SECRET = "2",
-        SUBSCRIPTION = "3"
-    ;
+describe("Ethereum", function() {
+    const nonHash = "0x7777777777777777777777777777777777777777777777777777777777777777";
 
-    const sampleTx = "0x8a72609aaa14c4ff4bd44bd75848c27efcc36b3341d170000000000000000000";
-
-    const queue = queueOpenApiResponse("openapi/v1.1.oas2.json");
-
-    it("should construct an instance", function () {
-        const wallet = new Ethereum(this.sandbox.stub(axios, "create"));
-        assert.ok(wallet instanceof Ethereum);
+    beforeEach(function() {
+        this.waas = this.sandbox.createStubInstance(Waas);
+        this.waas.wrap = (fn: any) => fn();
+        this.waas.instance = this.sandbox.stub(axios, "create");
     });
 
-    describe("getTxStatus", function () {
-        it("should return a status for given hash", async function () {
-            const w = new WaasApi(CLIENT_ID, CLIENT_SECRET, SUBSCRIPTION);
-            const _eth = w.ethereum;
+    it("should construct an instance", function() {
+        assert.ok(new Ethereum(this.waas));
+        assert.ok(new Ethereum(this.waas, nonHash));
+    });
 
-            await queue({
-                path: "/eth/transaction/{hash}",
-                operation: "get",
-                response: 200,
-            });
+    it("should throw for invalid hash", function() {
+        assert.throws(() => new Ethereum(this.stub, true as any), /Expected/);
+    });
 
-            const d = (await _eth.getTxStatus(sampleTx)).data;
-            assert.ok(d.hasOwnProperty("blockNr"));
-            assert.ok(d.hasOwnProperty("isError"));
+    describe("txHash", function() {
+        it("should throw for missing hash", async function() {
+            assert.throws(() => new Ethereum(this.waas).txHash);
+        });
+        it("should throw for invalid hash", async function() {
+            assert.throws(() => new Ethereum(this.waas, Infinity as any).txHash);
+        });
+        it("should return the hash", async function() {
+            assert.strictEqual(new Ethereum(this.waas, nonHash).txHash, nonHash);
         });
     });
 
-    describe("waitForMined", function () {
-        this.timeout(2000);
-
-        it("should resolve for given transaction", async function () {
-            const w = new WaasApi(CLIENT_ID, CLIENT_SECRET, SUBSCRIPTION);
-            const _eth = w.ethereum;
-
-            await queue({
-                path: "/eth/transaction/{hash}",
-                operation: "get",
-                response: 200,
-                delay: 400,
-            });
-
-            const d = await _eth.waitForMined(sampleTx, 9000);
-
-            console.log(d);
-            assert.ok(d.hasOwnProperty("blockNr"));
-            assert.ok(d.hasOwnProperty("isError"));
+    describe("get", function() {
+        it("should throw for missing transaction hash", function() {
+            const eth = new Ethereum(this.waas);
+            // The method should call the getter (with type check) instead of the instance variable, which may be undefined
+            const spy = this.sandbox.spy(eth, "txHash", ["get"]).get;
+            assert.throws(() => eth.txHash);
+            assert.ok(spy.calledOnce);
         });
 
-        it("should throw for a server timeout", function (done) {
-            const w = new WaasApi(CLIENT_ID, CLIENT_SECRET, SUBSCRIPTION);
-            const _eth = w.ethereum;
-            _eth
-                .waitForMined(sampleTx, 1000)
-                .then(() => assert.fail("should have thrown"))
-                .catch(e => {
-                    assert.ok(e instanceof TimeoutError);
-                    done();
-                });
+        it("should execute the api call", async function() {
+            const spy = this.waas.instance.get = this.sandbox.spy();
+            await new Ethereum(this.waas, nonHash).get();
+            assert.strictEqual(spy.callCount, 1);
         });
     });
+
+    // The method only calls the general function for wrapping search queries and this is tested in detail separately anyway.
+    describe("getTransactions", function() {
+        it("should execute the api call", async function() {
+            const sampleResponse: ISearchTxResponse = {
+                hits: {total: 4},
+                list: [
+                    {
+                        hash: "0x531ac2cc55a58171697136a63f2ff63d2a6f44ea0e706dbc3889a8a0b9b6ef6f",
+                        links: [{type: "GET", href: "/eth/transaction/1", rel: "transaction"}]
+                    },
+                ],
+                links: {next: null, previous: null}
+            };
+            const stub = this.waas.instance.get = this.sandbox.stub().resolves(sampleResponse);
+            await new Ethereum(this.waas).getTransactions()[Symbol.asyncIterator]().next();
+            assert.ok(stub.calledOnce);
+        });
+    });
+
+    describe("getEvent", function() {
+        it("should execute the api call", async function() {
+            const spy = this.waas.instance.get = this.sandbox.spy();
+            await new Ethereum(this.waas, nonHash).get();
+            assert.strictEqual(spy.callCount, 1);
+        });
+    });
+
+    describe("wait", function() {
+        it("should timeout for non-existent transaction", async function() {
+            const e = new Ethereum(this.waas, nonHash);
+            // tslint:disable-next-line:no-null-keyword
+            this.sandbox.stub(Ethereum.prototype, "get").resolves({isError: false, blockNr: null});
+
+            await assert.rejects(async () => e.wait(5), TimeoutError);
+        });
+        it("should resolve for a successful transaction", async function() {
+            const e = new Ethereum(this.waas, nonHash);
+            const stub = this.sandbox.stub()
+            this.waas.instance.get = stub;
+            const timer: SinonFakeTimers = this.sandbox.useFakeTimers({toFake: ["setInterval"]}); // fake the timer
+            const status: IBlockchainTransactionStatus = {isError: false, blockNr: 777, status: "confirmed"} as any
+            stub.resolves(status);
+
+            await Promise.all([
+                assert.doesNotReject(async () => e.wait()),
+                timer.tick(400),
+            ]);
+        });
+        it("should reject for a unsuccessful transaction", async function() {
+            const e = new Ethereum(this.waas, nonHash);
+            this.sandbox.stub(Ethereum.prototype, "get").resolves({isError: true, blockNr: undefined, status: "error"});
+            const timer: SinonFakeTimers = this.sandbox.useFakeTimers({toFake: ["setInterval"]}); // fake the timer
+
+            await Promise.all([
+                e
+                    .wait()
+                    .then(() => assert.fail("should have failed"))
+                    .catch((r: MiningError) => {
+                        assert.ok(r instanceof MiningError);
+                        if (isBitcoinMiningErrorData(r.txData)) {
+                            throw new Error("invalid error type");
+                        }
+                        const txData = (r.txData) as IEthereumTransactionStatus;
+                        assert.strictEqual(txData.isError, true);
+                        assert.strictEqual(txData.blockNr, undefined);
+                    }),
+                timer.tick(400),
+            ])
+        });
+        it("should throw while the 'get' call", async function() {
+            const e = new Ethereum(this.waas, nonHash);
+            // tslint:disable-next-line:no-null-keyword
+            this.sandbox.stub(Ethereum.prototype, "get").throws(() => new Error("Some error"));
+
+            const timer: SinonFakeTimers = this.sandbox.useFakeTimers({toFake: ["setInterval"]}); // fake the timer
+
+            await Promise.all([
+                assert.rejects(async () => e.wait(), /Some error/),
+                timer.tick(400),
+            ])
+        });
+    });
+
+    describe("getStatus", function() {
+        it("should execute the api call", async function() {
+            const spy = this.waas.instance.get = this.sandbox.spy();
+            await new Ethereum(this.waas, nonHash).get();
+            assert.strictEqual(spy.callCount, 1);
+        });
+    });
+
+    describe("contract", function() {
+        it("should return an EthereumContract instance", async function() {
+            const address = "0xC32AE45504Ee9482db99CfA21066A59E877Bc0e6";
+            const c = new Ethereum(this.waas).contract(address);
+            assert.strictEqual(c.address, address);
+        });
+    });
+
 });
