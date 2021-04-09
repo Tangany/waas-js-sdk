@@ -81,3 +81,8 @@ export interface ISearchResponse extends IPaginationResponse {
         links: IHateoasLink<string>[];
     }[];
 }
+
+export interface ISearchRequestConfig {
+    url: string;
+    params?: object;
+}
