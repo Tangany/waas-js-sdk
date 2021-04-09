@@ -1,22 +1,21 @@
 import * as t from "typeforce";
-import {BlockchainWallet} from "./blockchain-wallet"
+import {BlockchainWallet} from "./blockchain-wallet";
 import {IEthereumTxSearchItemData} from "./eth";
-import {EthContractWallet} from "./eth-contract-wallet"
-import {Request} from "./request"
-import {ethereumRecipientType, Waas} from "./waas";
-import {
-    IEthereumRecipient,
-    IEthereumTransactionEstimation,
-    IEthereumTransactionStatus,
-    IWalletSearchTxQueryParams,
-    ITransaction,
-    ITransmittableTransaction,
-    IWalletBalance,
-    IAsyncEthereumTransactionOutput, IAsyncEndpointResponse
-} from "./interfaces";
-
+import {EthContractWallet} from "./eth-contract-wallet";
 import {EthErc20Wallet} from "./eth-erc20-wallet";
+import {IAsyncEndpointResponse, ITransactionSentResponse} from "./interfaces/common";
+import {
+    IAsyncEthereumTransactionOutput,
+    IEthereumRecipient,
+    IEthereumTransaction,
+    IEthereumTransactionEstimation,
+    IWalletTransactionSearchParams
+} from "./interfaces/ethereum";
+import {ITransmittableTransaction} from "./interfaces/signature";
+import {IWalletBalance} from "./interfaces/wallet";
+import {Request} from "./request";
 import {wrapSearchRequestIterable} from "./utils/search-request-wrapper";
+import {ethereumRecipientType, Waas} from "./waas";
 import {Wallet} from "./wallet";
 
 /**
@@ -46,9 +45,9 @@ export class EthWallet extends BlockchainWallet {
      * @param recipient - {@link IEthereumRecipient}
      * @see [docs]{@link https://docs.tangany.com/#1d76974c-579a-47aa-9912-c7cfddf55889}
      */
-    public async send(recipient: IEthereumRecipient): Promise<ITransaction> {
+    public async send(recipient: IEthereumRecipient): Promise<ITransactionSentResponse> {
         this.validateRecipient(recipient);
-        return this.waas.wrap<ITransaction>(() => this.waas.instance
+        return this.waas.wrap<ITransactionSentResponse>(() => this.waas.instance
             .post(`eth/wallet/${this.wallet}/send`, {
                 ...recipient,
             }),
@@ -116,10 +115,10 @@ export class EthWallet extends BlockchainWallet {
      *    console.log(await value.list[0].get()); // get details for a list result
      * }
      */
-    public getTransactions(queryParams: IWalletSearchTxQueryParams = {}) {
-        return wrapSearchRequestIterable<IEthereumTransactionStatus, IEthereumTxSearchItemData>(
+    public getTransactions(params: IWalletTransactionSearchParams = {}) {
+        return wrapSearchRequestIterable<IEthereumTransaction, IEthereumTxSearchItemData>(
             this.waas, `eth/wallet/${this.wallet}/transactions`,
-            queryParams);
+            params);
     }
 
     /**

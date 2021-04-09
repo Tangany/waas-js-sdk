@@ -1,4 +1,4 @@
-import {IContractCall, IContractCallResponse} from "../interfaces";
+import {IContractCall, IContractCallResponse} from "../interfaces/ethereum-contract";
 import {Waas} from "../waas";
 
 /**

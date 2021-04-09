@@ -1,7 +1,7 @@
 import axios from "axios";
 import {EthContractWallet} from "./eth-contract-wallet"
 import {EthErc20Wallet} from "./eth-erc20-wallet";
-import {ISearchTxResponse} from "./interfaces"
+import {ITransactionSearchResponse} from "./interfaces/ethereum";
 import {sandbox} from "./utils/spec-helpers";
 import * as assert from "assert";
 import {Waas} from "./waas";
@@ -98,7 +98,7 @@ describe("EthWallet", function() {
     // The method only calls the general function for wrapping search queries and this is tested in detail separately anyway.
     describe("getTransactions", function() {
         it("should execute the api call", async function() {
-            const sampleResponse: ISearchTxResponse = {
+            const sampleResponse: ITransactionSearchResponse = {
                 hits: {total: 4},
                 list: [
                     {

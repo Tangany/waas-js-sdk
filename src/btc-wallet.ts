@@ -1,16 +1,10 @@
-import {BlockchainWallet} from "./blockchain-wallet"
+import {BlockchainWallet} from "./blockchain-wallet";
+import {IAsyncBitcoinTransactionOutput, IBitcoinSweepResult, IBitcoinTransactionEstimation} from "./interfaces/bitcoin";
+import {IAsyncEndpointResponse, IRecipient, ITransactionSentResponse} from "./interfaces/common";
+import {ITransmittableTransaction} from "./interfaces/signature";
+import {IWalletBalance} from "./interfaces/wallet";
 import {recipientType, Waas} from "./waas";
-import {
-    IAsyncBitcoinTransactionOutput,
-    IAsyncEndpointResponse,
-    IBitcoinTransactionEstimation,
-    ITransmittableTransaction,
-    IRecipient,
-    ITransaction,
-    IWalletBalance,
-    IBitcoinSweepResult
-} from "./interfaces";
-import {Request} from "./request"
+import {Request} from "./request";
 import {Wallet} from "./wallet";
 import * as t from "typeforce";
 
@@ -41,8 +35,8 @@ export class BtcWallet extends BlockchainWallet {
      * @param recipients - Recipient configuration
      * @see [docs]{@link https://docs.tangany.com/#62b0f6e4-641b-4230-8cf2-1cb8b2181812}
      */
-    public async send(recipients: IRecipient[] | IRecipient): Promise<ITransaction> {
-        return this.waas.wrap<ITransaction>(() => this.waas.instance.post(`${this.baseUrl}/send`, this.getRecipientsData(recipients)));
+    public async send(recipients: IRecipient[] | IRecipient): Promise<ITransactionSentResponse> {
+        return this.waas.wrap<ITransactionSentResponse>(() => this.waas.instance.post(`${this.baseUrl}/send`, this.getRecipientsData(recipients)));
     }
 
     /**

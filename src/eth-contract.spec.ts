@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import axios from "axios";
 import {EthereumContract} from "./eth-contract";
-import {ISearchContractEventsResponse} from "./interfaces";
+import {IEventSearchResponse} from "./interfaces/ethereum-contract";
 import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";
 
@@ -26,7 +26,7 @@ describe("EthereumContract", function() {
     describe("getEvents", function() {
 
         it("should execute the api call", async function() {
-            const sampleResponse: ISearchContractEventsResponse = {
+            const sampleResponse: IEventSearchResponse = {
                 hits: {total: 4},
                 list: [
                     {

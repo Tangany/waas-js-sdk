@@ -1,4 +1,6 @@
-import {IEventArgumentFilter, ISearchQueryParams, ISearchResponse} from "../interfaces";
+import {ISearchResponse} from "../interfaces/common";
+import {ITransactionSearchParams} from "../interfaces/ethereum";
+import {IEventArgumentFilter, IEventSearchParams} from "../interfaces/ethereum-contract";
 import {Waas} from "../waas";
 
 /**
@@ -48,7 +50,7 @@ interface ResourceMethods<T> {
 export function wrapSearchRequestIterable<TDetail, TData>(
     waas: Waas,
     url: string,
-    params: ISearchQueryParams = {}
+    params: ITransactionSearchParams | IEventSearchParams = {}
 ): ISearchResultIterable<TDetail, TData> {
 
     let previous: string | null;

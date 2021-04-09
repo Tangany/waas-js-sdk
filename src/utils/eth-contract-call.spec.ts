@@ -1,7 +1,7 @@
 import * as assert from "assert";
 // import axios from "axios"
 import * as moxios from "moxios";
-import {IContractCall} from "../interfaces";
+import {IContractCall} from "../interfaces/ethereum-contract";
 import {sandbox} from "./spec-helpers";
 import {Waas} from "../waas";
 // import {Waas} from "../waas";

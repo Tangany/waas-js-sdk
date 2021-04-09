@@ -1,7 +1,8 @@
 import * as moxios from "moxios";
 import * as assert from "assert";
 import {ConflictError, GeneralError} from "./errors";
-import {ISignatureResponse, SignatureEncoding} from "./interfaces"
+import {ISignatureResponse} from "./interfaces/signature";
+import {SignatureEncoding} from "./types/common";
 import {Waas} from "./waas";
 import {Wallet} from "./wallet";
 import {sandbox} from "./utils/spec-helpers";

@@ -1,16 +1,13 @@
 import * as t from "typeforce";
 import {BlockchainWallet} from "./blockchain-wallet";
-import {
-    ContractCallResult, IAsyncEndpointResponse,
-    IAsyncEthereumTransactionOutput,
-    IContractCall,
-    IContractTransaction,
-    IEthereumTransactionEstimation
-} from "./interfaces";
+import {IAsyncEndpointResponse} from "./interfaces/common";
+import {IAsyncEthereumTransactionOutput, IEthereumTransactionEstimation} from "./interfaces/ethereum";
+import {IContractCall, IContractTransaction} from "./interfaces/ethereum-contract";
 import {Request} from "./request";
-import {callContractFunction} from "./utils/eth-contract-call"
+import {ContractCallResult} from "./types/common";
+import {callContractFunction} from "./utils/eth-contract-call";
 import {Waas} from "./waas";
-import {Wallet} from "./wallet"
+import {Wallet} from "./wallet";
 
 /**
  * Instantiates a new interface to interact with universal Ethereum Smart Contracts

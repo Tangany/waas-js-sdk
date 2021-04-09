@@ -1,8 +1,9 @@
-import {EthereumContract} from "./eth-contract"
+import * as t from "typeforce";
+import {EthereumContract} from "./eth-contract";
+import {IEthereumTransaction, IEthStatus, ITransactionSearchParams} from "./interfaces/ethereum";
+import {ITransactionEvent} from "./interfaces/ethereum-contract";
 import {wrapSearchRequestIterable} from "./utils/search-request-wrapper";
 import {Waas} from "./waas";
-import {IEthereumTransactionStatus, IEthStatus, ISearchTxEventResponse, ISearchTxQueryParams} from "./interfaces";
-import * as t from "typeforce";
 import {IWaasMethod} from "./waas-method";
 
 export interface IEthereumTxSearchItemData {
@@ -36,7 +37,7 @@ export class Ethereum implements IWaasMethod {
      * Returns the status for an Ethereum transaction. The transaction is not mined until a blockNr is assigned.
      * @see [docs]{@link https://docs.tangany.com/#5b262285-c8a0-4e36-8a41-4a2b1f0cdb1b}
      */
-    public async get(): Promise<IEthereumTransactionStatus> {
+    public async get(): Promise<IEthereumTransaction> {
         return this.getTransactionDetails(this.txHash);
     }
 
@@ -52,16 +53,16 @@ export class Ethereum implements IWaasMethod {
      *     console.log(await value.list[0].get); // fetch transaction details
      * }
      */
-    public getTransactions(queryParams: ISearchTxQueryParams = {}) {
-        return wrapSearchRequestIterable<IEthereumTransactionStatus, IEthereumTxSearchItemData>(this.waas, "eth/transactions", queryParams);
+    public getTransactions(params: ITransactionSearchParams = {}) {
+        return wrapSearchRequestIterable<IEthereumTransaction, IEthereumTxSearchItemData>(this.waas, "eth/transactions", params);
     }
 
     /**
      * Returns details of the event corresponding to the passed log index of the current transaction hash.
      * @param index - Log index of the event that can be obtained by
      */
-    public async getEvent(index: number): Promise<ISearchTxEventResponse> {
-        return this.waas.wrap<ISearchTxEventResponse>(
+    public async getEvent(index: number): Promise<ITransactionEvent> {
+        return this.waas.wrap<ITransactionEvent>(
             () => this.waas.instance.get(`/eth/transaction/${this.txHash}/event/${index}`));
     }
 
@@ -71,12 +72,12 @@ export class Ethereum implements IWaasMethod {
      * @param [timeout] - reject timeout in ms
      * @param [ms] - milliseconds delay between API polling attempts
      */
-    public async wait(timeout = 20e3, ms = 4e2): Promise<IEthereumTransactionStatus> {
+    public async wait(timeout = 20e3, ms = 4e2): Promise<IEthereumTransaction> {
 
         const call = async () => this
             .get()
 
-        return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IEthereumTransactionStatus>;
+        return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IEthereumTransaction>;
     }
 
     /**
@@ -92,8 +93,8 @@ export class Ethereum implements IWaasMethod {
      * Queries the details for a given transaction hash.
      * @param txHash - Either the transaction hash of this object instance or any other
      */
-    private async getTransactionDetails(txHash: string): Promise<IEthereumTransactionStatus> {
-        return this.waas.wrap<IEthereumTransactionStatus>(() => this.waas.instance.get(`eth/transaction/${txHash}`));
+    private async getTransactionDetails(txHash: string): Promise<IEthereumTransaction> {
+        return this.waas.wrap<IEthereumTransaction>(() => this.waas.instance.get(`eth/transaction/${txHash}`));
     }
 
     /**

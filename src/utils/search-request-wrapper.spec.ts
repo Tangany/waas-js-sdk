@@ -1,6 +1,7 @@
 import * as assert from "assert";
 import axios from "axios";
-import {ISearchResponse, ISearchTxResponse} from "../interfaces";
+import {ISearchResponse} from "../interfaces/common";
+import {ITransactionSearchResponse} from "../interfaces/ethereum";
 import {composeEventArgumentQuery, wrapSearchRequestIterable} from "./search-request-wrapper";
 import {sandbox} from "./spec-helpers";
 import {Waas} from "../waas";
@@ -170,7 +171,7 @@ describe("SearchRequestWrapper", function() {
         it("should add the additional data (\"non-links\") for each search result item", async function() {
             // Use the transaction response as an example, but this works the same with any other type
             // that contains other data besides the array "links".
-            const sampleResponse: ISearchTxResponse = {
+            const sampleResponse: ITransactionSearchResponse = {
                 hits: {total: 4},
                 list: [
                     {

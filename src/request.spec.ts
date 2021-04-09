@@ -2,7 +2,8 @@ import * as assert from "assert";
 import axios from "axios";
 import {SinonFakeTimers} from "sinon"
 import {TimeoutError} from "./errors"
-import {IAsyncEthereumTransactionOutput, IAsyncRequestStatus} from "./interfaces"
+import {IAsyncRequestStatus} from "./interfaces/common";
+import {IAsyncEthereumTransactionOutput} from "./interfaces/ethereum"
 import {Request} from "./request";
 import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";

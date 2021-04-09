@@ -1,14 +1,9 @@
 import * as t from "typeforce";
 import {BtcWallet} from "./btc-wallet";
 import {EthWallet} from "./eth-wallet";
-import {
-    ISignatureResponse,
-    ISignatureVerificationResponse,
-    ISoftDeletedWallet,
-    IWallet,
-    IWalletList,
-    SignatureEncoding
-} from "./interfaces";
+import {ISignatureResponse, ISignatureVerificationResponse} from "./interfaces/signature";
+import {ISoftDeletedWallet, IWallet, IWalletList} from "./interfaces/wallet";
+import {SignatureEncoding} from "./types/common";
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
 

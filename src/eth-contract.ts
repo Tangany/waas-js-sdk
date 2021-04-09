@@ -1,12 +1,8 @@
 import * as t from "typeforce";
-import {
-    ContractCallResult,
-    IContractCall,
-    ISearchContractEventsQueryParams,
-    ISearchTxEventResponse
-} from "./interfaces";
+import {IContractCall, IEventSearchParams, ITransactionEvent} from "./interfaces/ethereum-contract";
+import {ContractCallResult} from "./types/common";
+import {callContractFunction} from "./utils/eth-contract-call";
 import {wrapSearchRequestIterable} from "./utils/search-request-wrapper";
-import {callContractFunction} from "./utils/eth-contract-call"
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
 
@@ -38,8 +34,8 @@ export class EthereumContract implements IWaasMethod {
      * const eventsIterator = api.eth().contract(contract).getEvents(query)[Symbol.asyncIterator]() // returns an new AsyncIterator Object
      * console.log(await eventsIterator.next()); // {value: { event: ...}, done: false}
      */
-    public getEvents(queryParams: ISearchContractEventsQueryParams = {}) {
-        return wrapSearchRequestIterable<ISearchTxEventResponse, IEthereumContractEventSearchItemData>(this.waas, `${this.baseUrl}/events`, queryParams);
+    public getEvents(params: IEventSearchParams = {}) {
+        return wrapSearchRequestIterable<ITransactionEvent, IEthereumContractEventSearchItemData>(this.waas, `${this.baseUrl}/events`, params);
     }
 
     /**

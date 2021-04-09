@@ -1,6 +1,7 @@
 import * as t from "typeforce";
 import {BlockchainWallet} from "./blockchain-wallet"
-import {IRecipient, ITokenBalance, ITransaction} from "./interfaces";
+import {IRecipient, ITransactionSentResponse} from "./interfaces/common";
+import {ITokenBalance} from "./interfaces/ethereum";
 import {recipientType, Waas} from "./waas";
 import {Wallet} from "./wallet";
 
@@ -38,8 +39,8 @@ export class EthErc20Wallet extends BlockchainWallet {
      * @param recipient - {@link IRecipient}
      * @see [docs]{@link https://docs.tangany.com/#8113cb99-b664-49b4-be12-35654f2190ef}
      */
-    public async send(recipient: IRecipient): Promise<ITransaction> {
-        return this.waas.wrap<ITransaction>(() => this.waas.instance
+    public async send(recipient: IRecipient): Promise<ITransactionSentResponse> {
+        return this.waas.wrap<ITransactionSentResponse>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/send`, this
                 .getRecipientsData(METHOD.TRANSFER)(recipient),
             ),
@@ -52,8 +53,8 @@ export class EthErc20Wallet extends BlockchainWallet {
      * @param amount - Float amount of tokens formatted as a string
      * @see [docs]{@link https://docs.tangany.com/#7a676b3d-93c9-4bed-b8ea-94c938909c61}
      */
-    public async approve({to, amount}: { to: string, amount: string }): Promise<ITransaction> {
-        return this.waas.wrap<ITransaction>(() => this.waas.instance
+    public async approve({to, amount}: { to: string, amount: string }): Promise<ITransactionSentResponse> {
+        return this.waas.wrap<ITransactionSentResponse>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/approve`, this
                 .getRecipientsData(METHOD.APPROVE)({to, amount}),
             ),
@@ -66,8 +67,8 @@ export class EthErc20Wallet extends BlockchainWallet {
      * @param amount - Float amount of tokens to withdraw formatted as a string
      * @see [docs]{@link https://docs.tangany.com/#3e92b48b-4626-4323-853e-3743237fc1f0}
      */
-    public async transferFrom({from, amount}: { from: string, amount: string }): Promise<ITransaction> {
-        return this.waas.wrap<ITransaction>(() => this.waas.instance
+    public async transferFrom({from, amount}: { from: string, amount: string }): Promise<ITransactionSentResponse> {
+        return this.waas.wrap<ITransactionSentResponse>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/transfer-from`, this
                 .getRecipientsData(METHOD.TRANSFER_FROM)({from, amount}),
             ),
@@ -79,8 +80,8 @@ export class EthErc20Wallet extends BlockchainWallet {
      * @param amount - Float amount of tokens to burn from the wallet formatted as a string
      * @see [docs]{@link https://docs.tangany.com/#ab52e66d-dffa-4bf7-aa4a-62ab5093f219}
      */
-    public async burn({amount}: { amount: string }): Promise<ITransaction> {
-        return this.waas.wrap<ITransaction>(() => this.waas.instance
+    public async burn({amount}: { amount: string }): Promise<ITransactionSentResponse> {
+        return this.waas.wrap<ITransactionSentResponse>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/burn`, this
                 .getRecipientsData(METHOD.BURN)({amount})),
         );
@@ -92,8 +93,8 @@ export class EthErc20Wallet extends BlockchainWallet {
      * @param [to] - Ethereum address to assign the mined tokens to. If omitted, tokens are assigned to the wallet address
      * @see [docs]{@link https://docs.tangany.com/#16d4bf9c-4bfb-4be5-bde4-cf4cdc938b29}
      */
-    public async mint({amount, to}: { amount: string, to?: string }): Promise<ITransaction> {
-        return this.waas.wrap<ITransaction>(() => this.waas.instance
+    public async mint({amount, to}: { amount: string, to?: string }): Promise<ITransactionSentResponse> {
+        return this.waas.wrap<ITransactionSentResponse>(() => this.waas.instance
             .post(`eth/erc20/${this.address}/${this.wallet}/mint`, this
                 .getRecipientsData(METHOD.MINT)({amount, to})),
         );
