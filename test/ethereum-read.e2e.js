@@ -88,8 +88,9 @@ describe("Example workflow for reading Ethereum blockchain data", function () {
 
 	it("should be possible to call next() until all data has been read", async function () {
 		const query = {
-			from: "0x9A67CaedE861007e59487227F6910bd774f9D5F7",
-			limit: 3
+			from: "0x9c2e011c0ce0d75c2b62b9c5a0ba0a7456593803",
+			to: "0xc32ae45504ee9482db99cfa21066a59e877bc0e6",
+			iserror: true,
 		};
 		let iterable = api.eth().getTransactions(query);
 		const iterator = await iterable[Symbol.asyncIterator]();

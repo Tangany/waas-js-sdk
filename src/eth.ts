@@ -1,14 +1,11 @@
 import * as t from "typeforce";
 import {EthereumContract} from "./eth-contract";
+import {EthTransaction} from "./eth-transaction";
 import {IEthereumTransaction, IEthStatus, ITransactionSearchParams} from "./interfaces/ethereum";
 import {ITransactionEvent} from "./interfaces/ethereum-contract";
-import {wrapSearchRequestIterable} from "./utils/search-request-wrapper";
+import {EthTransactionPageIterable} from "./iterables/eth-transaction-page-iterable"
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
-
-export interface IEthereumTxSearchItemData {
-    hash: string
-}
 
 /**
  * Instantiates a new Ethereum interface
@@ -44,17 +41,17 @@ export class Ethereum implements IWaasMethod {
     /**
      * Returns an async iterable object that is able to query lists of transactions based on passed filter criteria
      * @example
-     * const iterable = new Waas().eth().getTransactions(qs);
+     * const iterable = new Waas().eth().getTransactions(query);
      * // fetch a single page
-     * const iterator = iterable[Symbol.asyncIterator]()
-     * const txPage = (await iterator.next).value
+     * const iterator = iterable[Symbol.asyncIterator]();
+     * const txPage = (await iterator.next()).value;
      * // fetch all pages
-     * for await (value of iterable) {
-     *     console.log(await value.list[0].get); // fetch transaction details
+     * for await (const page of iterable) {
+     *     console.log(await page.list[0].get()); // get details for a list result
      * }
      */
-    public getTransactions(params: ITransactionSearchParams = {}) {
-        return wrapSearchRequestIterable<IEthereumTransaction, IEthereumTxSearchItemData>(this.waas, "eth/transactions", params);
+    public getTransactions(params?: ITransactionSearchParams): EthTransactionPageIterable {
+        return new EthTransactionPageIterable(this.waas, {url: "eth/transactions", params});
     }
 
     /**
@@ -85,7 +82,7 @@ export class Ethereum implements IWaasMethod {
      * The status faulty indicates that one or more info properties are missing.
      * The status unavailable is returned if all info properties are missing.
      */
-    public async getStatus(): Promise<IEthStatus>{
+    public async getStatus(): Promise<IEthStatus> {
         return this.waas.wrap<IEthStatus>(() => this.waas.instance.get(`eth/status`));
     }
 
@@ -94,7 +91,7 @@ export class Ethereum implements IWaasMethod {
      * @param txHash - Either the transaction hash of this object instance or any other
      */
     private async getTransactionDetails(txHash: string): Promise<IEthereumTransaction> {
-        return this.waas.wrap<IEthereumTransaction>(() => this.waas.instance.get(`eth/transaction/${txHash}`));
+        return new EthTransaction(this.waas, txHash).get();
     }
 
     /**
