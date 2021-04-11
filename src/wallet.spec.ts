@@ -2,6 +2,7 @@ import * as moxios from "moxios";
 import * as assert from "assert";
 import {ConflictError, GeneralError} from "./errors";
 import {ISignatureResponse} from "./interfaces/signature";
+import {IWalletSearchResponse} from "./interfaces/wallet"
 import {SignatureEncoding} from "./types/common";
 import {Waas} from "./waas";
 import {Wallet} from "./wallet";
@@ -80,22 +81,49 @@ describe("Wallet", function() {
     });
 
     describe("list", function() {
-        it("should not throw when called without arguments", async function() {
+
+        const singlePageResponse: IWalletSearchResponse = {
+            hits: {total: 0, hsm: 0},
+            list: [],
+            links: {next: null, previous: null},
+        }
+
+        it("should call the deprecated endpoint if no argument is passed", async function() {
             const stub = this.waas.instance.get = this.sandbox.stub().resolvesArg(0);
             await new Wallet(this.waas).list();
-            assert.ok(stub.alwaysCalledWithExactly("wallet"));
+            assert.ok(stub.calledOnce);
+            assert.ok(stub.firstCall.calledWithExactly("wallet"));
         });
 
-        it("should verify the skiptoken was passed to the api call", async function() {
+        it("should call the deprecated endpoint with the passed skiptoken", async function() {
             const stub = this.waas.instance.get = this.sandbox.stub().resolvesArg(0);
             await new Wallet(this.waas).list("123");
-            stub.alwaysCalledWithExactly([/wallet?skiptoken=123/]);
+            assert.ok(stub.calledOnce);
+            assert.ok(stub.firstCall.calledWithExactly("wallet?skiptoken=123"));
         });
 
-        it("should throw on invalid skiptoken", async function() {
-            const stub = this.waas.instance.post = this.sandbox.stub().resolvesArg(0);
+        it("should call the non-deprecated endpoint if the object parameter overload is used", async function() {
+            const stub = this.waas.instance.get = this.sandbox.stub().resolves(singlePageResponse);
+            const iterable = new Wallet(this.waas).list({tag: ["my-tag", "test"]});
+            await iterable.next();
+            assert.ok(stub.calledOnce);
+            assert.ok(stub.firstCall.calledWith("wallets"));
+        });
+
+        it("should return an asynchronous iterable if the object parameter overload is used", async function() {
+            const stub = this.waas.instance.get = this.sandbox.stub().resolves(singlePageResponse);
+            const iterable = await new Wallet(this.waas).list({sort: "createddesc"});
+            assert.ok(iterable);
+            assert.ok(typeof iterable[Symbol.asyncIterator] === "function");
+            const page = (await iterable[Symbol.asyncIterator]().next()).value;
+            assert.ok(page);
+            assert.ok(stub.calledOnce);
+        });
+
+        it("should throw on invalid argument", async function() {
+            const stub = this.waas.instance.get = this.sandbox.stub().resolves(0);
             const w = new Wallet(this.waas);
-            await assert.rejects(async () => w.list(123 as any), /Expected \?String, got Number 123/);
+            await assert.rejects(async () => w.list(123 as any), /The passed argument for wallet search is invalid/);
             assert.strictEqual(stub.callCount, 0);
         });
     });

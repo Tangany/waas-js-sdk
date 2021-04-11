@@ -1,4 +1,5 @@
 import {WalletSecurity, WalletVersion} from "../waas";
+import {IHateoasLink, ISearchResponse} from "./common";
 
 /**
  * Represents a wallet response
@@ -42,4 +43,38 @@ export interface IWalletBalance {
     address: string;
     balance: string;
     currency: string;
+}
+
+export interface IWalletSearchResponse extends ISearchResponse {
+    hits: {
+        total: number;
+        hsm: number
+    };
+    list: {
+        wallet: string;
+        links: IHateoasLink<"wallet">[];
+    }[];
+}
+
+/**
+ * Parameters to configure pagination, sorting or filtering for wallet search requests.
+ * There are API-side default values for index (0) and limit (10).
+ * For all other parameters `undefined` or `[]` is used if no value is set explicitly.
+ */
+export interface IWalletSearchParams {
+    index?: number;
+    limit?: number;
+    sort?:
+        | "wallet"
+        | "walletdesc"
+        | "created"
+        | "createddesc"
+        | "updated"
+        | "updateddesc"
+        | "security"
+        | "securitydesc";
+    /** Include filter for tags (AND-linked) */
+    tag?: string[];
+    /** Exclude filter for tags (AND-linked) */
+    xtag?: string[];
 }

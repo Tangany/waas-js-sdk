@@ -24,20 +24,11 @@ const api = new Waas();
 
 // e.g. fetch all client wallets
 (async () => {
-   let skiptoken = undefined;
-
-    async function listNextPage () {
-        const res = await api.wallet().list(skiptoken);
-        skiptoken = res.skiptoken;
-
-        return res;
+    const walletIterable = api.wallet().list({ sort: "createddesc" });
+    for await (const page of walletIterable) {
+        console.log(`Page with ${page.list.length} of a total of ${page.hits.total} wallets fetched. Details for the first wallet of this page:`);
+        console.log(await page.list[0].get());
     }
-
-    do {
-        const { list } = await listNextPage();
-        console.log(list);
-    }
-    while (!!skiptoken); // fetch until no skiptoken is returned in the response
 })();
 ```
 
@@ -85,8 +76,17 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````javascript
 (async () => {
     const api = new Waas();
-    // list all wallets
+
+    // Note: Temporarily, list() returns the fully populated list, thus calling the deprecated endpoint to avoid a breaking change.
+    // The new endpoint with extended parameters and pagination is used if you pass an object containing the filters instead of a skiptoken.
+    // Currently, you must therefore pass an empty object if you want to use the new endpoint with the default settings.
     const { list } = await api.wallet().list();
+    const walletIterable1 = api.wallet().list({});
+    const walletIterable2 = api.wallet().list({ sort: "createddesc" });
+    for await (const {hits, list} of walletIterable2) {
+        // Process the data of the current page
+    }
+
     //  create a new wallet
     const { wallet, security } = await api.wallet().create("some-other-wallet", false);
     //  fetch a wallet

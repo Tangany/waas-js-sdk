@@ -2,7 +2,8 @@ import * as t from "typeforce";
 import {BtcWallet} from "./btc-wallet";
 import {EthWallet} from "./eth-wallet";
 import {ISignatureResponse, ISignatureVerificationResponse} from "./interfaces/signature";
-import {ISoftDeletedWallet, IWallet, IWalletList} from "./interfaces/wallet";
+import {ISoftDeletedWallet, IWallet, IWalletList, IWalletSearchParams} from "./interfaces/wallet";
+import {WalletPageIterable} from "./iterables/wallet-page-iterable";
 import {SignatureEncoding} from "./types/common";
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
@@ -25,21 +26,38 @@ export class Wallet implements IWaasMethod {
     }
 
     /**
-     * Lists all wallets for current clientId.
-     * @param [skiptoken] - "skiptoken" value returned in the api response to fetch the next batch of wallets
-     * @see [docs]{@link https://docs.tangany.com/#5f27c76b-48a1-45d1-9d8b-44d5afbb1ef3}
+     * Lists all wallets for the current client.
      */
-    public async list(skiptoken?: string): Promise<IWalletList> {
-        t("?String", skiptoken);
+    public async list(): Promise<IWalletList>;
 
-        let url = "wallet";
-        if (skiptoken) {
-            url += `?skiptoken=${skiptoken}`;
+    /**
+     * Lists all wallets for the current client.
+     * @param [skiptoken] - "skiptoken" value returned in the API response to fetch the next batch of wallets
+     * @see [docs]{@link https://docs.tangany.com/#5f27c76b-48a1-45d1-9d8b-44d5afbb1ef3}
+     * @deprecated Use the method overload with {@link IWalletSearchParams} instead.
+     */
+    // Ignore the Lint warning because the overload with no arguments (i.e. .list()) should be intentionally documented differently than this one.
+    // tslint:disable-next-line:unified-signatures
+    public async list(skiptoken?: string): Promise<IWalletList>;
+
+    /**
+     * Returns an asynchronous iterable to iterate the wallets of the current client pagewise.
+     * @see [docs]{@link https://docs.tangany.com/#72b95742-6682-4dae-a802-4bbd504df9f4}
+     * @param [params] - Optional search parameters
+     */
+    public list(params?: IWalletSearchParams): WalletPageIterable;
+
+    public list(arg?: string | IWalletSearchParams): Promise<IWalletList> | WalletPageIterable {
+        // The first and second overload continue to use the deprecated endpoint to avoid breaking changes
+        if (arg === undefined || typeof arg === "string") {
+            const url = `wallet${arg ? `?skiptoken=${arg}` : ""}`;
+            return this.waas.wrap<IWalletList>(() => this.waas.instance.get(url));
         }
-
-        return this.waas.wrap<IWalletList>(() => this.waas.instance
-            .get(url),
-        );
+        // The third overload utilizes the new endpoint and uses an asynchronous iterable
+        else if (arg !== null && typeof arg === "object") {
+            return new WalletPageIterable(this.waas, {url: "wallets", params: arg});
+        }
+        throw new Error("The passed argument for wallet search is invalid");
     }
 
     /**
