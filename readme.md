@@ -87,8 +87,15 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
         // Process the data of the current page
     }
 
-    //  create a new wallet
-    const { wallet, security } = await api.wallet().create("some-other-wallet", false);
+    //  create a new wallet (all properties are optional)
+    const {wallet, security} = await api.wallet().create({
+        wallet: "some-other-wallet",
+        useHsm: false,
+        tags: [
+            {name: "isTest", value: true},
+            {name: "another-tag", value: 123}
+        ]
+    });
     //  fetch a wallet
     const { created } = await api.wallet(wallet).get();
     // replace a wallet

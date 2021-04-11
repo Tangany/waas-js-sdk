@@ -2,7 +2,14 @@ import * as t from "typeforce";
 import {BtcWallet} from "./btc-wallet";
 import {EthWallet} from "./eth-wallet";
 import {ISignatureResponse, ISignatureVerificationResponse} from "./interfaces/signature";
-import {ISoftDeletedWallet, IWallet, IWalletList, IWalletSearchParams} from "./interfaces/wallet";
+import {
+    ISoftDeletedWallet,
+    IWallet,
+    IWalletCreationBody,
+    IWalletCreationProperties,
+    IWalletList,
+    IWalletSearchParams
+} from "./interfaces/wallet";
 import {WalletPageIterable} from "./iterables/wallet-page-iterable";
 import {SignatureEncoding} from "./types/common";
 import {Waas} from "./waas";
@@ -62,15 +69,37 @@ export class Wallet implements IWaasMethod {
 
     /**
      * Creates a new wallet
+     * @param [wallet] - Values to configure the wallet to create
+     * @see [docs]{@link https://docs.tangany.com/#9524e598-b645-4a44-9036-c874e22be3a7}
+     */
+    public async create(wallet?: IWalletCreationProperties): Promise<IWallet>;
+
+    /**
+     * Creates a new wallet
      * @param [wallet] - Wallet name that can be linked to a user identifier
      * @param [useHsm] - Use a hardware secure module to store the wallet private key
-     * @see [docs]{@link https://docs.tangany.com/#88ca3b1c-fd97-4e92-bc42-89c5744f25d2}
+     * @deprecated Use the method overload with {@link IWalletCreationProperties} instead
      */
-    public async create(wallet?: string, useHsm?: boolean): Promise<IWallet> {
-        t("?String", wallet);
-        t("?Boolean", useHsm);
+    public async create(wallet?: string, useHsm?: boolean): Promise<IWallet>;
 
-        return this.waas.wrap<IWallet>(() => this.waas.instance.post("wallet", {wallet, useHsm,}));
+    public async create(wallet?: string | IWalletCreationProperties, useHsm?: boolean): Promise<IWallet> {
+        let reqBody: IWalletCreationBody;
+        if (wallet === undefined) {
+            reqBody = {};
+        } else if (typeof wallet === "string") {
+            t("?Boolean", useHsm);
+            reqBody = {wallet, useHsm};
+        } else if (typeof wallet === "object" && !Array.isArray(wallet)) {
+            const tags = wallet.tags?.map(x => ({[x.name]: x.value}));
+            reqBody = {
+                wallet: wallet.wallet,
+                useHsm: wallet.useHsm,
+                tags,
+            }
+        } else {
+            throw new Error("The passed arguments does not match a valid method overload");
+        }
+        return this.waas.wrap<IWallet>(() => this.waas.instance.post("wallets", reqBody));
     }
 
     /**

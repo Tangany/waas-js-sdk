@@ -29,6 +29,27 @@ export interface IWalletList {
 }
 
 /**
+ * Request body that is expected by the API endpoint for wallet creation
+ */
+export interface IWalletCreationBody {
+    wallet?: string;
+    useHsm?: boolean;
+    tags?: { [key: string]: string | number | boolean | null }[];
+}
+
+/**
+ * SDK-side (more restrictive) configuration object to create a new wallet
+ */
+export interface IWalletCreationProperties {
+    wallet?: IWalletCreationBody["wallet"];
+    useHsm?: IWalletCreationBody["useHsm"];
+    tags?: {
+        name: string;
+        value: string | number | boolean | null;
+    }[];
+}
+
+/**
  * Represents the response of a soft-deleted wallet
  */
 export interface ISoftDeletedWallet {

@@ -39,7 +39,7 @@ describe("WaaS sample wallet workflow", function () {
 
 	it("should fail creating a wallet with occupied name", async function () {
 		assert.ok(createdWallet, "cannot run without previous tests");
-		await assert.rejects(async () => api.wallet().create(createdWallet), e => {
+		await assert.rejects(async () => api.wallet().create({ wallet: createdWallet }), e => {
 			assert.ok(e instanceof ConflictError);
 			// Check properties against undefined, null and empty strings (https://stackoverflow.com/a/5515349)
 			assert.ok(e.status);

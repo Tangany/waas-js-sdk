@@ -53,7 +53,7 @@ describe("Wallet", function() {
                 response: {},
             });
             const w = new Wallet(this.noAuthWaas);
-            await assert.rejects(async () => w.create(dummyWalletName), ConflictError);
+            await assert.rejects(async () => w.create({wallet: dummyWalletName}), ConflictError);
         });
 
         it("should throw a GeneralError for any other errors", async function() {
@@ -64,7 +64,7 @@ describe("Wallet", function() {
                 response: {message},
             });
             const w = new Wallet(this.noAuthWaas);
-            await assert.rejects(async () => w.create(dummyWalletName), e => {
+            await assert.rejects(async () => w.create({wallet: dummyWalletName}), e => {
                 assert.ok(e instanceof GeneralError);
                 assert.strictEqual(e.status, status)
                 assert.strictEqual(e.message, message)
@@ -135,6 +135,12 @@ describe("Wallet", function() {
             await assert.doesNotReject(async () => w.create());
             await assert.doesNotReject(async () => w.create("some-wallet"));
             assert.strictEqual(stub.callCount, 2);
+        });
+        it("should throw an error if an invalid method overload is used", async function() {
+            const wallet = new Wallet(this.waas);
+            await assert.rejects(() => wallet.create("my-wallet", "no hsm" as any), /Expected \?Boolean, got String/)
+            await assert.rejects(() => wallet.create(true as any), /The passed arguments does not match a valid method overload/)
+            await assert.rejects(() => wallet.create(["abc", "def"] as any), /The passed arguments does not match a valid method overload/)
         });
     });
 
