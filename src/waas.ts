@@ -1,6 +1,7 @@
 import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} from "axios";
 import Bottleneck from "bottleneck";
 import * as Debug from "debug";
+import * as qs from "qs";
 import * as t from "typeforce";
 import {Bitcoin} from "./btc";
 import {AuthenticationError, ConflictError, GeneralError, MiningError, NotFoundError} from "./errors";
@@ -198,6 +199,9 @@ export class Waas {
                 },
             },
             responseType: "json",
+            paramsSerializer: (params: any): string => {
+                return qs.stringify(params, {arrayFormat: 'repeat'});
+            },
         };
 
         if (_options.vaultUrl) {
