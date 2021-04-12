@@ -11,9 +11,12 @@ import {
     IWalletSearchParams
 } from "./interfaces/wallet";
 import {WalletPageIterable} from "./iterables/wallet-page-iterable";
-import {SignatureEncoding} from "./types/common";
+import {AtLeastOne, SignatureEncoding} from "./types/common";
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
+
+/** Custom type for partial wallet updates that requires at least one property */
+type WalletUpdateValues = AtLeastOne<Omit<IWalletCreationProperties, "wallet" | "useHsm">>;
 
 /**
  *  Instantiates a new wallet interface
@@ -22,6 +25,16 @@ import {IWaasMethod} from "./waas-method";
  * @param  [wallet) - wallet name
  */
 export class Wallet implements IWaasMethod {
+
+    /**
+     * Converts SDK-specific objects for wallet tags into objects compatible with the API.
+     * @param tags - SDK-side wallet tags to be converted
+     */
+    private static convertTags(tags: IWalletCreationProperties["tags"]): IWalletCreationBody["tags"] {
+        // Ideally, we would have used typeforce to validate the type here as well, but for this somewhat more complex type, that doesn't seem to be so easy
+        return tags?.map(x => ({[x.name]: x.value}));
+    }
+
     constructor(public waas: Waas, private readonly name?: string) {
         t("?String", name);
     }
@@ -90,16 +103,29 @@ export class Wallet implements IWaasMethod {
             t("?Boolean", useHsm);
             reqBody = {wallet, useHsm};
         } else if (typeof wallet === "object" && !Array.isArray(wallet)) {
-            const tags = wallet.tags?.map(x => ({[x.name]: x.value}));
             reqBody = {
                 wallet: wallet.wallet,
                 useHsm: wallet.useHsm,
-                tags,
+                tags: Wallet.convertTags(wallet.tags),
             }
         } else {
             throw new Error("The passed arguments does not match a valid method overload");
         }
         return this.waas.wrap<IWallet>(() => this.waas.instance.post("wallets", reqBody));
+    }
+
+    /**
+     * Updates the given wallet without regenerating the cryptographic keys.
+     * @param newValues - Subset of wallet properties that are allowed to be updated. Non-primitive properties like arrays or objects replace the previous value and therefore need to contain all desired values.
+     * @see [docs]{@link https://docs.tangany.com/#05339c0f-8cc9-48d2-91e0-c9240764dc53}
+     */
+    public async update(newValues: WalletUpdateValues): Promise<IWallet> {
+        t("Object", newValues);
+        const reqBody = {
+            ...newValues,
+            tags: Wallet.convertTags(newValues.tags),
+        }
+        return this.waas.wrap<IWallet>(() => this.waas.instance.patch(`wallet/${this.wallet}`, reqBody));
     }
 
     /**

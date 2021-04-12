@@ -96,10 +96,22 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
             {name: "another-tag", value: 123}
         ]
     });
+
     //  fetch a wallet
     const { created } = await api.wallet(wallet).get();
+
+    // partially update a wallet
+    const updatedWallet = await api.wallet(wallet).update({
+        // The passed tag array overwrites the previous value and therefore must contain all desired values
+        tags: [
+            {name: "isTest", value: true},
+            {name: "additionalTag", value: 456}
+        ]
+    });
+
     // replace a wallet
     const { version } = await api.wallet(wallet).replace();
+
     //  delete a wallet
     const { scheduledPurgeDate, recoveryId } = await api.wallet(wallet).delete();
 })();

@@ -142,6 +142,45 @@ describe("Wallet", function() {
             await assert.rejects(() => wallet.create(true as any), /The passed arguments does not match a valid method overload/)
             await assert.rejects(() => wallet.create(["abc", "def"] as any), /The passed arguments does not match a valid method overload/)
         });
+        it("should convert the tags to the format expected by the API", async function() {
+            const spy = this.waas.instance.post = this.sandbox.spy();
+            await new Wallet(this.waas, dummyWalletName).create({
+                tags: [
+                    {name: "test-tag", value: true},
+                    {name: "anotherTag", value: "foo"}
+                ]
+            });
+            const expectedTags = [{"test-tag": true}, {"anotherTag": "foo"}];
+            assert.deepStrictEqual(spy.firstCall.args[1].tags, expectedTags);
+        });
+    });
+
+    describe("update", function() {
+        it("should throw for invalid argument", async function() {
+            const stub = this.waas.instance.patch = this.sandbox.stub().resolves();
+            const w = new Wallet(this.waas);
+            await assert.rejects(async () => w.update(undefined as any), /Expected Object, got undefined/);
+            await assert.rejects(async () => w.update(123 as any), /Expected Object, got Number/);
+            assert.ok(stub.notCalled);
+        });
+
+        it("should execute the api call", async function() {
+            const spy = this.waas.instance.patch = this.sandbox.spy();
+            await new Wallet(this.waas, dummyWalletName).update({tags: []});
+            assert.strictEqual(spy.callCount, 1);
+            assert.ok(spy.firstCall.calledWith(`wallet/${dummyWalletName}`));
+        });
+        it("should convert the tags to the format expected by the API", async function() {
+            const spy = this.waas.instance.patch = this.sandbox.spy();
+            await new Wallet(this.waas, dummyWalletName).update({
+                tags: [
+                    {name: "test-tag", value: true},
+                    {name: "anotherTag", value: "foo"}
+                ]
+            });
+            const expectedTags = [{"test-tag": true}, {"anotherTag": "foo"}];
+            assert.deepStrictEqual(spy.firstCall.args[1].tags, expectedTags);
+        });
     });
 
     describe("replace", function() {
