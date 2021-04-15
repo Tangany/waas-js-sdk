@@ -7,6 +7,7 @@ import * as assert from "assert";
 import {Waas} from "./waas";
 import {EthWallet} from "./eth-wallet";
 import {Wallet} from "./wallet";
+import {Monitor} from "./monitor";
 
 describe("EthWallet", function() {
     sandbox();
@@ -182,6 +183,15 @@ describe("EthWallet", function() {
             const ethWallet = new EthWallet(this.waas, wallet);
             const contractWallet = ethWallet.contract("0xC32AE45504Ee9482db99CfA21066A59E877Bc0e6");
             assert.ok(contractWallet instanceof EthContractWallet);
+        });
+    });
+
+    describe("monitor", function() {
+        it("should return a Monitor instance", function() {
+            const wallet = new Wallet(this.waas, sampleWallet);
+            const ethWallet = new EthWallet(this.waas, wallet);
+            const monitor = ethWallet.monitor("any-monitor-id");
+            assert.ok(monitor instanceof Monitor);
         });
     });
 });

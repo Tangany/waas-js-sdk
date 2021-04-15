@@ -304,6 +304,53 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 })();
 ````
 
+#### Monitor interface
+WaaS monitors use webhooks to inform about transactions that meet the defined criteria.
+They can be utilized to reduce status polling when sending transactions or can e.g. notify about in- or outgoing transaction that exceed a certain value.
+
+```javascript
+(async () => {
+    const waas = new Waas();
+    const ethWalletApi = waas.wallet("my-wallet").eth();
+
+    // Get all monitors for all wallets of the current customer with default pagination settings
+    const iterable1 = await waas.eth().monitor().list();
+    // Get all monitors for wallet called "my-wallet" returned on pages with 15 items each
+    const iterable2 = await waas.eth().monitor().list({limit: 15, wallet: "my-wallet"});
+    // The previous call is equivalent to this one, which uses the wallet-specific method
+    const iterable3 = await ethWalletApi.monitor().list({limit: 15});
+    for await (const page of iterable3) {
+        for (const monitor of page.list) {
+            console.log(await monitor.get());
+            await monitor.update({description: "New description"});
+        }
+    }
+
+    // Create new monitor
+    const {monitor, status} = await ethWalletApi.monitor().create(monitorObj);
+
+    // Interact with a specific monitor
+    const specificMonitor = ethWalletApi.monitor("any-monitor-id");
+    const details = await specificMonitor.get();
+
+    // Partially update monitor
+    let updatedMonitor = await specificMonitor.update({description: "New description"});
+    updatedMonitor = await specificMonitor.update({
+        description: "Another text",
+        configuration: {
+            // Specify all properties that should be present in `configuration` after the update.
+            // This is because the endpoint overrides nested properties.
+        }
+    });
+
+    // Replace monitor, which requires a complete object, not a partial
+    updatedMonitor = await specificMonitor.replace(monitorToWrite);
+
+    // Delete the entire monitor
+    await specificMonitor.delete();
+})();
+```
+
 #### Node status
 Get status information about the [Bitcoin](https://docs.tangany.com/#15f3dbb7-84b6-4828-b866-52255f72b2bc)
 or [Ethereum](https://docs.tangany.com/#cb2713db-04dc-4003-94f7-b6eeb021a5ad) full node

@@ -12,6 +12,7 @@ import {
 import {ITransmittableTransaction} from "./interfaces/signature";
 import {IWalletBalance} from "./interfaces/wallet";
 import {EthTransactionPageIterable} from "./iterables/eth-transaction-page-iterable";
+import {Monitor} from "./monitor";
 import {Request} from "./request";
 import {ethereumRecipientType, Waas} from "./waas";
 import {Wallet} from "./wallet";
@@ -130,6 +131,14 @@ export class EthWallet extends BlockchainWallet {
      */
     public contract(address: string): EthContractWallet {
         return new EthContractWallet(this.waas, this.walletInstance, address);
+    }
+
+    /**
+     * Returns an object to interact with monitors related to the current wallet.
+     * @param [id] - Monitor id that must be passed if a specific monitor is to be addressed
+     */
+    public monitor(id?: string) {
+        return new Monitor(this.waas, id, this.wallet);
     }
 
     /**

@@ -3,6 +3,8 @@ import {EthereumContract} from "./eth-contract";
 import {EthTransaction} from "./eth-transaction";
 import {IEthereumTransaction, IEthStatus, ITransactionSearchParams} from "./interfaces/ethereum";
 import {ITransactionEvent} from "./interfaces/ethereum-contract";
+import {IMonitorSearchParams} from "./interfaces/monitor";
+import {MonitorPageIterable} from "./iterables/monitor-page-iterable";
 import {EthTransactionPageIterable} from "./iterables/eth-transaction-page-iterable"
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
@@ -100,6 +102,22 @@ export class Ethereum implements IWaasMethod {
      */
     public contract(address: string): EthereumContract {
         return new EthereumContract(this.waas, address);
+    }
+
+    /**
+     * Returns an object to interact with Ethereum-based monitors (possibly of different wallets).
+     */
+    public monitor() {
+        return {
+            /**
+             * Returns an asynchronous iterable to iterate all Ethereum-based monitors.
+             * @param [params] - Optional search parameters
+             * @see [docs]{@link https://docs.tangany.com/#0cf31f8c-9ae1-4709-9ca6-842452d74b10}
+             */
+            list: (params?: IMonitorSearchParams): MonitorPageIterable => {
+                return new MonitorPageIterable(this.waas, {url: "eth/monitors", params});
+            }
+        }
     }
 
 }
