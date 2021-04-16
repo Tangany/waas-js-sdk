@@ -1,7 +1,7 @@
-import {ISearchRequestConfig} from "../interfaces/common";
-import {IMonitorSearchResponse} from "../interfaces/monitor";
-import {Monitor} from "../monitor";
-import {Waas} from "../waas";
+import {ISearchRequestConfig} from "../../interfaces/common";
+import {IMonitorSearchResponse} from "../../interfaces/monitor";
+import {Monitor} from "../../monitor";
+import {Waas} from "../../waas";
 import {IDefaultIteratorValue, ResourcePageIterable} from "./resource-page-iterable";
 
 interface IIteratorValue extends IDefaultIteratorValue<Monitor> {

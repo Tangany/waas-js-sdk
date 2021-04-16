@@ -1,6 +1,6 @@
 import * as t from "typeforce";
 import {IMonitor, IMonitorCreationProperties, IMonitorSearchParams} from "./interfaces/monitor";
-import {MonitorPageIterable} from "./iterables/monitor-page-iterable";
+import {MonitorPageIterable} from "./iterables/pagewise/monitor-page-iterable";
 import {AtLeastOne} from "./types/common";
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";

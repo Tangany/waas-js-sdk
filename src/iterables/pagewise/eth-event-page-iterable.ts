@@ -1,5 +1,5 @@
-import {EthTransactionEvent} from "../eth-transaction-event";
-import {IEventSearchResponse} from "../interfaces/ethereum-contract";
+import {EthTransactionEvent} from "../../eth-transaction-event";
+import {IEventSearchResponse} from "../../interfaces/ethereum-contract";
 import {IDefaultIteratorValue, ResourcePageIterable} from "./resource-page-iterable";
 
 interface IIteratorValue extends IDefaultIteratorValue<EthTransactionEvent> {

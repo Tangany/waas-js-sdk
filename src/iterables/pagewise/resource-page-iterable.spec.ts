@@ -1,9 +1,9 @@
 import * as assert from "assert";
 import axios from "axios";
 import {SinonSpyCall} from "sinon";
-import {ISearchResponse} from "../interfaces/common";
-import {sandbox} from "../utils/spec-helpers";
-import {Waas} from "../waas";
+import {ISearchResponse} from "../../interfaces/common";
+import {sandbox} from "../../utils/spec-helpers";
+import {Waas} from "../../waas";
 import {IDefaultIteratorValue, ResourcePageIterable} from "./resource-page-iterable";
 
 interface IIteratorValue extends IDefaultIteratorValue<{ mappedProperty: string }> {

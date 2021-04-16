@@ -10,7 +10,7 @@ import {
     IWalletList,
     IWalletSearchParams
 } from "./interfaces/wallet";
-import {WalletPageIterable} from "./iterables/wallet-page-iterable";
+import {WalletPageIterable} from "./iterables/pagewise/wallet-page-iterable";
 import {AtLeastOne, SignatureEncoding} from "./types/common";
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";

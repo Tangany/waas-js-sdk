@@ -1,6 +1,6 @@
 import {AxiosRequestConfig} from "axios";
-import {IPaginationResponse, ISearchRequestConfig} from "../interfaces/common";
-import {Waas} from "../waas";
+import {IPaginationResponse, ISearchRequestConfig} from "../../interfaces/common";
+import {Waas} from "../../waas";
 
 export interface IDefaultIteratorValue<T> {
     hits: {

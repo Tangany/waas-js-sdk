@@ -4,8 +4,8 @@ import {EthTransaction} from "./eth-transaction";
 import {IEthereumTransaction, IEthStatus, ITransactionSearchParams} from "./interfaces/ethereum";
 import {ITransactionEvent} from "./interfaces/ethereum-contract";
 import {IMonitorSearchParams} from "./interfaces/monitor";
-import {MonitorPageIterable} from "./iterables/monitor-page-iterable";
-import {EthTransactionPageIterable} from "./iterables/eth-transaction-page-iterable"
+import {MonitorPageIterable} from "./iterables/pagewise/monitor-page-iterable";
+import {EthTransactionPageIterable} from "./iterables/pagewise/eth-transaction-page-iterable"
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
 

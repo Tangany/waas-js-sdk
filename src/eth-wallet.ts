@@ -11,7 +11,7 @@ import {
 } from "./interfaces/ethereum";
 import {ITransmittableTransaction} from "./interfaces/signature";
 import {IWalletBalance} from "./interfaces/wallet";
-import {EthTransactionPageIterable} from "./iterables/eth-transaction-page-iterable";
+import {EthTransactionPageIterable} from "./iterables/pagewise/eth-transaction-page-iterable";
 import {Monitor} from "./monitor";
 import {Request} from "./request";
 import {ethereumRecipientType, Waas} from "./waas";

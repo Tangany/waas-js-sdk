@@ -1,5 +1,5 @@
-import {IWalletSearchResponse} from "../interfaces/wallet";
-import {Wallet} from "../wallet";
+import {IWalletSearchResponse} from "../../interfaces/wallet";
+import {Wallet} from "../../wallet";
 import {ResourcePageIterable} from "./resource-page-iterable";
 
 interface IIteratorValue {

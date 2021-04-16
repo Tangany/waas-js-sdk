@@ -1,6 +1,6 @@
 import * as t from "typeforce";
 import {IContractCall, IEventSearchParams} from "./interfaces/ethereum-contract";
-import {EthEventPageIterable} from "./iterables/eth-event-page-iterable";
+import {EthEventPageIterable} from "./iterables/pagewise/eth-event-page-iterable";
 import {ContractCallResult} from "./types/common";
 import {callContractFunction} from "./utils/eth-contract-call";
 import {EventArgumentFilterCollection} from "./utils/event-argument-filter-collection";

@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import axios from "axios";
-import {MonitorPageIterable} from "./iterables/monitor-page-iterable";
+import {MonitorPageIterable} from "./iterables/pagewise/monitor-page-iterable";
 import {Monitor} from "./monitor";
 import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";
