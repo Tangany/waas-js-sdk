@@ -1,5 +1,7 @@
 import * as t from "typeforce";
+import {ISearchOptions, ISearchRequestConfig} from "./interfaces/common";
 import {IMonitor, IMonitorCreationProperties, IMonitorSearchParams} from "./interfaces/monitor";
+import {MonitorIterable} from "./iterables/auto-pagination/monitor-iterable";
 import {MonitorPageIterable} from "./iterables/pagewise/monitor-page-iterable";
 import {AtLeastOne} from "./types/common";
 import {Waas} from "./waas";
@@ -7,6 +9,9 @@ import {IWaasMethod} from "./waas-method";
 
 /** Custom type for partial wallet updates that requires at least one property */
 type MonitorUpdateValues = AtLeastOne<Omit<IMonitorCreationProperties, "target">>;
+
+/** Custom type for search parameters in this wallet-based context */
+type SearchParams = Omit<IMonitorSearchParams, "wallet">;
 
 export class Monitor implements IWaasMethod {
 
@@ -46,12 +51,38 @@ export class Monitor implements IWaasMethod {
     }
 
     /**
-     * Returns an asynchronous iterable to iterate the monitors related to the current wallet.
+     * Returns an asynchronous iterable to iterate **page by page** through the monitors that matched the search parameters.
      * @param [params] - Optional search parameters
      * @see [docs]{@link https://docs.tangany.com/#25362117-57b0-4c46-9e40-0e8e119a17b5}
      */
-    public list(params?: Omit<IMonitorSearchParams, "wallet">): MonitorPageIterable {
-        return new MonitorPageIterable(this.waas, {url: this.baseUrlResourceList, params}, this.wallet);
+    public list(params?: SearchParams): MonitorPageIterable;
+
+    /**
+     * Returns an asynchronous iterable that yields **one monitor object per iteration**.
+     * A page of monitors that match the search parameters is fetched and saved once, so that all items can be returned one by one.
+     * After that, the next page is loaded from the API and processed item by item again.
+     * @param [params] - Optional search parameters
+     * @param [options] - Additional options that do not affect the API request but the SDK-side processing
+     * @see [docs]{@link https://docs.tangany.com/#25362117-57b0-4c46-9e40-0e8e119a17b5}
+     */
+    public list(params?: SearchParams, options?: { autoPagination: true }): MonitorIterable;
+
+    /**
+     * Returns an asynchronous iterable to iterate **page by page** through the monitors that matched the search parameters.
+     * @param [params] - Optional search parameters
+     * @param [options] - Additional options that do not affect the API request but the SDK-side processing
+     * @see [docs]{@link https://docs.tangany.com/#25362117-57b0-4c46-9e40-0e8e119a17b5}
+     */
+    // tslint:disable-next-line:unified-signatures
+    public list(params?: SearchParams, options?: ISearchOptions): MonitorPageIterable;
+
+    public list(params?: SearchParams, options?: ISearchOptions): MonitorPageIterable | MonitorIterable {
+        const initialRequest: ISearchRequestConfig = {url: this.baseUrlResourceList, params};
+        if (options?.autoPagination) {
+            return new MonitorIterable(this.waas, initialRequest);
+        } else {
+            return new MonitorPageIterable(this.waas, initialRequest, this.wallet);
+        }
     }
 
     /**

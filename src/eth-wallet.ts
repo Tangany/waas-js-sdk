@@ -2,7 +2,7 @@ import * as t from "typeforce";
 import {BlockchainWallet} from "./blockchain-wallet";
 import {EthContractWallet} from "./eth-contract-wallet";
 import {EthErc20Wallet} from "./eth-erc20-wallet";
-import {IAsyncEndpointResponse, ITransactionSentResponse} from "./interfaces/common";
+import {IAsyncEndpointResponse, ISearchOptions, ISearchRequestConfig, ITransactionSentResponse} from "./interfaces/common";
 import {
     IAsyncEthereumTransactionOutput,
     IEthereumRecipient,
@@ -11,6 +11,7 @@ import {
 } from "./interfaces/ethereum";
 import {ITransmittableTransaction} from "./interfaces/signature";
 import {IWalletBalance} from "./interfaces/wallet";
+import {EthTransactionIterable} from "./iterables/auto-pagination/eth-transaction-iterable";
 import {EthTransactionPageIterable} from "./iterables/pagewise/eth-transaction-page-iterable";
 import {Monitor} from "./monitor";
 import {Request} from "./request";
@@ -97,25 +98,38 @@ export class EthWallet extends BlockchainWallet {
     }
 
     /**
-     * Returns an async iterable object that is able to query lists of transactions based on passed filter criteria
-     * @example
-     * const iterable = api.eth().getTransactions(query); // can be used to iterate forward in a for await of loop
-     * const iterator = iterable[Symbol.asyncIterator](); // can be used to iterate forward and backward via manual calls
-     *
-     * // iterate manually
-     * const firstPage = (await iterator.next()).value; // fetch the initial page
-     * const firstTxData = await firstPage.list[0].get(); // fetching transaction details from the results list
-     * const secondPage = await iterator.next(); // fetch the next page
-     * const firstPageListAgain = await iterator.previous(); // fetch the first page again
-     *
-     * // automatically iterate forward through the rest of the results
-     * for await (const page of iterable) {
-     *    console.log(page.hits.total);
-     *    console.log(await page.list[0].get()); // get details for a list result
-     * }
+     * Returns an asynchronous iterable to iterate **page by page** through the transactions that matched the search parameters.
+     * @param [params] - Optional search parameters
+     * @see [docs]{@link https://docs.tangany.com/#63266651-76f9-4a4c-a971-0a39d6ede955}
      */
-    public getTransactions(params?: IWalletTransactionSearchParams): EthTransactionPageIterable {
-        return new EthTransactionPageIterable(this.waas, {url: `eth/wallet/${this.wallet}/transactions`, params});
+    public getTransactions(params?: IWalletTransactionSearchParams): EthTransactionPageIterable;
+
+    /**
+     * Returns an asynchronous iterable that yields **one transaction object per iteration**.
+     * A page of transactions that match the search parameters is fetched and saved once, so that all items can be returned one by one.
+     * After that, the next page is loaded from the API and processed item by item again.
+     * @param [params] - Optional search parameters
+     * @param [options] - Additional options that do not affect the API request but the SDK-side processing
+     * @see [docs]{@link https://docs.tangany.com/#63266651-76f9-4a4c-a971-0a39d6ede955}
+     */
+    public getTransactions(params?: IWalletTransactionSearchParams, options?: { autoPagination: true }): EthTransactionIterable;
+
+    /**
+     * Returns an asynchronous iterable to iterate **page by page** through the transactions that matched the search parameters.
+     * @param [params] - Optional search parameters
+     * @param [options] - Additional options that do not affect the API request but the SDK-side processing
+     * @see [docs]{@link https://docs.tangany.com/#63266651-76f9-4a4c-a971-0a39d6ede955}
+     */
+    // tslint:disable-next-line:unified-signatures
+    public getTransactions(params?: IWalletTransactionSearchParams, options?: ISearchOptions): EthTransactionPageIterable;
+
+    public getTransactions(params?: IWalletTransactionSearchParams, options?: ISearchOptions): EthTransactionIterable | EthTransactionPageIterable {
+        const initialRequest: ISearchRequestConfig = {url: `eth/wallet/${this.wallet}/transactions`, params};
+        if (options?.autoPagination) {
+            return new EthTransactionIterable(this.waas, initialRequest);
+        } else {
+            return new EthTransactionPageIterable(this.waas, initialRequest);
+        }
     }
 
     /**

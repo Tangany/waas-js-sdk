@@ -2,6 +2,8 @@ import axios from "axios";
 import {EthContractWallet} from "./eth-contract-wallet"
 import {EthErc20Wallet} from "./eth-erc20-wallet";
 import {ITransactionSearchResponse} from "./interfaces/ethereum";
+import {EthTransactionIterable} from "./iterables/auto-pagination/eth-transaction-iterable"
+import {EthTransactionPageIterable} from "./iterables/pagewise/eth-transaction-page-iterable"
 import {sandbox} from "./utils/spec-helpers";
 import * as assert from "assert";
 import {Waas} from "./waas";
@@ -96,8 +98,24 @@ describe("EthWallet", function() {
         });
     });
 
-    // The method only calls the general function for wrapping search queries and this is tested in detail separately anyway.
     describe("getTransactions", function() {
+
+        it("should return a page-wise returning iterable if the autoPagination option is not enabled", function() {
+            const ethWallet = new EthWallet(this.waas, new Wallet(this.waas, sampleWallet));
+            const iterable1 = ethWallet.getTransactions({});
+            assert.ok(iterable1 instanceof EthTransactionPageIterable);
+            const iterable2 = ethWallet.getTransactions({}, {});
+            assert.ok(iterable2 instanceof EthTransactionPageIterable);
+            const iterable3 = ethWallet.getTransactions({}, {autoPagination: false});
+            assert.ok(iterable3 instanceof EthTransactionPageIterable);
+        });
+
+        it("should return an item-wise returning iterable if the autoPagination option is enabled", function() {
+            const ethWallet = new EthWallet(this.waas, new Wallet(this.waas, sampleWallet));
+            const iterable = ethWallet.getTransactions({}, {autoPagination: true});
+            assert.ok(iterable instanceof EthTransactionIterable);
+        });
+
         it("should execute the api call", async function() {
             const sampleResponse: ITransactionSearchResponse = {
                 hits: {total: 4},

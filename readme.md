@@ -362,6 +362,42 @@ or [Ethereum](https://docs.tangany.com/#cb2713db-04dc-4003-94f7-b6eeb021a5ad) fu
 })();
 ````
 
+## Item-wise returning iterables
+
+The asynchronous iterables returned by some methods for searching resources such as wallets or transactions return the full search results page per iteration by default.
+Since it may well be more convenient if the iterator returns the individual items like wallets instead of pages, there is the `autoPagination` option.
+Then, when iterating e.g. with `for await ... of` the iterable appears as if it were a single list of items, although page-transcending accesses may take place in the background.
+The option can be enabled in an additional object argument in the corresponding methods. In the current version it is set to `false` by default.
+
+Typically, the search methods support an optional `limit` parameter that overrides the default setting for the number of hits per page. Even with the `autoPagination` option, `limit` is not to be confused with the total number of resource items (such as wallets) that the iterator returns. However, `limit` can still be used to adjust the pagination mechanism as needed. This is not noticeable when using the item-wise returning iterables, but the number of HTTP requests in the background may differ.
+
+```javascript
+(async () => {
+    const api = new Waas().eth().monitor();
+
+    const monitorPageIterable = api.list();
+    for await (const page of monitorPageIterable) {
+        // The number of hits is only available through the iterator because it is the one that returns the pages
+        const count = page.hits.total;
+
+        for (const monitor of page.list) {
+            const details = await monitor.get();
+            await monitor.update({description: "Hello World"});
+        }
+    }
+
+
+    const monitorIterable = api.list({}, {autoPagination: true});
+
+    // The number of hits can be accessed independently of the iterator
+    const count = (await monitorIterable.hits).total;
+
+    for await (const monitor of monitorIterable) {
+        const details = await monitor.get();
+        await monitor.update({description: "Hello World"});
+    }
+})();
+```
 
 ## Affinity Cookies
 WaaS employs its own load-balanced full-node backend to transmit transactions to the blockchains. Due to the nature of blockchain, full nodes sync their states only in the event of a new block. One implication of this behavior is that sending multiple transactions from the same wallet during a time frame of a single block may lead to an overlap of backend memory pool assignments which subsequent may result in transactions being cancelled and discarded from the blockchain.

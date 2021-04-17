@@ -1,11 +1,12 @@
 import * as t from "typeforce";
 import {EthereumContract} from "./eth-contract";
+import {EthMonitorSearch} from "./eth-monitor-search";
 import {EthTransaction} from "./eth-transaction";
+import {ISearchOptions, ISearchRequestConfig} from "./interfaces/common";
 import {IEthereumTransaction, IEthStatus, ITransactionSearchParams} from "./interfaces/ethereum";
 import {ITransactionEvent} from "./interfaces/ethereum-contract";
-import {IMonitorSearchParams} from "./interfaces/monitor";
-import {MonitorPageIterable} from "./iterables/pagewise/monitor-page-iterable";
-import {EthTransactionPageIterable} from "./iterables/pagewise/eth-transaction-page-iterable"
+import {EthTransactionIterable} from "./iterables/auto-pagination/eth-transaction-iterable";
+import {EthTransactionPageIterable} from "./iterables/pagewise/eth-transaction-page-iterable";
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
 
@@ -41,19 +42,38 @@ export class Ethereum implements IWaasMethod {
     }
 
     /**
-     * Returns an async iterable object that is able to query lists of transactions based on passed filter criteria
-     * @example
-     * const iterable = new Waas().eth().getTransactions(query);
-     * // fetch a single page
-     * const iterator = iterable[Symbol.asyncIterator]();
-     * const txPage = (await iterator.next()).value;
-     * // fetch all pages
-     * for await (const page of iterable) {
-     *     console.log(await page.list[0].get()); // get details for a list result
-     * }
+     * Returns an asynchronous iterable to iterate **page by page** through the transactions that matched the search parameters.
+     * @param [params] - Optional search parameters
+     * @see [docs]{@link https://docs.tangany.com/#63266651-76f9-4a4c-a971-0a39d6ede955}
      */
-    public getTransactions(params?: ITransactionSearchParams): EthTransactionPageIterable {
-        return new EthTransactionPageIterable(this.waas, {url: "eth/transactions", params});
+    public getTransactions(params?: ITransactionSearchParams): EthTransactionPageIterable;
+
+    /**
+     * Returns an asynchronous iterable that yields **one transaction object per iteration**.
+     * A page of transactions that match the search parameters is fetched and saved once, so that all items can be returned one by one.
+     * After that, the next page is loaded from the API and processed item by item again.
+     * @param [params] - Optional search parameters
+     * @param [options] - Additional options that do not affect the API request but the SDK-side processing
+     * @see [docs]{@link https://docs.tangany.com/#63266651-76f9-4a4c-a971-0a39d6ede955}
+     */
+    public getTransactions(params?: ITransactionSearchParams, options?: { autoPagination: true }): EthTransactionIterable;
+
+    /**
+     * Returns an asynchronous iterable to iterate **page by page** through the transactions that matched the search parameters.
+     * @param [params] - Optional search parameters
+     * @param [options] - Additional options that do not affect the API request but the SDK-side processing
+     * @see [docs]{@link https://docs.tangany.com/#63266651-76f9-4a4c-a971-0a39d6ede955}
+     */
+    // tslint:disable-next-line:unified-signatures
+    public getTransactions(params?: ITransactionSearchParams, options?: ISearchOptions): EthTransactionPageIterable;
+
+    public getTransactions(params?: ITransactionSearchParams, options?: ISearchOptions): EthTransactionIterable | EthTransactionPageIterable {
+        const initialRequest: ISearchRequestConfig = {url: "eth/transactions", params};
+        if (options?.autoPagination) {
+            return new EthTransactionIterable(this.waas, initialRequest);
+        } else {
+            return new EthTransactionPageIterable(this.waas, initialRequest);
+        }
     }
 
     /**
@@ -107,17 +127,8 @@ export class Ethereum implements IWaasMethod {
     /**
      * Returns an object to interact with Ethereum-based monitors (possibly of different wallets).
      */
-    public monitor() {
-        return {
-            /**
-             * Returns an asynchronous iterable to iterate all Ethereum-based monitors.
-             * @param [params] - Optional search parameters
-             * @see [docs]{@link https://docs.tangany.com/#0cf31f8c-9ae1-4709-9ca6-842452d74b10}
-             */
-            list: (params?: IMonitorSearchParams): MonitorPageIterable => {
-                return new MonitorPageIterable(this.waas, {url: "eth/monitors", params});
-            }
-        }
+    public monitor(): EthMonitorSearch {
+        return new EthMonitorSearch(this.waas);
     }
 
 }

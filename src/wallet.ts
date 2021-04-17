@@ -1,6 +1,7 @@
 import * as t from "typeforce";
 import {BtcWallet} from "./btc-wallet";
 import {EthWallet} from "./eth-wallet";
+import {ISearchOptions} from "./interfaces/common";
 import {ISignatureResponse, ISignatureVerificationResponse} from "./interfaces/signature";
 import {
     ISoftDeletedWallet,
@@ -10,6 +11,7 @@ import {
     IWalletList,
     IWalletSearchParams
 } from "./interfaces/wallet";
+import {WalletIterable} from "./iterables/auto-pagination/wallet-iterable";
 import {WalletPageIterable} from "./iterables/pagewise/wallet-page-iterable";
 import {AtLeastOne, SignatureEncoding} from "./types/common";
 import {Waas} from "./waas";
@@ -67,15 +69,39 @@ export class Wallet implements IWaasMethod {
      */
     public list(params?: IWalletSearchParams): WalletPageIterable;
 
-    public list(arg?: string | IWalletSearchParams): Promise<IWalletList> | WalletPageIterable {
+    /**
+     * Returns an asynchronous iterable that yields **one wallet per iteration**.
+     * A page of wallets that match the search parameters is fetched and saved once, so that all items can be returned one by one.
+     * After that, the next page is loaded from the API and processed item by item again.
+     * @param [params] - Optional search parameters
+     * @param [options] - Additional options that do not affect the API request but the SDK-side processing
+     * @see [docs]{@link https://docs.tangany.com/#72b95742-6682-4dae-a802-4bbd504df9f4}
+     */
+    public list(params?: IWalletSearchParams, options?: { autoPagination: true }): WalletIterable;
+
+    /**
+     * Returns an asynchronous iterable to iterate **page by page** through the wallets that matched the search parameters.
+     * @param [params] - Optional search parameters
+     * @param [options] - Additional options that do not affect the API request but the SDK-side processing
+     * @see [docs]{@link https://docs.tangany.com/#72b95742-6682-4dae-a802-4bbd504df9f4}
+     */
+    // tslint:disable-next-line:unified-signatures
+    public list(params?: IWalletSearchParams, options?: ISearchOptions): WalletPageIterable;
+
+    public list(arg?: string | IWalletSearchParams, options?: ISearchOptions): Promise<IWalletList> | WalletPageIterable | WalletIterable {
         // The first and second overload continue to use the deprecated endpoint to avoid breaking changes
         if (arg === undefined || typeof arg === "string") {
             const url = `wallet${arg ? `?skiptoken=${arg}` : ""}`;
             return this.waas.wrap<IWalletList>(() => this.waas.instance.get(url));
         }
-        // The third overload utilizes the new endpoint and uses an asynchronous iterable
+        // All other overloads expect an object as first argument
         else if (arg !== null && typeof arg === "object") {
-            return new WalletPageIterable(this.waas, {url: "wallets", params: arg});
+            const initialRequest = {url: "wallets", params: arg};
+            if (options?.autoPagination) {
+                return new WalletIterable(this.waas, initialRequest);
+            } else {
+                return new WalletPageIterable(this.waas, initialRequest);
+            }
         }
         throw new Error("The passed argument for wallet search is invalid");
     }

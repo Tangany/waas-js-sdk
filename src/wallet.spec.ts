@@ -2,7 +2,9 @@ import * as moxios from "moxios";
 import * as assert from "assert";
 import {ConflictError, GeneralError} from "./errors";
 import {ISignatureResponse} from "./interfaces/signature";
-import {IWalletSearchResponse} from "./interfaces/wallet"
+import {IWalletSearchResponse} from "./interfaces/wallet";
+import {WalletIterable} from "./iterables/auto-pagination/wallet-iterable";
+import {WalletPageIterable} from "./iterables/pagewise/wallet-page-iterable";
 import {SignatureEncoding} from "./types/common";
 import {Waas} from "./waas";
 import {Wallet} from "./wallet";
@@ -110,15 +112,21 @@ describe("Wallet", function() {
             assert.ok(stub.firstCall.calledWith("wallets"));
         });
 
-        it("should return an asynchronous iterable if the object parameter overload is used", async function() {
-            const stub = this.waas.instance.get = this.sandbox.stub().resolves(singlePageResponse);
-            const iterable = await new Wallet(this.waas).list({sort: "createddesc"});
-            assert.ok(iterable);
-            assert.ok(typeof iterable[Symbol.asyncIterator] === "function");
-            const page = (await iterable[Symbol.asyncIterator]().next()).value;
-            assert.ok(page);
-            assert.ok(stub.calledOnce);
+        it("should return a page-wise returning iterable if the autoPagination option is not enabled", function() {
+            const wallet = new Wallet(this.waas);
+            const iterable1 = wallet.list({});
+            assert.ok(iterable1 instanceof WalletPageIterable);
+            const iterable2 = wallet.list({}, {});
+            assert.ok(iterable2 instanceof WalletPageIterable);
+            const iterable3 = wallet.list({}, {autoPagination: false});
+            assert.ok(iterable3 instanceof WalletPageIterable);
         });
+
+        it("should return an item-wise returning iterable if the autoPagination option is enabled", function() {
+            const iterable = new Wallet(this.waas).list({}, {autoPagination: true});
+            assert.ok(iterable instanceof WalletIterable);
+        });
+
 
         it("should throw on invalid argument", async function() {
             const stub = this.waas.instance.get = this.sandbox.stub().resolves(0);

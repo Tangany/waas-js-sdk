@@ -1,5 +1,6 @@
 import * as assert from "assert";
 import axios from "axios";
+import {MonitorIterable} from "./iterables/auto-pagination/monitor-iterable"
 import {MonitorPageIterable} from "./iterables/pagewise/monitor-page-iterable";
 import {Monitor} from "./monitor";
 import {sandbox} from "./utils/spec-helpers";
@@ -54,12 +55,19 @@ describe("Monitor", function() {
 
     describe("list", function() {
 
-        it("should return a page-wise returning iterable", function() {
+        it("should return a page-wise returning iterable if the autoPagination option is not enabled", function() {
             const monitor = new Monitor(this.waas, monitorId, wallet);
             const iterable1 = monitor.list();
             assert.ok(iterable1 instanceof MonitorPageIterable);
-            const iterable2 = monitor.list({});
+            const iterable2 = monitor.list({}, {});
             assert.ok(iterable2 instanceof MonitorPageIterable);
+            const iterable3 = monitor.list({}, {autoPagination: false});
+            assert.ok(iterable3 instanceof MonitorPageIterable);
+        });
+
+        it("should return an item-wise returning iterable if the autoPagination option is enabled", function() {
+            const iterable = new Monitor(this.waas, monitorId, wallet).list({}, {autoPagination: true});
+            assert.ok(iterable instanceof MonitorIterable);
         });
 
     });

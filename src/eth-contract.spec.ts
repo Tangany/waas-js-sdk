@@ -2,6 +2,8 @@ import * as assert from "assert";
 import axios from "axios";
 import {EthereumContract} from "./eth-contract";
 import {IEventSearchResponse} from "./interfaces/ethereum-contract";
+import {EthEventIterable} from "./iterables/auto-pagination/eth-event-iterable";
+import {EthEventPageIterable} from "./iterables/pagewise/eth-event-page-iterable";
 import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";
 
@@ -22,8 +24,22 @@ describe("EthereumContract", function() {
         assert.ok(contract);
     });
 
-// The method only calls the general function for wrapping search queries and this is tested in detail separately anyway.
     describe("getEvents", function() {
+
+        it("should return a page-wise returning iterable if the autoPagination option is not enabled", function() {
+            const ethContract = new EthereumContract(this.waas, tokenAddress);
+            const iterable1 = ethContract.getEvents({});
+            assert.ok(iterable1 instanceof EthEventPageIterable);
+            const iterable2 = ethContract.getEvents({}, {});
+            assert.ok(iterable2 instanceof EthEventPageIterable);
+            const iterable3 = ethContract.getEvents({}, {autoPagination: false});
+            assert.ok(iterable3 instanceof EthEventPageIterable);
+        });
+
+        it("should return an item-wise returning iterable if the autoPagination option is enabled", function() {
+            const iterable = new EthereumContract(this.waas, tokenAddress).getEvents({}, {autoPagination: true});
+            assert.ok(iterable instanceof EthEventIterable);
+        });
 
         it("should execute the api call", async function() {
             const sampleResponse: IEventSearchResponse = {

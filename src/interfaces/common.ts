@@ -82,6 +82,15 @@ export interface ISearchResponse extends IPaginationResponse {
     }[];
 }
 
+/**
+ * SDK-side options to control how the results of search requests (such as wallets, transactions or monitors) are processed.
+ * This includes, for example, how API-side pagination should be handled in TypeScript iterables.
+ * These options are not passed to the API and therefore should not be confused with search parameters such as {@link IWalletSearchParams}.
+ */
+export interface ISearchOptions {
+    autoPagination?: boolean;
+}
+
 export interface ISearchRequestConfig {
     url: string;
     params?: object;
