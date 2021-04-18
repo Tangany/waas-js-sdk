@@ -196,12 +196,19 @@ describe("Wallet", function() {
             const stub = this.waas.instance.put = this.sandbox.stub().resolves();
             const w = new Wallet(this.waas, dummyWalletName);
             await assert.doesNotReject(async () => w.replace());
-            assert.strictEqual(stub.callCount, 1);
+            await assert.doesNotReject(async () => w.replace({}));
+            assert.strictEqual(stub.callCount, 2);
+        });
+
+        it("should throw an error if an invalid method overload is used", async function() {
+            const wallet = new Wallet(this.waas);
+            await assert.rejects(() => wallet.replace(123 as any), /The passed arguments does not match a valid method overload/)
+            await assert.rejects(() => wallet.replace([] as any), /The passed arguments does not match a valid method overload/)
         });
 
         it("should execute the api call", async function() {
             const stub = this.waas.instance.put = this.sandbox.spy();
-            await new Wallet(this.waas, dummyWalletName).replace();
+            await new Wallet(this.waas, dummyWalletName).replace({useHsm: true});
             assert.strictEqual(stub.callCount, 1);
         });
     });

@@ -20,6 +20,9 @@ import {IWaasMethod} from "./waas-method";
 /** Custom type for partial wallet updates that requires at least one property */
 type WalletUpdateValues = AtLeastOne<Omit<IWalletCreationProperties, "wallet" | "useHsm">>;
 
+/** Custom type for wallet replacements */
+type WalletReplaceValues = Omit<IWalletCreationProperties, "wallet">;
+
 /**
  *  Instantiates a new wallet interface
  * @param instance - axios instance created by {@link Waas}
@@ -156,12 +159,35 @@ export class Wallet implements IWaasMethod {
 
     /**
      * Creates a new version of the current wallet. It generates new keys and therefore disables "write" operations of the previous wallet version to the blockchain.
-     * @param [useHsm] - Use a hardware secure module to store the wallet private key
+     * @param [wallet] - Object to overwrite the existing wallet
      * @see [docs]{@link https://docs.tangany.com/#73451025-c889-4d94-b424-fbe2a3f9999f}
      */
-    public async replace(useHsm?: boolean): Promise<IWallet> {
-        t("?Boolean", useHsm);
-        return this.waas.wrap<IWallet>(() => this.waas.instance.put(`wallet/${this.wallet}`, {useHsm}));
+    public async replace(wallet?: WalletReplaceValues): Promise<IWallet>;
+
+    /**
+     * Creates a new version of the current wallet. It generates new keys and therefore disables "write" operations of the previous wallet version to the blockchain.
+     * @param [useHsm] - Use a hardware secure module to store the wallet private key
+     * @see [docs]{@link https://docs.tangany.com/#73451025-c889-4d94-b424-fbe2a3f9999f}
+     * @deprecated Use the method overload with {@link WalletReplaceValues} instead
+     */
+    // tslint:disable-next-line:unified-signatures
+    public async replace(useHsm?: boolean): Promise<IWallet>;
+
+    public async replace(arg?: boolean | WalletReplaceValues): Promise<IWallet> {
+        let reqBody: Omit<IWalletCreationBody, "wallet">;
+        if (arg === undefined) {
+            reqBody = {};
+        } else if (typeof arg === "boolean") {
+            reqBody = {useHsm: arg};
+        } else if (typeof arg === "object" && !Array.isArray(arg)) {
+            reqBody = {
+                useHsm: arg.useHsm,
+                tags: Wallet.convertTags(arg.tags),
+            }
+        } else {
+            throw new Error("The passed arguments does not match a valid method overload");
+        }
+        return this.waas.wrap<IWallet>(() => this.waas.instance.put(`wallet/${this.wallet}`, reqBody));
     }
 
     /**
