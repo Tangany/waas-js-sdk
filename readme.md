@@ -62,6 +62,7 @@ ethereumTxSpeed |  Additional gas fee that is added to the base gas fee for the 
 ethereumGasPrice | Enforces custom base transaction fee in wei. This prevents the dynamic gas price calculation by the network and nullifies `ethereumTxSpeed`. Example: `7000000000` | `auto` |
 ethereumGas | Enforces custom amount of transaction gas. Example: `21000` | `auto` |
 ethereumNonce | Enforces custom transaction nonce. Example: `123` | `auto` |
+ethereumChainId | Enforces custom chain id. Example: `9876` | `auto` |
 useGasTank | Allows to pre-fund the transaction fee for the desired wallet transaction. Supported values: `false`, `true` | `false`
 bitcoinNetwork | Public Bitcoin network name. Supported networks: `bitcoin`, `testnet` | `bitcoin` |
 bitcoinTxConfirmations | Minimum amount of block confirmations required for Bitcoin balance outputs ("utxo", "coins") to be included in the total wallet balance calculation. The exclusion of unconfirmed outputs prevents the posthumous invalidation of own wallet transaction by the parent utxo sending party. Either a numeric value or one of the following levels can be set, each corresponding to a number of target block confirmations: `none`: 0, `default`: 1, `secure`: 6 | `default` |

@@ -70,6 +70,7 @@ describe("Waas", function() {
         assert.throws(() => new Waas({...auth, ethereumGasPrice: 12345678} as any));
         assert.throws(() => new Waas({...auth, ethereumGas: "12345,6"} as any));
         assert.throws(() => new Waas({...auth, ethereumNonce: "42"} as any));
+        assert.throws(() => new Waas({...auth, ethereumChainId: "567"} as any));
         assert.throws(() => new Waas({...auth, useGasTank: "yes"} as any));
         assert.throws(() => new Waas({...auth, ethereumTxSpeed: eval} as any));
         assert.throws(() => new Waas({...auth, bitcoinNetwork: 1} as any));
