@@ -39,6 +39,7 @@ export interface IEthereumTransactionEstimation {
     gas: string;
     gasPrice: string;
     fee: string;
+    data: string;
 }
 
 /**

@@ -195,7 +195,7 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
         inputs: [someOtherWalletAddress, "2500000000000000"]
     }
     // estimate transaction fee
-    const {gas, gasPrice, fee} = await api.estimateFee(contractCall);
+    const {gas, gasPrice, fee, data} = await api.estimateFee(contractCall);
     // send token asynchronously (see examples for request interface to retrieve status details)
     const req = await api.sendAsync(contractCall);
     // execute readonly contract function on behalf the given wallet

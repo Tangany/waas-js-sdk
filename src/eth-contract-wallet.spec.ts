@@ -53,7 +53,8 @@ describe("EthContractWallet", function() {
             const sampleEstimation: IEthereumTransactionEstimation = {
                 gas: "25028",
                 gasPrice: "7786250000",
-                fee: "0.000194874265"
+                fee: "0.000194874265",
+                data: "0x095ea7b3000000000000000000000000ab174eab6761d6525a8a3a2e065ca042e74d",
             };
             const postStub = this.waas.instance.post = this.sandbox.stub().resolves(sampleEstimation);
             const contractWallet = new EthContractWallet(this.waas, this.walletInstance, sampleTokenAddress);
