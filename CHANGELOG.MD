@@ -11,7 +11,25 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+* Support [WaaS 1.8](https://github.com/Tangany/Wallet-as-a-Service/blob/master/CHANGELOG.md#180---2021-03-10) (#60)
+    * Add transaction monitors
+    * Add wallet search
+    * Support the specification of tags during wallet creation and replacement
+    * Add the possibility to partially update wallets
+    * Return extended object for sending Ethereum methods
+    * Extend Ethereum contract estimation response
+    * Add option for item-wise returning iterables
+    * Add global option to enforce custom chain id
+
 ### Changed
+
+### Deprecated
+
+Methods that use synchronous endpoints for sending are deprecated and will permanently cease function on 01 July 2021:
+* ERC20 methods
+* Synchronous sending of Ethereum or Bitcoin transactions
+* Signing Ethereum or Bitcoin transaction
+
 
 ## [1.2.0]
 
