@@ -155,10 +155,6 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const api = new Waas().wallet("my-wallet");
     // estimate transaction fee
     const {gas, gasPrice, fee} = await api.eth().estimateFee({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
-    // send Ether
-    const tx = await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
-    const { hash } = tx;
-    const details = await tx.get();
     // send Ether asynchronously (see examples for request interface to retrieve status details)
     const req = await api.eth().sendAsync({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // create a signed transaction that can be manually transmitted
@@ -252,10 +248,8 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     // estimate fee for a transaction
     const { fee, feeRate } = await api.btc().estimateFee({to: someAddress, amount: "0.021"});
     // send BTC to a single recipient
-    const { hash } = await api.btc().send({to: someAddress, amount: "0.021"});
+    const req1 = await api.btc().sendAsync({to: someAddress, amount: "0.021"});
     // send BTC to multiple recipients
-    await api.btc().send([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
-    // send BTC using an asynchronous request
     const sendReq = await api.btc().sendAsync([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
     // create a signed transaction that can be manually transmitted
     const { rawTransaction } = await api.btc().sign({to: someAddress, amount: "0.021"});

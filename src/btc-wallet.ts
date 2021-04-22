@@ -39,6 +39,7 @@ export class BtcWallet extends BlockchainWallet {
      * Send BTC to address from current wallet
      * @param recipients - Recipient configuration
      * @see [docs]{@link https://docs.tangany.com/#62b0f6e4-641b-4230-8cf2-1cb8b2181812}
+     * @deprecated Use {@link sendAsync} instead
      */
     public async send(recipients: IRecipient[] | IRecipient): Promise<IBitcoinTransactionSentResponse> {
         return this.waas.wrap<IBitcoinTransactionSentResponse>(() => this.waas.instance.post(`${this.baseUrl}/send`, this.getRecipientsData(recipients)));

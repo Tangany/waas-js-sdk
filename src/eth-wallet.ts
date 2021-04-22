@@ -45,6 +45,7 @@ export class EthWallet extends BlockchainWallet {
      * Sends Ether to address from given wallet
      * @param recipient - {@link IEthereumRecipient}
      * @see [docs]{@link https://docs.tangany.com/#1d76974c-579a-47aa-9912-c7cfddf55889}
+     * @deprecated Use {@link sendAsync} instead
      */
     public async send(recipient: IEthereumRecipient): Promise<EthTransaction> {
         this.validateRecipient(recipient);
