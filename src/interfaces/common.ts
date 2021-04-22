@@ -59,10 +59,6 @@ export interface IRecipient {
     amount: string;
 }
 
-export interface ITransactionSentResponse {
-    hash: string;
-}
-
 export interface INodeStatus<T> {
     status: NodeStatus;
     info: T;

@@ -62,13 +62,6 @@ describe("Sample workflow with asynchronous requests", function () {
 			// Query the request status by passing an id
 			const statusById = await api.request(txRequest.id).get();
 			assert.ok(statusById);
-
-			// Make sure both variants return the same result
-			const r = await Promise.all([
-				txRequest.get(),
-				api.request(txRequest.id).get(),
-			]);
-			assert.deepStrictEqual(r[0], r[1]);
 		});
 
 	});

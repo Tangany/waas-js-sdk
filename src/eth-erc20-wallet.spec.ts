@@ -1,3 +1,5 @@
+import axios from "axios"
+import {IEthereumTransactionSentResponse} from "./interfaces/ethereum"
 import {sandbox} from "./utils/spec-helpers";
 import * as assert from "assert";
 import {EthErc20Wallet} from "./eth-erc20-wallet";
@@ -14,12 +16,20 @@ describe("EthErc20Wallet", function() {
 
     beforeEach(function() {
         this.waas = this.sandbox.createStubInstance(Waas);
-        this.spy = this.waas.wrap = this.sandbox.spy();
+        this.waas.wrap = (fn: any) => fn();
+        this.waas.instance = this.sandbox.stub(axios, "create");
+        const hash = "0xd7532d29a2f29806e0aaed2eb3987be53ccd8689ec7ce9934532021f5c9708e3";
+        const response: IEthereumTransactionSentResponse = {
+            hash,
+            nonce: "123",
+            links: [{type: "GET", rel: "transaction", href: `/eth/transaction/${hash}`}]
+        }
+        this.axiosPostStub = this.waas.instance.post = this.sandbox.stub().resolves(response);
         this.walletInstance = new Wallet(this.waas, sampleWallet);
     });
 
     it("should construct an instance", function() {
-        assert.ok(new EthErc20Wallet(this.stub, this.walletInstance, sampleToken));
+        assert.ok(new EthErc20Wallet(this.waas, this.walletInstance, sampleToken));
     });
 
     it("should throw for invalid address", function() {
@@ -29,8 +39,9 @@ describe("EthErc20Wallet", function() {
 
     describe("get", function() {
         it("should execute the api call", async function() {
+            const spy = this.waas.instance.get = this.sandbox.spy();
             await new EthErc20Wallet(this.waas, this.walletInstance, sampleToken).get();
-            assert.strictEqual(this.spy.callCount, 1);
+            assert.strictEqual(spy.callCount, 1);
         });
     });
 
@@ -38,7 +49,7 @@ describe("EthErc20Wallet", function() {
         it("should execute the call", async function() {
             const r = new EthErc20Wallet(this.waas, this.walletInstance, sampleToken);
             await r.send({to: sampleAddress, amount: "23.010298"});
-            assert.strictEqual(this.spy.callCount, 1);
+            assert.strictEqual(this.axiosPostStub.callCount, 1);
         });
     });
 
@@ -47,7 +58,7 @@ describe("EthErc20Wallet", function() {
             const r = new EthErc20Wallet(this.waas, this.walletInstance, sampleToken);
             await r.approve({to: sampleAddress, amount: "23.010298"});
             await r.approve({to: sampleAddress, amount: "1"});
-            assert.strictEqual(this.spy.callCount, 2);
+            assert.strictEqual(this.axiosPostStub.callCount, 2);
         });
     });
 
@@ -55,7 +66,7 @@ describe("EthErc20Wallet", function() {
         it("should execute the call", async function() {
             const r = new EthErc20Wallet(this.waas, this.walletInstance, sampleToken);
             await r.transferFrom({from: sampleAddress, amount: "23.010298"});
-            assert.strictEqual(this.spy.callCount, 1);
+            assert.strictEqual(this.axiosPostStub.callCount, 1);
         });
     });
 
@@ -63,14 +74,14 @@ describe("EthErc20Wallet", function() {
         it("should execute the call", async function() {
             const r = new EthErc20Wallet(this.waas, this.walletInstance, sampleToken);
             await r.burn({amount: "1"});
-            assert.strictEqual(this.spy.callCount, 1);
+            assert.strictEqual(this.axiosPostStub.callCount, 1);
         });
     });
     describe("mint", function() {
         it("should execute the call", async function() {
             const r = new EthErc20Wallet(this.waas, this.walletInstance, sampleToken);
             await r.mint({amount: "18"});
-            assert.strictEqual(this.spy.callCount, 1);
+            assert.strictEqual(this.axiosPostStub.callCount, 1);
         });
     });
 

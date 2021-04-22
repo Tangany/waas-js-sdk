@@ -1,7 +1,7 @@
 import axios from "axios";
 import {EthContractWallet} from "./eth-contract-wallet"
 import {EthErc20Wallet} from "./eth-erc20-wallet";
-import {ITransactionSearchResponse} from "./interfaces/ethereum";
+import {IEthereumTransactionSentResponse, ITransactionSearchResponse} from "./interfaces/ethereum";
 import {EthTransactionIterable} from "./iterables/auto-pagination/eth-transaction-iterable"
 import {EthTransactionPageIterable} from "./iterables/pagewise/eth-transaction-page-iterable"
 import {sandbox} from "./utils/spec-helpers";
@@ -40,12 +40,19 @@ describe("EthWallet", function() {
 
     describe("send", function() {
         it("should execute the call", async function() {
-            const postSpy = this.waas.instance.post = this.sandbox.spy();
+            const hash = "0xd7532d29a2f29806e0aaed2eb3987be53ccd8689ec7ce9934532021f5c9708e3";
+            const response: IEthereumTransactionSentResponse = {
+                hash,
+                nonce: "123",
+                links: [{type: "GET", rel: "transaction", href: `/eth/transaction/${hash}`}]
+            }
+            const postStub = this.waas.instance.post = this.sandbox.stub().resolves(response);
             const wallet = new Wallet(this.waas, sampleWallet);
             const r = new EthWallet(this.waas, wallet);
             const validateSpy = this.sandbox.spy(r, "validateRecipient");
-            await r.send({to: sampleAddress, amount: "0.1", data: "0xf03"});
-            assert.strictEqual(postSpy.callCount, 1);
+            const tx = await r.send({to: sampleAddress, amount: "0.1", data: "0xf03"});
+            assert.strictEqual(tx.hash, hash);
+            assert.strictEqual(postStub.callCount, 1);
             assert.strictEqual(validateSpy.callCount, 1);
         });
     });

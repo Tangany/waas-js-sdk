@@ -156,7 +156,9 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     // estimate transaction fee
     const {gas, gasPrice, fee} = await api.eth().estimateFee({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // send Ether
-    const { hash } = await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
+    const tx = await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
+    const { hash } = tx;
+    const details = await tx.get();
     // send Ether asynchronously (see examples for request interface to retrieve status details)
     const req = await api.eth().sendAsync({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // create a signed transaction that can be manually transmitted
@@ -172,7 +174,8 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 (async () => {
     const api = new Waas().wallet("my-wallet").eth().erc20(tokenAddress);
     // send token
-    const { hash } = await api.send({to: someOtherWalletAddress, amount: "0.043"});
+    const tx = await api.send({to: someOtherWalletAddress, amount: "0.043"});
+    const details = await tx.get();
     // get token balance
     const { currency, balance, address } = await api.get();
      // mint token

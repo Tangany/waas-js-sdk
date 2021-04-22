@@ -12,7 +12,7 @@ export interface IEthereumRecipient extends Optional<IRecipient, "amount"> {
 }
 
 /**
- * Represents the transaction status response for the Ethereum network
+ * Represents the details for a single Ethereum transaction
  */
 export interface IEthereumTransaction {
     isError: boolean;
@@ -43,13 +43,24 @@ export interface IEthereumTransactionEstimation {
 }
 
 /**
- * Represents the output of an asynchronous request for ethereum transactions
+ * Represents the API response that is returned once an Ethereum transaction is sent through a synchronous endpoint.
+ */
+export interface IEthereumTransactionSentResponse {
+    hash: string;
+    nonce: string;
+    links: IHateoasLink<"transaction">[];
+}
+
+/**
+ * Represents the output of an asynchronous request for a confirmed Ethereum transaction
  */
 export interface IAsyncEthereumTransactionOutput {
     hash: string;
     blockNr: number;
     data: string;
     status: string;
+    nonce: number;
+    links: IHateoasLink<"transaction">[];
 }
 
 export interface IEthStatus extends INodeStatus<IEthStatusInfo> {

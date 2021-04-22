@@ -49,7 +49,9 @@ describe("Request", function() {
                     hash: "0x9f4eb3fe6da8377f5316b2c2103583e88730d273a318459098867fd8ad417d43",
                     blockNr: 7675874,
                     data: "0xf00ba7",
-                    status: "confirmed"
+                    status: "confirmed",
+                    nonce: 1234,
+                    links: [],
                 },
                 created: new Date(),
                 updated: new Date(),

@@ -1,9 +1,9 @@
 import * as t from "typeforce";
 import {BlockchainWallet} from "./blockchain-wallet";
+import {EthTransactionRequest} from "./eth-transaction-request";
 import {IAsyncEndpointResponse} from "./interfaces/common";
-import {IAsyncEthereumTransactionOutput, IEthereumTransactionEstimation} from "./interfaces/ethereum";
+import {IEthereumTransactionEstimation} from "./interfaces/ethereum";
 import {IContractCall, IContractTransaction} from "./interfaces/ethereum-contract";
-import {Request} from "./request";
 import {ContractCallResult} from "./types/common";
 import {callContractFunction} from "./utils/eth-contract-call";
 import {Waas} from "./waas";
@@ -29,14 +29,14 @@ export class EthContractWallet extends BlockchainWallet {
      * @param config - Smart Contract function configuration
      * @see [docs]{@link https://docs.tangany.com/#945c237f-5273-4e85-bf9d-1ba2b132df17}
      */
-    public async sendAsync(config: IContractTransaction): Promise<Request<IAsyncEthereumTransactionOutput>> {
+    public async sendAsync(config: IContractTransaction): Promise<EthTransactionRequest> {
         const rawResponse = await this.waas.wrap<IAsyncEndpointResponse>(() => this.waas.instance
             .post(`${this.baseUrl}/send-async`, {
                 ...config,
             }),
         );
         const id = this.extractRequestId(rawResponse);
-        return new Request<IAsyncEthereumTransactionOutput>(this.waas, id);
+        return new EthTransactionRequest(this.waas, id);
     }
 
     /**

@@ -20,6 +20,13 @@ export interface IBitcoinTransactionEstimation {
 }
 
 /**
+ * Represents the API response that is returned once a Bitcoin transaction is sent through a synchronous endpoint.
+ */
+export interface IBitcoinTransactionSentResponse {
+    hash: string;
+}
+
+/**
  * Represents the transaction status after a sweep operation
  */
 export interface IBitcoinSweepResult extends Pick<IBitcoinTransaction, "status" | "blockNr"> {
