@@ -168,27 +168,6 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 })();
 ````
 
-#### Ethereum ERC20 token interface for wallet
-[*Wallet based calls for Ethereum ERC20 token management*](https://docs.tangany.com/#1cbcb11f-f2ca-4334-82b3-9729f4d5e7d8)
-````javascript
-(async () => {
-    const api = new Waas().wallet("my-wallet").eth().erc20(tokenAddress);
-    // send token
-    const tx = await api.send({to: someOtherWalletAddress, amount: "0.043"});
-    const details = await tx.get();
-    // get token balance
-    const { currency, balance, address } = await api.get();
-     // mint token
-    await api.mint({amount: "12.291", to: someOtherWalletAddress}); // assuming myWalletAddress is erc20token's minter
-    // approve token withdrawal
-    await api.approve({to: someOtherWalletAddress, amount: "213"});
-    // withdraw pre-approved tokens
-    await new Waas().wallet("some-other-wallet").eth().erc20(tokenAddress).transferFrom({from: myWalletAddress, amount: "213"});
-    // burn token
-    await new Waas().wallet("some-other-wallet").eth().erc20(tokenAddress).burn({amount: "2"});
-})();
-````
-
 #### Universal Ethereum Smart Contract interface for wallet
 [*Wallet based calls for universal smart contract token management*](https://docs.tangany.com/#945c237f-5273-4e85-bf9d-1ba2b132df17)
 ````javascript
