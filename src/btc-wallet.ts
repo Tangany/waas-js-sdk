@@ -62,6 +62,7 @@ export class BtcWallet extends BlockchainWallet {
      * to compatible blockchain networks at a later stage.
      * @param recipients - Recipient configuration
      * @see [docs]{@link https://docs.tangany.com/#53017845-c0e8-4100-bb24-6168b00bd225}
+     * @deprecated This synchronous version is deprecated, but in the future there will be an asynchronous version
      */
     public async sign(recipients: IRecipient[] | IRecipient): Promise<ITransmittableTransaction> {
         return this.waas.wrap<ITransmittableTransaction>(() => this.waas.instance

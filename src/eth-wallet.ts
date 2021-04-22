@@ -78,6 +78,7 @@ export class EthWallet extends BlockchainWallet {
      * to compatible blockchain networks at a later stage.
      * @param recipient - {@link IEthereumRecipient}
      * @see [docs]{@link https://docs.tangany.com/#925fd26a-daff-4321-9595-8509dd2ed6b3}
+     * @deprecated This synchronous version is deprecated, but in the future there will be an asynchronous version
      */
     public async sign(recipient: IEthereumRecipient): Promise<ITransmittableTransaction> {
         this.validateRecipient(recipient);

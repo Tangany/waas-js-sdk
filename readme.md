@@ -157,8 +157,6 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const {gas, gasPrice, fee} = await api.eth().estimateFee({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // send Ether asynchronously (see examples for request interface to retrieve status details)
     const req = await api.eth().sendAsync({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
-    // create a signed transaction that can be manually transmitted
-    const { rawTransaction } = await api.eth().sign({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // get eth balance and wallet address
     const { currency, balance, address } = await api.eth().get();
 })();
@@ -251,8 +249,6 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const req1 = await api.btc().sendAsync({to: someAddress, amount: "0.021"});
     // send BTC to multiple recipients
     const sendReq = await api.btc().sendAsync([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
-    // create a signed transaction that can be manually transmitted
-    const { rawTransaction } = await api.btc().sign({to: someAddress, amount: "0.021"});
     // get BTC balance and wallet address
     const { balance,address,currency } = await api.btc().get();
     // sweep wallet
