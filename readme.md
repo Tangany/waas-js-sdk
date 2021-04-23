@@ -8,7 +8,7 @@
 node.js wrapper for [Tangany WaaS](https://tangany.com)
 
 [![NPM version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/package-badge.svg?sanitize=true)](https://www.npmjs.com/package/@tangany/waas)
-[![WaaS API version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/sdk-badge.svg?sanitize=true)](https://docs.tangany.com/?version=latest)
+[![WaaS API version](https://raw.githubusercontent.com/Tangany/waas-js-sdk/master/docs/sdk-badge.svg?sanitize=true)](https://docs.tangany.com)
 
 ## Getting started
 
