@@ -1,7 +1,11 @@
 import * as moxios from "moxios";
 import * as assert from "assert";
 import {ConflictError, GeneralError} from "./errors";
-import {ISignatureResponse, SignatureEncoding} from "./interfaces"
+import {ISignatureResponse} from "./interfaces/signature";
+import {IWalletSearchResponse} from "./interfaces/wallet";
+import {WalletIterable} from "./iterables/auto-pagination/wallet-iterable";
+import {WalletPageIterable} from "./iterables/pagewise/wallet-page-iterable";
+import {SignatureEncoding} from "./types/common";
 import {Waas} from "./waas";
 import {Wallet} from "./wallet";
 import {sandbox} from "./utils/spec-helpers";
@@ -51,7 +55,7 @@ describe("Wallet", function() {
                 response: {},
             });
             const w = new Wallet(this.noAuthWaas);
-            await assert.rejects(async () => w.create(dummyWalletName), ConflictError);
+            await assert.rejects(async () => w.create({wallet: dummyWalletName}), ConflictError);
         });
 
         it("should throw a GeneralError for any other errors", async function() {
@@ -62,7 +66,7 @@ describe("Wallet", function() {
                 response: {message},
             });
             const w = new Wallet(this.noAuthWaas);
-            await assert.rejects(async () => w.create(dummyWalletName), e => {
+            await assert.rejects(async () => w.create({wallet: dummyWalletName}), e => {
                 assert.ok(e instanceof GeneralError);
                 assert.strictEqual(e.status, status)
                 assert.strictEqual(e.message, message)
@@ -79,22 +83,55 @@ describe("Wallet", function() {
     });
 
     describe("list", function() {
-        it("should not throw when called without arguments", async function() {
+
+        const singlePageResponse: IWalletSearchResponse = {
+            hits: {total: 0, hsm: 0},
+            list: [],
+            links: {next: null, previous: null},
+        }
+
+        it("should call the deprecated endpoint if no argument is passed", async function() {
             const stub = this.waas.instance.get = this.sandbox.stub().resolvesArg(0);
             await new Wallet(this.waas).list();
-            assert.ok(stub.alwaysCalledWithExactly("wallet"));
+            assert.ok(stub.calledOnce);
+            assert.ok(stub.firstCall.calledWithExactly("wallet"));
         });
 
-        it("should verify the skiptoken was passed to the api call", async function() {
+        it("should call the deprecated endpoint with the passed skiptoken", async function() {
             const stub = this.waas.instance.get = this.sandbox.stub().resolvesArg(0);
             await new Wallet(this.waas).list("123");
-            stub.alwaysCalledWithExactly([/wallet?skiptoken=123/]);
+            assert.ok(stub.calledOnce);
+            assert.ok(stub.firstCall.calledWithExactly("wallet?skiptoken=123"));
         });
 
-        it("should throw on invalid skiptoken", async function() {
-            const stub = this.waas.instance.post = this.sandbox.stub().resolvesArg(0);
+        it("should call the non-deprecated endpoint if the object parameter overload is used", async function() {
+            const stub = this.waas.instance.get = this.sandbox.stub().resolves(singlePageResponse);
+            const iterable = new Wallet(this.waas).list({tag: ["my-tag", "test"]});
+            await iterable.next();
+            assert.ok(stub.calledOnce);
+            assert.ok(stub.firstCall.calledWith("wallets"));
+        });
+
+        it("should return a page-wise returning iterable if the autoPagination option is not enabled", function() {
+            const wallet = new Wallet(this.waas);
+            const iterable1 = wallet.list({});
+            assert.ok(iterable1 instanceof WalletPageIterable);
+            const iterable2 = wallet.list({}, {});
+            assert.ok(iterable2 instanceof WalletPageIterable);
+            const iterable3 = wallet.list({}, {autoPagination: false});
+            assert.ok(iterable3 instanceof WalletPageIterable);
+        });
+
+        it("should return an item-wise returning iterable if the autoPagination option is enabled", function() {
+            const iterable = new Wallet(this.waas).list({}, {autoPagination: true});
+            assert.ok(iterable instanceof WalletIterable);
+        });
+
+
+        it("should throw on invalid argument", async function() {
+            const stub = this.waas.instance.get = this.sandbox.stub().resolves(0);
             const w = new Wallet(this.waas);
-            await assert.rejects(async () => w.list(123 as any), /Expected \?String, got Number 123/);
+            await assert.rejects(async () => w.list(123 as any), /The passed argument for wallet search is invalid/);
             assert.strictEqual(stub.callCount, 0);
         });
     });
@@ -107,6 +144,51 @@ describe("Wallet", function() {
             await assert.doesNotReject(async () => w.create("some-wallet"));
             assert.strictEqual(stub.callCount, 2);
         });
+        it("should throw an error if an invalid method overload is used", async function() {
+            const wallet = new Wallet(this.waas);
+            await assert.rejects(() => wallet.create("my-wallet", "no hsm" as any), /Expected \?Boolean, got String/)
+            await assert.rejects(() => wallet.create(true as any), /The passed arguments does not match a valid method overload/)
+            await assert.rejects(() => wallet.create(["abc", "def"] as any), /The passed arguments does not match a valid method overload/)
+        });
+        it("should convert the tags to the format expected by the API", async function() {
+            const spy = this.waas.instance.post = this.sandbox.spy();
+            await new Wallet(this.waas, dummyWalletName).create({
+                tags: [
+                    {name: "test-tag", value: true},
+                    {name: "anotherTag", value: "foo"}
+                ]
+            });
+            const expectedTags = [{"test-tag": true}, {"anotherTag": "foo"}];
+            assert.deepStrictEqual(spy.firstCall.args[1].tags, expectedTags);
+        });
+    });
+
+    describe("update", function() {
+        it("should throw for invalid argument", async function() {
+            const stub = this.waas.instance.patch = this.sandbox.stub().resolves();
+            const w = new Wallet(this.waas);
+            await assert.rejects(async () => w.update(undefined as any), /Expected Object, got undefined/);
+            await assert.rejects(async () => w.update(123 as any), /Expected Object, got Number/);
+            assert.ok(stub.notCalled);
+        });
+
+        it("should execute the api call", async function() {
+            const spy = this.waas.instance.patch = this.sandbox.spy();
+            await new Wallet(this.waas, dummyWalletName).update({tags: []});
+            assert.strictEqual(spy.callCount, 1);
+            assert.ok(spy.firstCall.calledWith(`wallet/${dummyWalletName}`));
+        });
+        it("should convert the tags to the format expected by the API", async function() {
+            const spy = this.waas.instance.patch = this.sandbox.spy();
+            await new Wallet(this.waas, dummyWalletName).update({
+                tags: [
+                    {name: "test-tag", value: true},
+                    {name: "anotherTag", value: "foo"}
+                ]
+            });
+            const expectedTags = [{"test-tag": true}, {"anotherTag": "foo"}];
+            assert.deepStrictEqual(spy.firstCall.args[1].tags, expectedTags);
+        });
     });
 
     describe("replace", function() {
@@ -114,12 +196,19 @@ describe("Wallet", function() {
             const stub = this.waas.instance.put = this.sandbox.stub().resolves();
             const w = new Wallet(this.waas, dummyWalletName);
             await assert.doesNotReject(async () => w.replace());
-            assert.strictEqual(stub.callCount, 1);
+            await assert.doesNotReject(async () => w.replace({}));
+            assert.strictEqual(stub.callCount, 2);
+        });
+
+        it("should throw an error if an invalid method overload is used", async function() {
+            const wallet = new Wallet(this.waas);
+            await assert.rejects(() => wallet.replace(123 as any), /The passed arguments does not match a valid method overload/)
+            await assert.rejects(() => wallet.replace([] as any), /The passed arguments does not match a valid method overload/)
         });
 
         it("should execute the api call", async function() {
             const stub = this.waas.instance.put = this.sandbox.spy();
-            await new Wallet(this.waas, dummyWalletName).replace();
+            await new Wallet(this.waas, dummyWalletName).replace({useHsm: true});
             assert.strictEqual(stub.callCount, 1);
         });
     });

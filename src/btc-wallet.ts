@@ -1,16 +1,15 @@
-import {BlockchainWallet} from "./blockchain-wallet"
-import {recipientType, Waas} from "./waas";
+import {BlockchainWallet} from "./blockchain-wallet";
 import {
     IAsyncBitcoinTransactionOutput,
-    IAsyncEndpointResponse,
+    IBitcoinSweepResult,
     IBitcoinTransactionEstimation,
-    ITransmittableTransaction,
-    IRecipient,
-    ITransaction,
-    IWalletBalance,
-    IBitcoinSweepResult
-} from "./interfaces";
-import {Request} from "./request"
+    IBitcoinTransactionSentResponse
+} from "./interfaces/bitcoin";
+import {IAsyncEndpointResponse, IRecipient} from "./interfaces/common";
+import {ITransmittableTransaction} from "./interfaces/signature";
+import {IWalletBalance} from "./interfaces/wallet";
+import {recipientType, Waas} from "./waas";
+import {Request} from "./request";
 import {Wallet} from "./wallet";
 import * as t from "typeforce";
 
@@ -40,9 +39,10 @@ export class BtcWallet extends BlockchainWallet {
      * Send BTC to address from current wallet
      * @param recipients - Recipient configuration
      * @see [docs]{@link https://docs.tangany.com/#62b0f6e4-641b-4230-8cf2-1cb8b2181812}
+     * @deprecated Use {@link sendAsync} instead
      */
-    public async send(recipients: IRecipient[] | IRecipient): Promise<ITransaction> {
-        return this.waas.wrap<ITransaction>(() => this.waas.instance.post(`${this.baseUrl}/send`, this.getRecipientsData(recipients)));
+    public async send(recipients: IRecipient[] | IRecipient): Promise<IBitcoinTransactionSentResponse> {
+        return this.waas.wrap<IBitcoinTransactionSentResponse>(() => this.waas.instance.post(`${this.baseUrl}/send`, this.getRecipientsData(recipients)));
     }
 
     /**
@@ -62,6 +62,7 @@ export class BtcWallet extends BlockchainWallet {
      * to compatible blockchain networks at a later stage.
      * @param recipients - Recipient configuration
      * @see [docs]{@link https://docs.tangany.com/#53017845-c0e8-4100-bb24-6168b00bd225}
+     * @deprecated This synchronous version is deprecated, but in the future there will be an asynchronous version
      */
     public async sign(recipients: IRecipient[] | IRecipient): Promise<ITransmittableTransaction> {
         return this.waas.wrap<ITransmittableTransaction>(() => this.waas.instance

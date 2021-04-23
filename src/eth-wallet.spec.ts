@@ -1,12 +1,15 @@
 import axios from "axios";
 import {EthContractWallet} from "./eth-contract-wallet"
 import {EthErc20Wallet} from "./eth-erc20-wallet";
-import {ISearchTxResponse} from "./interfaces"
+import {IEthereumTransactionSentResponse, ITransactionSearchResponse} from "./interfaces/ethereum";
+import {EthTransactionIterable} from "./iterables/auto-pagination/eth-transaction-iterable"
+import {EthTransactionPageIterable} from "./iterables/pagewise/eth-transaction-page-iterable"
 import {sandbox} from "./utils/spec-helpers";
 import * as assert from "assert";
 import {Waas} from "./waas";
 import {EthWallet} from "./eth-wallet";
 import {Wallet} from "./wallet";
+import {Monitor} from "./monitor";
 
 describe("EthWallet", function() {
     sandbox();
@@ -37,12 +40,19 @@ describe("EthWallet", function() {
 
     describe("send", function() {
         it("should execute the call", async function() {
-            const postSpy = this.waas.instance.post = this.sandbox.spy();
+            const hash = "0xd7532d29a2f29806e0aaed2eb3987be53ccd8689ec7ce9934532021f5c9708e3";
+            const response: IEthereumTransactionSentResponse = {
+                hash,
+                nonce: "123",
+                links: [{type: "GET", rel: "transaction", href: `/eth/transaction/${hash}`}]
+            }
+            const postStub = this.waas.instance.post = this.sandbox.stub().resolves(response);
             const wallet = new Wallet(this.waas, sampleWallet);
             const r = new EthWallet(this.waas, wallet);
             const validateSpy = this.sandbox.spy(r, "validateRecipient");
-            await r.send({to: sampleAddress, amount: "0.1", data: "0xf03"});
-            assert.strictEqual(postSpy.callCount, 1);
+            const tx = await r.send({to: sampleAddress, amount: "0.1", data: "0xf03"});
+            assert.strictEqual(tx.hash, hash);
+            assert.strictEqual(postStub.callCount, 1);
             assert.strictEqual(validateSpy.callCount, 1);
         });
     });
@@ -95,10 +105,26 @@ describe("EthWallet", function() {
         });
     });
 
-    // The method only calls the general function for wrapping search queries and this is tested in detail separately anyway.
     describe("getTransactions", function() {
+
+        it("should return a page-wise returning iterable if the autoPagination option is not enabled", function() {
+            const ethWallet = new EthWallet(this.waas, new Wallet(this.waas, sampleWallet));
+            const iterable1 = ethWallet.getTransactions({});
+            assert.ok(iterable1 instanceof EthTransactionPageIterable);
+            const iterable2 = ethWallet.getTransactions({}, {});
+            assert.ok(iterable2 instanceof EthTransactionPageIterable);
+            const iterable3 = ethWallet.getTransactions({}, {autoPagination: false});
+            assert.ok(iterable3 instanceof EthTransactionPageIterable);
+        });
+
+        it("should return an item-wise returning iterable if the autoPagination option is enabled", function() {
+            const ethWallet = new EthWallet(this.waas, new Wallet(this.waas, sampleWallet));
+            const iterable = ethWallet.getTransactions({}, {autoPagination: true});
+            assert.ok(iterable instanceof EthTransactionIterable);
+        });
+
         it("should execute the api call", async function() {
-            const sampleResponse: ISearchTxResponse = {
+            const sampleResponse: ITransactionSearchResponse = {
                 hits: {total: 4},
                 list: [
                     {
@@ -182,6 +208,15 @@ describe("EthWallet", function() {
             const ethWallet = new EthWallet(this.waas, wallet);
             const contractWallet = ethWallet.contract("0xC32AE45504Ee9482db99CfA21066A59E877Bc0e6");
             assert.ok(contractWallet instanceof EthContractWallet);
+        });
+    });
+
+    describe("monitor", function() {
+        it("should return a Monitor instance", function() {
+            const wallet = new Wallet(this.waas, sampleWallet);
+            const ethWallet = new EthWallet(this.waas, wallet);
+            const monitor = ethWallet.monitor("any-monitor-id");
+            assert.ok(monitor instanceof Monitor);
         });
     });
 });

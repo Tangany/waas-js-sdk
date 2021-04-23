@@ -1,5 +1,5 @@
 import * as t from "typeforce";
-import {IBitcoinTransactionStatus, IBtcStatus} from "./interfaces";
+import {IBitcoinTransaction, IBtcStatus} from "./interfaces/bitcoin";
 import {Waas} from "./waas";
 import {IWaasMethod} from "./waas-method";
 
@@ -24,8 +24,8 @@ export class Bitcoin implements IWaasMethod {
      * Returns the status for a Bitcoin transaction
      * @see [docs]{@link https://docs.tangany.com/#e9f7074c-50ea-432c-8835-1d278ad68f1c}
      */
-    public async get(): Promise<IBitcoinTransactionStatus> {
-        return this.waas.wrap<IBitcoinTransactionStatus>(() => this.waas.instance.get(`btc/transaction/${this.txHash}`));
+    public async get(): Promise<IBitcoinTransaction> {
+        return this.waas.wrap<IBitcoinTransaction>(() => this.waas.instance.get(`btc/transaction/${this.txHash}`));
     }
 
     /**
@@ -41,10 +41,10 @@ export class Bitcoin implements IWaasMethod {
      * @param [timeout] - reject timeout in ms
      * @param [ms] - milliseconds delay between api polling attempts
      */
-    public async wait(timeout = 20e3, ms = 8e2): Promise<IBitcoinTransactionStatus> {
+    public async wait(timeout = 20e3, ms = 8e2): Promise<IBitcoinTransaction> {
         const call = () => this.get()
 
-        return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IBitcoinTransactionStatus>;
+        return Waas.waitForTxStatus(call, this.txHash, timeout, ms) as Promise<IBitcoinTransaction>;
     }
 
     /**

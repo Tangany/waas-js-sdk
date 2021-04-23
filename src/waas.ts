@@ -1,13 +1,15 @@
 import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} from "axios";
 import Bottleneck from "bottleneck";
 import * as Debug from "debug";
+import * as qs from "qs";
 import * as t from "typeforce";
 import {Bitcoin} from "./btc";
 import {AuthenticationError, ConflictError, GeneralError, MiningError, NotFoundError} from "./errors";
 import {Ethereum} from "./eth";
-import {BlockchainTransactionStatuses, IBlockchainTransactionStatus, IWaasError, WaasErrorResponse} from "./interfaces";
+import {IWaasError} from "./interfaces/common";
+import {Transaction, WaasErrorResponse} from "./types/common";
 import {limiter} from "./utils/limiter";
-import {Request} from "./request"
+import {Request} from "./request";
 import {Wallet} from "./wallet";
 import {poll} from "./utils/polling-helper";
 
@@ -67,6 +69,7 @@ interface IWaaSOptions {
     ethereumGasPrice?: string;
     ethereumGas?: number;
     ethereumNonce?: number;
+    ethereumChainId?: number;
     useGasTank?: boolean;
     bitcoinNetwork?: BitcoinNetwork;
     bitcoinTxConfirmations?: BlockchainTxConfirmations | number;
@@ -86,11 +89,6 @@ export const ethereumRecipientType = t.compile({
     amount: "?String",
     data: "?String",
 });
-
-export interface IWaitForTxStatus {
-    status: BlockchainTransactionStatuses;
-    response: IBlockchainTransactionStatus;
-}
 
 /**
  * Instantiates a new API interface. Multiple instances with different settings can run in parallel
@@ -125,8 +123,8 @@ export class Waas {
      * @param [timeout] - if the statusGetterCall did not resolved during the timeout period (in ms) the function will reject
      * @param [ms] - milliseconds delay between api polling attempts
      */
-    public static async waitForTxStatus(statusGetterCall: () => Promise<IBlockchainTransactionStatus>, hash?: string, timeout = 20e3, ms = 400): Promise<IBlockchainTransactionStatus> {
-        const validate = (s: IBlockchainTransactionStatus) => {
+    public static async waitForTxStatus(statusGetterCall: () => Promise<Transaction>, hash?: string, timeout = 20e3, ms = 400): Promise<Transaction> {
+        const validate = (s: Transaction) => {
             switch (s.status) {
                 case "confirmed":
                     return true
@@ -138,7 +136,7 @@ export class Waas {
             }
         }
 
-        return poll<IBlockchainTransactionStatus>(statusGetterCall, validate, `transaction status ${hash}`, timeout, ms)
+        return poll<Transaction>(statusGetterCall, validate, `transaction status ${hash}`, timeout, ms)
     }
 
     public instance: AxiosInstance;
@@ -174,6 +172,7 @@ export class Waas {
             ethereumGasPrice: "?String",
             ethereumGas: "?Number",
             ethereumNonce: "?Number",
+            ethereumChainId: "?Number",
             useGasTank: "?Boolean",
             bitcoinNetwork: "?String",
             bitcoinTxSpeed: "?String",
@@ -202,6 +201,9 @@ export class Waas {
                 },
             },
             responseType: "json",
+            paramsSerializer: (params: any): string => {
+                return qs.stringify(params, {arrayFormat: 'repeat'});
+            },
         };
 
         if (_options.vaultUrl) {
@@ -224,6 +226,9 @@ export class Waas {
         }
         if (_options.ethereumNonce){
             api.headers["tangany-ethereum-nonce"] = _options.ethereumNonce;
+        }
+        if (_options.ethereumChainId){
+            api.headers["tangany-ethereum-chain-id"] = _options.ethereumChainId;
         }
         if (_options.useGasTank) {
             api.headers["tangany-use-gas-tank"] = _options.useGasTank;

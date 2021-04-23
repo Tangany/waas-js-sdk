@@ -1,10 +1,14 @@
 import * as assert from "assert";
 import axios from "axios";
-import {SinonFakeTimers} from "sinon"
+import {SinonFakeTimers} from "sinon";
 import {MiningError, TimeoutError} from "./errors";
 import {isBitcoinMiningErrorData} from "./errors/mining-error";
 import {Ethereum} from "./eth";
-import {IBlockchainTransactionStatus, IEthereumTransactionStatus, ISearchTxResponse} from "./interfaces";
+import {EthMonitorSearch} from "./eth-monitor-search";
+import {IEthereumTransaction, ITransactionSearchResponse} from "./interfaces/ethereum";
+import {EthTransactionIterable} from "./iterables/auto-pagination/eth-transaction-iterable";
+import {EthTransactionPageIterable} from "./iterables/pagewise/eth-transaction-page-iterable";
+import {Transaction} from "./types/common";
 import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";
 
@@ -56,10 +60,24 @@ describe("Ethereum", function() {
         });
     });
 
-    // The method only calls the general function for wrapping search queries and this is tested in detail separately anyway.
     describe("getTransactions", function() {
+        it("should return a page-wise returning iterable if the autoPagination option is not enabled", function() {
+            const eth = new Ethereum(this.waas);
+            const iterable1 = eth.getTransactions({});
+            assert.ok(iterable1 instanceof EthTransactionPageIterable);
+            const iterable2 = eth.getTransactions({}, {});
+            assert.ok(iterable2 instanceof EthTransactionPageIterable);
+            const iterable3 = eth.getTransactions({}, {autoPagination: false});
+            assert.ok(iterable3 instanceof EthTransactionPageIterable);
+        });
+
+        it("should return an item-wise returning iterable if the autoPagination option is enabled", function() {
+            const iterable = new Ethereum(this.waas).getTransactions({}, {autoPagination: true});
+            assert.ok(iterable instanceof EthTransactionIterable);
+        });
+
         it("should execute the api call", async function() {
-            const sampleResponse: ISearchTxResponse = {
+            const sampleResponse: ITransactionSearchResponse = {
                 hits: {total: 4},
                 list: [
                     {
@@ -96,7 +114,7 @@ describe("Ethereum", function() {
             const stub = this.sandbox.stub()
             this.waas.instance.get = stub;
             const timer: SinonFakeTimers = this.sandbox.useFakeTimers({toFake: ["setInterval"]}); // fake the timer
-            const status: IBlockchainTransactionStatus = {isError: false, blockNr: 777, status: "confirmed"} as any
+            const status: Transaction = {isError: false, blockNr: 777, status: "confirmed"} as any
             stub.resolves(status);
 
             await Promise.all([
@@ -118,7 +136,7 @@ describe("Ethereum", function() {
                         if (isBitcoinMiningErrorData(r.txData)) {
                             throw new Error("invalid error type");
                         }
-                        const txData = (r.txData) as IEthereumTransactionStatus;
+                        const txData = (r.txData) as IEthereumTransaction;
                         assert.strictEqual(txData.isError, true);
                         assert.strictEqual(txData.blockNr, undefined);
                     }),
@@ -152,6 +170,13 @@ describe("Ethereum", function() {
             const address = "0xC32AE45504Ee9482db99CfA21066A59E877Bc0e6";
             const c = new Ethereum(this.waas).contract(address);
             assert.strictEqual(c.address, address);
+        });
+    });
+
+    describe("monitor", function() {
+        it("should return an EthMonitorSearch instance", async function() {
+            const monitor = new Ethereum(this.waas).monitor();
+            assert.ok(monitor instanceof EthMonitorSearch);
         });
     });
 

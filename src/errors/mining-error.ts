@@ -1,18 +1,20 @@
+import {IBitcoinTransaction} from "../interfaces/bitcoin";
+import {IEthereumTransaction} from "../interfaces/ethereum";
+import {Transaction} from "../types/common";
 import {HttpError} from "./http-error";
-import {IBitcoinTransactionStatus, IBlockchainTransactionStatus, IEthereumTransactionStatus} from "../interfaces";
 
 export class MiningError extends HttpError {
-    constructor(public readonly txData: IBlockchainTransactionStatus, message = "Transaction was not mined due to an error") {
+    constructor(public readonly txData: Transaction, message = "Transaction was not mined due to an error") {
         super(message, 400);
         this.name = this.constructor.name;
         Object.setPrototypeOf(this, MiningError.prototype);
     }
 }
 
-export function isEthereumMiningErrorData(txData: IBlockchainTransactionStatus): txData is IEthereumTransactionStatus {
+export function isEthereumMiningErrorData(txData: Transaction): txData is IEthereumTransaction {
     return txData.hasOwnProperty("isError");
 }
 
-export function isBitcoinMiningErrorData(txData: IBlockchainTransactionStatus): txData is IBitcoinTransactionStatus {
+export function isBitcoinMiningErrorData(txData: Transaction): txData is IBitcoinTransaction {
     return !isEthereumMiningErrorData(txData);
 }

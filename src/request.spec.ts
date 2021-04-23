@@ -2,7 +2,8 @@ import * as assert from "assert";
 import axios from "axios";
 import {SinonFakeTimers} from "sinon"
 import {TimeoutError} from "./errors"
-import {IAsyncEthereumTransactionOutput, IAsyncRequestStatus} from "./interfaces"
+import {IAsyncRequestStatus} from "./interfaces/common";
+import {IAsyncEthereumTransactionOutput} from "./interfaces/ethereum"
 import {Request} from "./request";
 import {sandbox} from "./utils/spec-helpers";
 import {Waas} from "./waas";
@@ -48,7 +49,9 @@ describe("Request", function() {
                     hash: "0x9f4eb3fe6da8377f5316b2c2103583e88730d273a318459098867fd8ad417d43",
                     blockNr: 7675874,
                     data: "0xf00ba7",
-                    status: "confirmed"
+                    status: "confirmed",
+                    nonce: 1234,
+                    links: [],
                 },
                 created: new Date(),
                 updated: new Date(),

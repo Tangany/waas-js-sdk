@@ -39,7 +39,7 @@ describe("WaaS sample wallet workflow", function () {
 
 	it("should fail creating a wallet with occupied name", async function () {
 		assert.ok(createdWallet, "cannot run without previous tests");
-		await assert.rejects(async () => api.wallet().create(createdWallet), e => {
+		await assert.rejects(async () => api.wallet().create({ wallet: createdWallet }), e => {
 			assert.ok(e instanceof ConflictError);
 			// Check properties against undefined, null and empty strings (https://stackoverflow.com/a/5515349)
 			assert.ok(e.status);
@@ -64,6 +64,30 @@ describe("WaaS sample wallet workflow", function () {
 		assert.ok(signatureP1363);
 		const isValidP1363 = await walletApi.verifySignature(payload, signatureP1363, "ieee-p1363");
 		assert.ok(isValidP1363);
+	});
+
+	it("should update the created wallet", async function () {
+		assert.ok(createdWallet, "cannot run without previous tests");
+
+		const wallet = api.wallet(createdWallet);
+		const originalWallet = await wallet.get();
+		const updatedWallet = await wallet.update({
+			tags: [
+				{ name: "my-tag", value: "This is a test" },
+				{ name: "foo", value: true }
+			]
+		});
+
+		const expectedTags = [
+			{ "my-tag": "This is a test" },
+			{ "foo": true }
+		];
+		assert.deepStrictEqual(updatedWallet.tags, expectedTags);
+
+		// Verify that no property has changed except the one we wanted to update
+		delete originalWallet.tags;
+		delete updatedWallet.tags;
+		assert.deepStrictEqual(originalWallet, updatedWallet);
 	});
 
 	it("should replace the created wallet with a new version", async function(){

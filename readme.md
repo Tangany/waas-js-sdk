@@ -24,20 +24,11 @@ const api = new Waas();
 
 // e.g. fetch all client wallets
 (async () => {
-   let skiptoken = undefined;
-
-    async function listNextPage () {
-        const res = await api.wallet().list(skiptoken);
-        skiptoken = res.skiptoken;
-
-        return res;
+    const walletIterable = api.wallet().list({ sort: "createddesc" });
+    for await (const page of walletIterable) {
+        console.log(`Page with ${page.list.length} of a total of ${page.hits.total} wallets fetched. Details for the first wallet of this page:`);
+        console.log(await page.list[0].get());
     }
-
-    do {
-        const { list } = await listNextPage();
-        console.log(list);
-    }
-    while (!!skiptoken); // fetch until no skiptoken is returned in the response
 })();
 ```
 
@@ -71,6 +62,7 @@ ethereumTxSpeed |  Additional gas fee that is added to the base gas fee for the 
 ethereumGasPrice | Enforces custom base transaction fee in wei. This prevents the dynamic gas price calculation by the network and nullifies `ethereumTxSpeed`. Example: `7000000000` | `auto` |
 ethereumGas | Enforces custom amount of transaction gas. Example: `21000` | `auto` |
 ethereumNonce | Enforces custom transaction nonce. Example: `123` | `auto` |
+ethereumChainId | Enforces custom chain id. Example: `9876` | `auto` |
 useGasTank | Allows to pre-fund the transaction fee for the desired wallet transaction. Supported values: `false`, `true` | `false`
 bitcoinNetwork | Public Bitcoin network name. Supported networks: `bitcoin`, `testnet` | `bitcoin` |
 bitcoinTxConfirmations | Minimum amount of block confirmations required for Bitcoin balance outputs ("utxo", "coins") to be included in the total wallet balance calculation. The exclusion of unconfirmed outputs prevents the posthumous invalidation of own wallet transaction by the parent utxo sending party. Either a numeric value or one of the following levels can be set, each corresponding to a number of target block confirmations: `none`: 0, `default`: 1, `secure`: 6 | `default` |
@@ -85,14 +77,42 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 ````javascript
 (async () => {
     const api = new Waas();
-    // list all wallets
+
+    // Note: Temporarily, list() returns the fully populated list, thus calling the deprecated endpoint to avoid a breaking change.
+    // The new endpoint with extended parameters and pagination is used if you pass an object containing the filters instead of a skiptoken.
+    // Currently, you must therefore pass an empty object if you want to use the new endpoint with the default settings.
     const { list } = await api.wallet().list();
-    //  create a new wallet
-    const { wallet, security } = await api.wallet().create("some-other-wallet", false);
+    const walletIterable1 = api.wallet().list({});
+    const walletIterable2 = api.wallet().list({ sort: "createddesc" });
+    for await (const {hits, list} of walletIterable2) {
+        // Process the data of the current page
+    }
+
+    //  create a new wallet (all properties are optional)
+    const {wallet, security} = await api.wallet().create({
+        wallet: "some-other-wallet",
+        useHsm: false,
+        tags: [
+            {name: "isTest", value: true},
+            {name: "another-tag", value: 123}
+        ]
+    });
+
     //  fetch a wallet
     const { created } = await api.wallet(wallet).get();
+
+    // partially update a wallet
+    const updatedWallet = await api.wallet(wallet).update({
+        // The passed tag array overwrites the previous value and therefore must contain all desired values
+        tags: [
+            {name: "isTest", value: true},
+            {name: "additionalTag", value: 456}
+        ]
+    });
+
     // replace a wallet
     const { version } = await api.wallet(wallet).replace();
+
     //  delete a wallet
     const { scheduledPurgeDate, recoveryId } = await api.wallet(wallet).delete();
 })();
@@ -135,34 +155,10 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     const api = new Waas().wallet("my-wallet");
     // estimate transaction fee
     const {gas, gasPrice, fee} = await api.eth().estimateFee({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
-    // send Ether
-    const { hash } = await api.eth().send({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // send Ether asynchronously (see examples for request interface to retrieve status details)
     const req = await api.eth().sendAsync({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
-    // create a signed transaction that can be manually transmitted
-    const { rawTransaction } = await api.eth().sign({to: someOtherWalletAddress, amount: "0.043", data: "0xf03"});
     // get eth balance and wallet address
     const { currency, balance, address } = await api.eth().get();
-})();
-````
-
-#### Ethereum ERC20 token interface for wallet
-[*Wallet based calls for Ethereum ERC20 token management*](https://docs.tangany.com/#1cbcb11f-f2ca-4334-82b3-9729f4d5e7d8)
-````javascript
-(async () => {
-    const api = new Waas().wallet("my-wallet").eth().erc20(tokenAddress);
-    // send token
-    const { hash } = await api.send({to: someOtherWalletAddress, amount: "0.043"});
-    // get token balance
-    const { currency, balance, address } = await api.get();
-     // mint token
-    await api.mint({amount: "12.291", to: someOtherWalletAddress}); // assuming myWalletAddress is erc20token's minter
-    // approve token withdrawal
-    await api.approve({to: someOtherWalletAddress, amount: "213"});
-    // withdraw pre-approved tokens
-    await new Waas().wallet("some-other-wallet").eth().erc20(tokenAddress).transferFrom({from: myWalletAddress, amount: "213"});
-    // burn token
-    await new Waas().wallet("some-other-wallet").eth().erc20(tokenAddress).burn({amount: "2"});
 })();
 ````
 
@@ -176,7 +172,7 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
         inputs: [someOtherWalletAddress, "2500000000000000"]
     }
     // estimate transaction fee
-    const {gas, gasPrice, fee} = await api.estimateFee(contractCall);
+    const {gas, gasPrice, fee, data} = await api.estimateFee(contractCall);
     // send token asynchronously (see examples for request interface to retrieve status details)
     const req = await api.sendAsync(contractCall);
     // execute readonly contract function on behalf the given wallet
@@ -250,13 +246,9 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
     // estimate fee for a transaction
     const { fee, feeRate } = await api.btc().estimateFee({to: someAddress, amount: "0.021"});
     // send BTC to a single recipient
-    const { hash } = await api.btc().send({to: someAddress, amount: "0.021"});
+    const req1 = await api.btc().sendAsync({to: someAddress, amount: "0.021"});
     // send BTC to multiple recipients
-    await api.btc().send([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
-    // send BTC using an asynchronous request
     const sendReq = await api.btc().sendAsync([{to: someAddress, amount: "0.324"}, {to: someOtherAddress, amount: "0.021"}]);
-    // create a signed transaction that can be manually transmitted
-    const { rawTransaction } = await api.btc().sign({to: someAddress, amount: "0.021"});
     // get BTC balance and wallet address
     const { balance,address,currency } = await api.btc().get();
     // sweep wallet
@@ -285,6 +277,53 @@ For more examples check out the tests (e.g. [./test/*.e2e.js](./test/ethereum.e2
 })();
 ````
 
+#### Monitor interface
+WaaS monitors use webhooks to inform about transactions that meet the defined criteria.
+They can be utilized to reduce status polling when sending transactions or can e.g. notify about in- or outgoing transaction that exceed a certain value.
+
+```javascript
+(async () => {
+    const waas = new Waas();
+    const ethWalletApi = waas.wallet("my-wallet").eth();
+
+    // Get all monitors for all wallets of the current customer with default pagination settings
+    const iterable1 = await waas.eth().monitor().list();
+    // Get all monitors for wallet called "my-wallet" returned on pages with 15 items each
+    const iterable2 = await waas.eth().monitor().list({limit: 15, wallet: "my-wallet"});
+    // The previous call is equivalent to this one, which uses the wallet-specific method
+    const iterable3 = await ethWalletApi.monitor().list({limit: 15});
+    for await (const page of iterable3) {
+        for (const monitor of page.list) {
+            console.log(await monitor.get());
+            await monitor.update({description: "New description"});
+        }
+    }
+
+    // Create new monitor
+    const {monitor, status} = await ethWalletApi.monitor().create(monitorObj);
+
+    // Interact with a specific monitor
+    const specificMonitor = ethWalletApi.monitor("any-monitor-id");
+    const details = await specificMonitor.get();
+
+    // Partially update monitor
+    let updatedMonitor = await specificMonitor.update({description: "New description"});
+    updatedMonitor = await specificMonitor.update({
+        description: "Another text",
+        configuration: {
+            // Specify all properties that should be present in `configuration` after the update.
+            // This is because the endpoint overrides nested properties.
+        }
+    });
+
+    // Replace monitor, which requires a complete object, not a partial
+    updatedMonitor = await specificMonitor.replace(monitorToWrite);
+
+    // Delete the entire monitor
+    await specificMonitor.delete();
+})();
+```
+
 #### Node status
 Get status information about the [Bitcoin](https://docs.tangany.com/#15f3dbb7-84b6-4828-b866-52255f72b2bc)
 or [Ethereum](https://docs.tangany.com/#cb2713db-04dc-4003-94f7-b6eeb021a5ad) full node
@@ -296,6 +335,42 @@ or [Ethereum](https://docs.tangany.com/#cb2713db-04dc-4003-94f7-b6eeb021a5ad) fu
 })();
 ````
 
+## Item-wise returning iterables
+
+The asynchronous iterables returned by some methods for searching resources such as wallets or transactions return the full search results page per iteration by default.
+Since it may well be more convenient if the iterator returns the individual items like wallets instead of pages, there is the `autoPagination` option.
+Then, when iterating e.g. with `for await ... of` the iterable appears as if it were a single list of items, although page-transcending accesses may take place in the background.
+The option can be enabled in an additional object argument in the corresponding methods. In the current version it is set to `false` by default.
+
+Typically, the search methods support an optional `limit` parameter that overrides the default setting for the number of hits per page. Even with the `autoPagination` option, `limit` is not to be confused with the total number of resource items (such as wallets) that the iterator returns. However, `limit` can still be used to adjust the pagination mechanism as needed. This is not noticeable when using the item-wise returning iterables, but the number of HTTP requests in the background may differ.
+
+```javascript
+(async () => {
+    const api = new Waas().eth().monitor();
+
+    const monitorPageIterable = api.list();
+    for await (const page of monitorPageIterable) {
+        // The number of hits is only available through the iterator because it is the one that returns the pages
+        const count = page.hits.total;
+
+        for (const monitor of page.list) {
+            const details = await monitor.get();
+            await monitor.update({description: "Hello World"});
+        }
+    }
+
+
+    const monitorIterable = api.list({}, {autoPagination: true});
+
+    // The number of hits can be accessed independently of the iterator
+    const count = (await monitorIterable.hits).total;
+
+    for await (const monitor of monitorIterable) {
+        const details = await monitor.get();
+        await monitor.update({description: "Hello World"});
+    }
+})();
+```
 
 ## Affinity Cookies
 WaaS employs its own load-balanced full-node backend to transmit transactions to the blockchains. Due to the nature of blockchain, full nodes sync their states only in the event of a new block. One implication of this behavior is that sending multiple transactions from the same wallet during a time frame of a single block may lead to an overlap of backend memory pool assignments which subsequent may result in transactions being cancelled and discarded from the blockchain.
