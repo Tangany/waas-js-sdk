@@ -11,6 +11,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+### Changed
+
+## [1.3.0]
+
+### Fixed
+
+### Added
+
 * Support [WaaS 1.8](https://github.com/Tangany/Wallet-as-a-Service/blob/master/CHANGELOG.md#180---2021-03-10) (#60)
     * Add transaction monitors
     * Add wallet search
@@ -26,10 +34,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Deprecated
 
 Methods that use synchronous endpoints for sending are deprecated and will permanently cease function on 01 July 2021:
+
 * ERC20 methods
 * Synchronous sending of Ethereum or Bitcoin transactions
 * Signing Ethereum or Bitcoin transaction
-
 
 ## [1.2.0]
 
