@@ -12,16 +12,18 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 ### Changed
-- Change project license to MIT
 
 ## [1.3.1]
 
 ### Fixed
+
 - Bumped vulnerable lodash package to 4.17.21
 
-## [1.3.0]
+### Changed
 
-### Fixed
+- Change project license to MIT
+
+## [1.3.0]
 
 ### Added
 
@@ -35,8 +37,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     * Add option for item-wise returning iterables
     * Add global option to enforce custom chain id
 
-### Changed
-
 ### Deprecated
 
 Methods that use synchronous endpoints for sending are deprecated and will permanently cease function on 01 July 2021:
@@ -46,8 +46,6 @@ Methods that use synchronous endpoints for sending are deprecated and will perma
 * Signing Ethereum or Bitcoin transaction
 
 ## [1.2.0]
-
-### Fixed
 
 ### Added
 
@@ -61,13 +59,7 @@ Methods that use synchronous endpoints for sending are deprecated and will perma
     * Extend transaction search options
     * Add asynchronous Bitcoin transactions
 
-### Changed
-
 ## [1.1.0]
-
-### Fixed
-
-### Added
 
 * Supporting [WaaS 1.6](https://github.com/Tangany/Wallet-as-a-Service/blob/master/CHANGELOG.md#161---2020-08-12):
     * Call arbitrary readonly smart contract methods
@@ -81,8 +73,6 @@ Methods that use synchronous endpoints for sending are deprecated and will perma
 
 ## [1.0.0]
 
-### Fixed
-
 ### Added
 
 * Supporting [WaaS 1.5](https://tangany.com/blog/release-notes-1-5/):
@@ -93,17 +83,11 @@ Methods that use synchronous endpoints for sending are deprecated and will perma
     * Get status information about the Ethereum or Bitcoin full node
 * Added `wait` method for asynchronous requests
 
-### Changed
-
 ## [1.0.0-beta.9]
 
 ### Fixed
 
 * Fixed undefined hash parameter in ethereum transaction status request
-
-### Added
-
-### Changed
 
 ## [1.0.0-beta.8]
 
@@ -119,8 +103,6 @@ Methods that use synchronous endpoints for sending are deprecated and will perma
     * Universal Ethereum smart contracts
     * `ethereumGasPrice` & `useGasTank` header
 
-### Changed
-
 ## [1.0.0-beta.7]
 
 ### Fixed
@@ -131,13 +113,7 @@ Methods that use synchronous endpoints for sending are deprecated and will perma
 
 * Added [E2E code examples](./test/wallet.e2e.js) for a WaaS Wallet based workflow
 
-### Changed
-
 ## [1.0.0-beta.6]
-
-### Fixed
-
-### Added
 
 ### Changed
 
