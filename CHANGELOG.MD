@@ -14,6 +14,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 - Change project license to MIT
 
+## [1.3.1]
+
+### Fixed
+- Bumped vulnerable lodash package to 4.17.21
+
 ## [1.3.0]
 
 ### Fixed
